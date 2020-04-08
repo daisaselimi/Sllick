@@ -1,0 +1,6 @@
+framework module Pods_xChat {
+  umbrella header "Pods-xChat-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -1,0 +1,8 @@
+framework module Sinch {
+umbrella header "Sinch.h"
+
+export *
+module *
+
+{ export * }
+}
