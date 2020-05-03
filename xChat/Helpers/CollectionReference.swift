@@ -1,9 +1,9 @@
 //
 //  CollectionReference.swift
-//  iChat
+//  Sllick
 //
-//  Created by David Kababyan on 08/06/2018.
-//  Copyright © 2018 David Kababyan. All rights reserved.
+//  Created by Isa  Selimi on 15.10.19.
+//  Copyright © 2019 com.isaselimi. All rights reserved.
 //
 
 import Foundation

@@ -1,6 +1,6 @@
 //
 //  GroupViewController.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 10.11.19.
 //  Copyright © 2019 com.isaselimi. All rights reserved.
@@ -43,7 +43,7 @@ class GroupViewController: UIViewController, UIImagePickerControllerDelegate, UI
         groupMembersCollectionView.dataSource = self
         tapGestureRecognizer.addTarget(self, action: #selector(avatarImageTap))
         cameraButtonOutlet.addGestureRecognizer(tapGestureRecognizer)
-        ProgressHUD.show()
+          ProgressHUD.show()
         
         getGroupMembers(completion: { (users) in
             self.allMembers = users
@@ -60,7 +60,7 @@ class GroupViewController: UIViewController, UIImagePickerControllerDelegate, UI
                 self.groupMembersCollectionView.setEmptyMessage("No members to show")
             }
             self.groupMembersCollectionView.reloadData() {
-                ProgressHUD.dismiss()
+                   ProgressHUD.dismiss()
                 print("xxxxxx")
             }
         })
@@ -99,7 +99,7 @@ class GroupViewController: UIViewController, UIImagePickerControllerDelegate, UI
         if !firstLoad {
             groupMembersCollectionView.reloadData()
             self.navigationItem.rightBarButtonItems?.first?.isEnabled = false
-            ProgressHUD.show()
+              ProgressHUD.show()
             Group.getGroup(groupId: group[kGROUPID]! as! String, completion: { updatedGroup in
                 self.group = updatedGroup
                 self.navigationItem.rightBarButtonItems?.first?.isEnabled = true
@@ -111,7 +111,7 @@ class GroupViewController: UIViewController, UIImagePickerControllerDelegate, UI
                                           self.allMembersToPush = self.group[kMEMBERSTOPUSH] as! [String]
                                           self.allMembers = users
                                           self.groupMembersCollectionView.reloadData() {
-                                              ProgressHUD.dismiss()
+                                                 ProgressHUD.dismiss()
                                           }
                     } else {
                          self.groupMembersCollectionView.setEmptyMessage("No members to show")
@@ -226,7 +226,7 @@ class GroupViewController: UIViewController, UIImagePickerControllerDelegate, UI
 ////        let i = navigationController?.viewControllers.firstIndex(of: self)
 ////        let previousViewController = navigationController?.viewControllers[i!-1] as! ChatViewController
 //        self.navigationController?.pushViewController(userVC, animated: true)
-        ProgressHUD.show()
+          ProgressHUD.show()
         let contactsVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(identifier: "contactsView") as! ContactsTableViewController
         contactsVC.isGroup = true
         contactsVC.isInviting = true
@@ -234,7 +234,7 @@ class GroupViewController: UIViewController, UIImagePickerControllerDelegate, UI
             contactsVC.group = tgroup
 
             self.navigationController?.pushViewController(contactsVC, animated: true)
-            ProgressHUD.dismiss()
+               ProgressHUD.dismiss()
         })
     }
     

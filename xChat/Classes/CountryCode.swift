@@ -1,6 +1,6 @@
 //
 //  CountryCode.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 6.11.19.
 //  Copyright © 2019 com.isaselimi. All rights reserved.

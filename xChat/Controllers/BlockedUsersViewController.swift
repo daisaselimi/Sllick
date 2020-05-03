@@ -1,6 +1,6 @@
 //
 //  BlockedUsersViewController.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 5.11.19.
 //  Copyright © 2019 com.isaselimi. All rights reserved.
@@ -72,11 +72,11 @@ class BlockedUsersViewController: UIViewController, UITableViewDataSource, UITab
     //MARK: Load blocked users
     func loadBlockedUsers() {
         if FUser.currentUser()!.blockedUsers.count > 0 {
-            ProgressHUD.show()
+              ProgressHUD.show()
             
             getUsersFromFirestore(withIds: FUser.currentUser()!.blockedUsers) { (allBlockedUsers) in
                 
-                ProgressHUD.dismiss()
+                   ProgressHUD.dismiss()
                 self.blockedUsers = allBlockedUsers
                 self.tableView.reloadData()
             }

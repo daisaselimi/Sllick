@@ -1,6 +1,6 @@
 //
 //  InviteUsersTableViewController.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 10.11.19.
 //  Copyright © 2019 com.isaselimi. All rights reserved.
@@ -28,7 +28,7 @@ class InviteUsersTableViewController: UITableViewController, UserTableViewCellDe
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-        ProgressHUD.dismiss()
+           ProgressHUD.dismiss()
     }
     
     override func viewDidLoad() {
@@ -151,7 +151,7 @@ class InviteUsersTableViewController: UITableViewController, UserTableViewCellDe
     //MARK: Helper
     
     func loadUsers(filter: String) {
-        ProgressHUD.show()
+          ProgressHUD.show()
         
         var query: Query!
         
@@ -171,12 +171,12 @@ class InviteUsersTableViewController: UITableViewController, UserTableViewCellDe
             
             if error != nil {
                 print(error!.localizedDescription)
-                ProgressHUD.dismiss()
+                   ProgressHUD.dismiss()
                 self.tableView.reloadData()
                 return
             }
             
-            guard let snapshot = snapshot else { ProgressHUD.dismiss(); return }
+            guard let snapshot = snapshot else {    ProgressHUD.dismiss(); return }
             
             if !snapshot.isEmpty {
                 
@@ -194,7 +194,7 @@ class InviteUsersTableViewController: UITableViewController, UserTableViewCellDe
             }
             
             self.tableView.reloadData()
-            ProgressHUD.dismiss()
+               ProgressHUD.dismiss()
         }
     }
     

@@ -1,6 +1,6 @@
 //
 //  CallTableViewController.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 18.3.20.
 //  Copyright © 2020 com.isaselimi. All rights reserved.
@@ -14,14 +14,14 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
     
     var allCalls: [CallClass] = []
     var filteredCalls: [CallClass] = []
-    
+    var firstLoadFinished = false
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     let searchController = UISearchController(searchResultsController: nil)
     var callListener: ListenerRegistration!
     
     override func viewWillAppear(_ animated: Bool) {
-        loadCalls()
+       loadCalls()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -30,17 +30,16 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
         tableView.tableFooterView = UIView()
-        
-        navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.searchController = searchController
+                tableView.separatorInset = UIEdgeInsets(top: 0, left: 45, bottom: 0, right: 0)
         navigationItem.hidesSearchBarWhenScrolling = true
+        
          self.navigationController?.navigationBar.shadowImage = UIImage()
         searchController.searchResultsUpdater = self
         searchController.dimsBackgroundDuringPresentation = false
         definesPresentationContext = true
+        loadCalls()
     }
     
     var firstLoad = false
@@ -97,6 +96,10 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
         }
     }
     
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        cell.separatorInset = .zero
+    }
+    
     //MARK: LoadCalls
     
     var lastDocumentSnapshot: DocumentSnapshot!
@@ -149,6 +152,7 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
     }
     
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+     
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
         //print("offsetY: \(offsetY) | contHeight-scrollViewHeight: \(contentHeight-scrollView.frame.height)")
@@ -253,6 +257,7 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
         let call = callClient()?.callUser(withId: userToCall)
         let callVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(identifier: "CallVC") as! CallViewController
         callVC._call = call
+        callVC.callingName = user.fullname
         self.present(callVC, animated: true, completion: nil)
          callToSave.saveCallInBackground()
     }

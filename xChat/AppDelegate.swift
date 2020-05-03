@@ -1,6 +1,6 @@
 //
 //  AppDelegate.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 15.10.19.
 //  Copyright © 2019 com.isaselimi. All rights reserved.
@@ -11,6 +11,30 @@ import Firebase
 import ProgressHUD
 import OneSignal
 import PushKit
+import FirebaseFirestore
+import GSMessages
+import GradientLoadingBar
+import Reachability
+import SystemConfiguration
+
+extension NSNotification.Name {
+    static let globalContactsVariable = NSNotification.Name(Bundle.main.bundleIdentifier! + ".globalContactsVariable")
+    static let internetConnectionState = NSNotification.Name(Bundle.main.bundleIdentifier! + ".internetConnectionState")
+}
+
+struct MyVariables {
+    static var globalContactsVariable: [String] = [] {
+           didSet {
+               NotificationCenter.default.post(name: .globalContactsVariable, object: nil)
+           }
+       }
+    
+    static var internetConnectionState: Bool = true {
+        didSet {
+            NotificationCenter.default.post(name: .internetConnectionState, object: nil)
+        }
+    }
+}
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -19,15 +43,44 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     //    var window: UIWindow?
     //    var authListener: AuthStateDidChangeListenerHandle?
     var orientationLock = UIInterfaceOrientationMask.all
-    
-    
+    var reachability: Reachability!
+        
+
+   
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        FirebaseApp.configure()
-
+        FirebaseApp.configure() 
+        
         UNUserNotificationCenter.current().delegate = self
-        print(FUser.currentUser()!.objectId)
+        
+        
+
+       
+        checkReachability()
+
+        setupUIForAlerts()
+        GradientLoadingBar.shared.gradientColors = [UIColor.getAppColor(.light), .systemTeal, UIColor.getAppColor(.dark)]
+        
+       UIBarButtonItem.appearance().setBackButtonTitlePositionAdjustment(UIOffset(horizontal: -1000.0, vertical: 0.0), for: .default)
+       // print(FUser.currentUser()!.objectId)
+
+   
+
+     
+        
+//        Database.database().reference(withPath: ".info/connected").observe(.value) { (snapshot) in
+//            if snapshot.value == nil {
+//                userStatusDatabaseRef.setValue(isOfflineForDatabase)
+//             return
+//            }
+//            userStatusDatabaseRef.onDisconnectSetValue(isOfflineForDatabase) { (error, dbref) in
+//                userStatusDatabaseRef.setValue(isOnlineForDatabase)
+//                userStatusDatabaseRef.setValue(isOnlineForDatabase)
+//            }
+//        }
+        
+  
         //reference(.User).document(FUser.currentUser()!.objectId).updateData([kCOUNTRYCODE : "KS"])
 //        reference(.User).getDocuments { (snapshot, error) in
 //            let docs = snapshot?.documents
@@ -199,6 +252,42 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         OneSignal.inFocusDisplayType = OSNotificationDisplayType.none
         return true
     }
+
+    func checkReachability() {
+       
+        do {
+            reachability = try Reachability()
+            reachability.whenReachable = { reachability in
+                if reachability.connection == .wifi {
+                    print("- - - - - - -- - - - - - - - - - - - - - - - -Reachable via WiFi")
+                } else {
+                    print("- - - - - - - - - - - - - - - - - - - - - -- - Reachable via Cellular")
+                }
+                MyVariables.internetConnectionState = true
+            }
+            
+            reachability.whenUnreachable = { _ in
+                print("- - - - - - - - - -Not reachable")
+                MyVariables.internetConnectionState = false
+            }
+            
+            do {
+                try reachability.startNotifier()
+            } catch {
+                print("Unable to start notifier")
+            }
+        } catch {
+            print("Unable to start reachability")
+        }
+    }
+    
+    func setupUIForAlerts() {
+        GSMessage.font = UIFont.boldSystemFont(ofSize: 14)
+      //  GSMessage.successBackgroundColor = UIColor(red: 142.0/255, green: 183.0/255, blue: 64.0/255,  alpha: 0.95)
+       // GSMessage.warningBackgroundColor = UIColor(red: 230.0/255, green: 189.0/255, blue: 1.0/255,   alpha: 0.95)
+        GSMessage.errorBackgroundColor   = UIColor.systemPink.withAlphaComponent(0.7)
+        //GSMessage.infoBackgroundColor    = UIColor(red: 44.0/255,  green: 187.0/255, blue: 255.0/255, alpha: 0.90)
+    }
     
     //    func goToApp() {
     //
@@ -243,7 +332,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         let dictionaryItem = dictionaryItm!["additionalData"]
         
         if (dictionaryItem?["inApp"]) == nil {
-            return
+            return 
         }
         
         getUsersFromFirestore(withIds: dictionaryItem!["memberIds"] as! [String]) { (users) in
@@ -273,9 +362,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             else {
                 let animated = (viewController.navigationController?.topViewController?.isKind(of: ChatsViewController.self))! ? true : false
                 if navigationController.viewControllers.count > 1 {
+
                     navigationController.popToRootViewController(animated: false)
                 }
-                
+                          UIApplication.getTopViewController()?.dismiss(animated: true, completion: nil)
                 
                 viewController.navigationController?.pushViewController(chatVC, animated: animated)
             }
@@ -301,14 +391,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             UIDevice.current.setValue(rotateOrientation.rawValue, forKey: "orientation")
         }
     }
-    
-    
-    //MARK: OneSignal
-    
-    
-    
-    
 }
+
 func createKeywords(word: String) -> Set<String> {
     var allKeywords: Set<String> = Set<String>()
     

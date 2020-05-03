@@ -1,6 +1,6 @@
 //
 //  OutgoingMessages.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 23.10.19.
 //  Copyright © 2019 com.isaselimi. All rights reserved.
@@ -41,7 +41,7 @@ class OutgoingMessage {
     
     //MARK: Send message
     
-    func sendMessage(chatRoomID: String, messageDictionary: NSMutableDictionary, memberIds: [String], membersToPush: [String], lastMessageType: String, isGroup: Bool = false, groupName: String = "", chatTitle: String) {
+    func sendMessage(chatRoomID: String, messageDictionary: NSMutableDictionary, memberIds: [String], membersToPush: [String], lastMessageType: String, isGroup: Bool = false, groupName: String = "", chatTitle: String, plainMessage: String = "") {
          
         let messageId = UUID().uuidString
         messageDictionary[kMESSAGEID] = messageId
@@ -58,11 +58,11 @@ class OutgoingMessage {
         var pushText = ""
         
         switch (messageDictionary[kTYPE] as! String) {
-            case kPICTURE:  pushText = "Sent a picture"
-            case kVIDEO: pushText = "Sent a video"
-            case kLOCATION: pushText = "Sent their location"
+            case kPICTURE:  pushText = "Sent a picture."
+            case kVIDEO: pushText = "Sent a video."
+            case kLOCATION: pushText = "Sent their location."
         default:
-            pushText = "Sent a message"
+            pushText = plainMessage != "" ? plainMessage : "Sent a messag."
         }
         
         sendPushNotification(membersToPush: membersToPush, message: pushText, isGroup: isGroup, groupName: groupName, memberIds: memberIds, chatRoomId: chatRoomID, titleName: chatTitle)

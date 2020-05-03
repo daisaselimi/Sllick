@@ -1,6 +1,6 @@
 //
 //  AudioViewController.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 28.10.19.
 //  Copyright © 2019 com.isaselimi. All rights reserved.

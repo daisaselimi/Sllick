@@ -1,6 +1,6 @@
 //
 //  UserTableViewCell.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 18.10.19.
 //  Copyright © 2019 com.isaselimi. All rights reserved.
@@ -35,10 +35,9 @@ class UserTableViewCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
     }
     
-    func generateCellWith(fUser: FUser, indexPath: IndexPath) {
+    func generateCellWith(fUser: FUser, indexPath: IndexPath, isOnline: Bool = false) {
         self.indexPath = indexPath
         self.fullNameLabel.text = fUser.fullname
-        
         if(fUser.avatar != "") {
             imageFromData(pictureData: fUser.avatar) { (image) in
                 if avatarImage != nil {

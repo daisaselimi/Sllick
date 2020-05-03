@@ -1,6 +1,6 @@
 //
 //  GroupTableViewController.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 1.12.19.
 //  Copyright © 2019 com.isaselimi. All rights reserved.
@@ -35,26 +35,34 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
     var firstLoad = false
     var groupChangedListener: ListenerRegistration?
     var muted = false
+    var groupImage: UIImage?
+    var groupTitle: String?
     
     override func viewDidLoad() {
         firstLoad = true
    
         super.viewDidLoad()
+        
      activityIndicator.isHidden = false
+         tableView.separatorInset = UIEdgeInsets(top: 0, left: 50, bottom: 0, right: 0)
           activityIndicator.hidesWhenStopped = true
+      //  groupNameTextField.addBottomBorder()
           activityIndicator.startAnimating()
         setupUI()
         allMembersToPush = group[kMEMBERSTOPUSH] as! [String]
         muted = !(group[kMEMBERSTOPUSH] as! [String]).contains(FUser.currentId())
         muteGroupButton.setTitle(muted ? "Unmute Group" : "Mute Group", for: .normal)
-        saveButtonOutlet.backgroundColor = UIColor.getAppColor(.light)
+        saveButtonOutlet.backgroundColor = .systemOrange
+//        saveButtonOutlet.layer.borderWidth = 0.5
+//        saveButtonOutlet.layer.borderColor = UIColor.secondaryLabel.cgColor
         groupMembersCollectionView.delegate = self
         groupMembersCollectionView.dataSource = self
+  
         tapGestureRecognizer.addTarget(self, action: #selector(avatarImageTap))
         removeKeyboardGestureRecognizer.addTarget(self, action: #selector(viewTapped))
         self.view.addGestureRecognizer(removeKeyboardGestureRecognizer)
         cameraButtonOutlet.addGestureRecognizer(tapGestureRecognizer)
-        ProgressHUD.show()
+       //   ProgressHUD.show()
         
         getGroupMembers(completion: { (users) in
             self.allMembers = users
@@ -64,7 +72,7 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
                 if !showedGroupTips {
                     let popTip = PopTip()
                               
-                              popTip.show(text: "Long press members' pictures to delete", direction: .none, maxWidth: 200, in: self.view, from: self.view.frame, duration: 10)
+                              popTip.show(text: "Long press members' pictures to remove them from group", direction: .none, maxWidth: 200, in: self.view, from: self.view.frame, duration: 10)
                               
                               popTip.entranceAnimation = .scale
                               popTip.actionAnimation = .bounce(5)
@@ -79,7 +87,7 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
                 self.groupMembersCollectionView.setEmptyMessage("No members to show")
             }
             self.groupMembersCollectionView.reloadData() {
-                ProgressHUD.dismiss()
+                   ProgressHUD.dismiss()
                 if let activityIndic = self.activityIndicator {
                     activityIndic.stopAnimating()
                 }
@@ -88,7 +96,10 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
             }
         })
         cameraButtonOutlet.isUserInteractionEnabled = true
-        self.navigationItem.rightBarButtonItems = [UIBarButtonItem(title: "Invite users", style: .plain, target: self, action: #selector(self.inviteUsers))]
+        var inviteImage = UIImage(systemName: "plus.circle.fill")
+        let inviteButton = UIBarButtonItem(image: inviteImage, style: .plain, target: self, action: #selector(self.inviteUsers))
+        inviteButton.tintColor = UIColor.systemIndigo
+        self.navigationItem.rightBarButtonItems = [inviteButton]
         self.navigationItem.largeTitleDisplayMode = .never
      
         // Do any additional setup after loading the view.
@@ -121,8 +132,7 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
 //                            } else {
 //                                imageFromData(pictureData: self.group[kAVATAR] as! String) { (image) in
 //                                    self.cameraButtonOutlet.image = image!
-//                                    self.groupIcon = image!
-//                                }
+//                                    self.groupIcon = image!f   }
 //                                
 //                            }
                          
@@ -158,6 +168,9 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
 
 
     
+    override func viewWillDisappear(_ animated: Bool) {
+         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+    }
     
     override func viewWillAppear(_ animated: Bool) {
   
@@ -165,7 +178,7 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
         if !firstLoad {
             groupMembersCollectionView.reloadData()
             self.navigationItem.rightBarButtonItems?.first?.isEnabled = false
-            ProgressHUD.show()
+           //   ProgressHUD.show()
             Group.getGroup(groupId: group[kGROUPID]! as! String, completion: { updatedGroup in
                 self.group = updatedGroup
                 self.navigationItem.rightBarButtonItems?.first?.isEnabled = true
@@ -177,7 +190,7 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
                         self.allMembersToPush = self.group[kMEMBERSTOPUSH] as! [String]
                         self.allMembers = users
                         self.groupMembersCollectionView.reloadData() {
-                            ProgressHUD.dismiss()
+                           //    ProgressHUD.dismiss()
                         }
                     } else {
                         self.groupMembersCollectionView.setEmptyMessage("No members to show")
@@ -248,13 +261,18 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
         
         var members = allMembers.map { $0.objectId }
         members.append(FUser.currentId())
+          self.navigationItem.rightBarButtonItems?.first?.isEnabled = false
         Group.updateGroup(groupId: group![kGROUPID] as! String, withValues: [kMEMBERS : members, kMEMBERSTOPUSH : allMembersToPush])
         Group.getGroup(groupId: group![kGROUPID] as! String) { (updatedGroup) in
+            self.group = updatedGroup
+              self.navigationItem.rightBarButtonItems?.first?.isEnabled = true
             self.delegate?.updatedGroupMembers(group: updatedGroup)
         }
        
+        var updateForMembers = members
+        updateForMembers.append(removedId)
         self.groupMembersCollectionView.reloadData()
-          updateExistingRecentWithNewValues(forMembers: [removedId], chatRoomId: group![kGROUPID] as! String, withValues: [kMEMBERS : members, kMEMBERSTOPUSH : allMembersToPush])
+          updateExistingRecentWithNewValues(forMembers: updateForMembers, chatRoomId: group![kGROUPID] as! String, withValues: [kMEMBERS : members, kMEMBERSTOPUSH : allMembersToPush])
     }
     
     var pendingToDelete: Set<String> = []
@@ -313,17 +331,13 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
         ////        let i = navigationController?.viewControllers.firstIndex(of: self)
         ////        let previousViewController = navigationController?.viewControllers[i!-1] as! ChatViewController
         //        self.navigationController?.pushViewController(userVC, animated: true)
-        ProgressHUD.show()
+  
         let contactsVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(identifier: "contactsView") as! ContactsTableViewController
         contactsVC.isGroup = true
         contactsVC.title = "Invite from contacts"
         contactsVC.isInviting = true
-        Group.getGroup(groupId: group[kGROUPID] as! String, completion: { (tgroup) in
-            contactsVC.group = tgroup
-            
+        contactsVC.group = self.group
             self.navigationController?.pushViewController(contactsVC, animated: true)
-            ProgressHUD.dismiss()
-        })
     }
     
     @IBAction func editButtonPressed(_ sender: Any) {
@@ -408,9 +422,12 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
     
     }
     
+    var groupId: String!
+    
     //MARK: Helpers
     
     func setupUI() {
+        
         self.title = "Group"
         groupNameTextField.text = (group[kNAME] as! String)
         imageFromData(pictureData: group[kAVATAR] as! String) { (avatarImage) in

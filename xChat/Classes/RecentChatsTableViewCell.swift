@@ -1,6 +1,6 @@
 //
 //  RecentChatsTableViewCell.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 22.10.19.
 //  Copyright © 2019 com.isaselimi. All rights reserved.
@@ -20,6 +20,19 @@ class RecentChatsTableViewCell: UITableViewCell {
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var messageCounterLabel: UILabel!
     @IBOutlet weak var messageCounterBackgroundView: UIView!
+    @IBOutlet weak var onlineIndicatorView: UIView!
+    @IBOutlet weak var activeView: UIView!
+    var profileIsEmpty: Bool = false
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+//
+//        self.avatarImageView.image = nil // or set a placeholder image
+//        nameLabel.text = ""
+//        lastMessageLabel.text = ""
+//        dateLabel.text = ""
+//        messageCounterLabel.text = ""
+    }
     
     var img: UIImage?
     
@@ -30,17 +43,21 @@ class RecentChatsTableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        
+
         messageCounterBackgroundView.layer.cornerRadius = messageCounterBackgroundView.frame.width / 2
+        onlineIndicatorView.layer.cornerRadius = onlineIndicatorView.frame.width / 2
+        activeView.layer.cornerRadius = activeView.frame.width / 2
         self.selectionStyle = .none
         tapGesture.addTarget(self, action: #selector(self.avatarTapped))
         avatarImageView.addGestureRecognizer(tapGesture)
         avatarImageView.isUserInteractionEnabled = true
         lastMessageLabel.textColor = .secondaryLabel
         dateLabel.textColor = .tertiaryLabel
-        messageCounterBackgroundView.backgroundColor = #colorLiteral(red: 0, green: 1, blue: 0.3892391806, alpha: 1)
+        messageCounterBackgroundView.backgroundColor = #colorLiteral(red: 0.0001922522367, green: 1, blue: 0.1971572093, alpha: 1)
         
     }
+    
+
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
@@ -53,11 +70,12 @@ class RecentChatsTableViewCell: UITableViewCell {
     
     //MARL: Generate cell
     
-    func generateCell(isGroup: Bool, recentChat: NSDictionary, indexPath: IndexPath) {
+    func generateCell(isGroup: Bool, recentChat: NSDictionary, indexPath: IndexPath, isOnline: Bool, tabBarController: UITabBarController) {
         
         self.indexPath = indexPath
         
         self.nameLabel.text = recentChat[kWITHUSERFULLNAME] as? String
+        onlineIndicatorView.isHidden = !isOnline
         
         var decryptedText = ""
         DispatchQueue.global().async {
@@ -96,6 +114,8 @@ class RecentChatsTableViewCell: UITableViewCell {
                 DispatchQueue.main.async {
                     
                     self.lastMessageLabel.text = messageContent
+   
+                    
                 }
             }
           
@@ -111,9 +131,10 @@ class RecentChatsTableViewCell: UITableViewCell {
                     self.avatarImageView.image = image
                 }else if !isGroup {
                     self.avatarImageView.image = UIImage(named: "avatarph")
+                  
                 } else{
                     self.avatarImageView.image = UIImage(named: "groupph")
-                                
+                    profileIsEmpty = true
                 }
                 self.img = avatarImageView.image
                 self.avatarImageView.maskCircle()

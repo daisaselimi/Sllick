@@ -1,6 +1,6 @@
 //
 //  ChatViewController.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 23.10.19.
 //  Copyright © 2019 com.isaselimi. All rights reserved.
@@ -17,6 +17,9 @@ import FirebaseFirestore
 import ProgressHUD
 import SKPhotoBrowser
 import OneSignal
+import GradientLoadingBar
+import Firebase
+
 
 
 
@@ -26,7 +29,6 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         return .portrait
     }
     
-    
     override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
         return .portrait
     }
@@ -34,10 +36,6 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     override var shouldAutorotate: Bool {
         return true
     }
-    
-    
-    
-    
     
     var chatRoomId: String!
     var memberIds: [String]!
@@ -57,6 +55,8 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     var loadedMessages: [NSDictionary] = []
     var allPictureMessages: [String] = []
     var initialLoadComplete = false
+    
+    var recentListener: ListenerRegistration!
     
     var withUsers: [FUser] = []
     
@@ -87,6 +87,8 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     var outgoingBubble: JSQMessagesBubbleImage?
     var incomingBubble: JSQMessagesBubbleImage?
     
+    private let gradientLoadingBar = GradientLoadingBar()
+    
     
     var leftBarButtonView: UIView = {
         let view = UIView(frame: CGRect(x: 0, y: 0, width: 200, height: 45))
@@ -100,7 +102,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     
     
     let titleLabel : UILabel = {
-        let title = UILabel(frame: CGRect(x: 40, y: 5, width: 300, height: 20))
+        let title = UILabel(frame: CGRect(x: 40, y: 5, width: 150, height: 20))
         title.textAlignment = .left
         title.font = UIFont(name: "Helvetica Neue", size: 18)
         return title
@@ -123,42 +125,104 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-//        let item = self.collectionView(self.collectionView, numberOfItemsInSection: 0) - 1
-//        let lastItemIndex = NSIndexPath(item: item, section: 0)
-//        self.collectionView.scrollToItem(at: lastItemIndex as IndexPath, at: .top, animated: true)
+        setNavigationBarAppearance()
+        if let viewWithTag = self.view.viewWithTag(0) {
+            viewWithTag.isHidden = false
+        }
+        //        let item = self.collectionView(self.collectionView, numberOfItemsInSection: 0) - 1
+        //        let lastItemIndex = NSIndexPath(item: item, section: 0)
+        //        self.collectionView.scrollToItem(at: lastItemIndex as IndexPath, at: .top, animated: true)
         //        AppDelegate.AppUtility.lockOrientation(UIInterfaceOrientationMask.portrait, andRotateTo: UIInterfaceOrientation.portrait)
-        checkForBackgroundImage()
+        
+        if !isGroup! {
+            recentListener = reference(.Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).addSnapshotListener({ (snapshot, error) in
+                guard let snapshot = snapshot else { return }
+                
+                if !snapshot.isEmpty {
+                
+                    let docs = snapshot.documents
+                    for doc in docs {
+                        self.membersToPush = doc[kMEMBERSTOPUSH] as! [String]
+                    }
+                }
+            })
+        }
+
+        
+        
         avatarButton.imageView?.contentMode = .scaleAspectFill
         avatarButton.layer.cornerRadius = 0.5 * avatarButton.bounds.size.width
         avatarButton.clipsToBounds = true
-        clearRecentCounter(chatRoomId: chatRoomId)
+     
     }
+    
+    func setNavigationBarAppearance() {
+
+
+    }
+    
+    
+    
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
+        recentListener?.remove()
+        gradientLoadingBar.fadeOut(duration: 0)
+        if let viewWithTag = self.view.viewWithTag(0) {
+            if  userDefaults.object(forKey: kBACKGROUBNDIMAGE) != nil {
+                self.view.subviews[0].backgroundColor = .systemBackground
+                self.view.window?.backgroundColor = .systemBackground
+                viewWithTag.isHidden = true
+            }
+            
+        }
         //        AppDelegate.AppUtility.lockOrientation(UIInterfaceOrientationMask.all)
         //        removeListeners()
+        //newChatListener.remove()
         clearRecentCounter(chatRoomId: chatRoomId)
     }
     
-  
+    @objc func internetConnectionChanged() {
+        if !MyVariables.internetConnectionState {
+            self.showMessage("No internet connection", type: .warning, options: [.autoHide(false), .hideOnTap(false)])
+            //self.loadViewIfNeeded()
+        }
+        else {
+            self.hideMessage()
+        }
+    }
+    
+    
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-      
+        
         outgoingBubble = JSQMessagesBubbleImageFactory()?.outgoingMessagesBubbleImage(with: UIColor(named: "outgoingBubbleColor"))
         incomingBubble = JSQMessagesBubbleImageFactory()?.incomingMessagesBubbleImage(with: UIColor(named: "incomingBubbleColor"))
     }
     
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-    
-      
+        //internetConnectionChanged()
+ 
+        checkForBackgroundImage()
+        clearRecentCounter(chatRoomId: chatRoomId)
+        
+        NotificationCenter.default.addObserver(self,
+                                                             selector: #selector(internetConnectionChanged),
+                                                             name: .internetConnectionState, object: nil)
+        self.view.backgroundColor = .systemBackground
+        self.showTypingIndicator = false
+        gradientLoadingBar.gradientColors =  [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
+        self.loadMessages()
+        navigationItem.backBarButtonItem = UIBarButtonItem(
+            title: "", style: .plain, target: nil, action: nil)
         if let isDeleted = isUserDeleted {
             if isDeleted {
                 
-                titleLabel.text = "Sent User"
+                titleLabel.text = "Sllick User"
                 self.inputToolbar.isHidden = true
                 
                 subTitleLabel.text = "Deleted account"
@@ -178,10 +242,19 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
             }
         }
         
+        if !isGroup! {
+            if let isDeleted = isUserDeleted {
+                if !isDeleted {
+                    listenForBlockStatus()
+                }
+            } else {
+                listenForBlockStatus()
+            }
+        }
         
-        self.loadMessages()
         
-        ProgressHUD.show()
+        self.gradientLoadingBar.fadeIn()
+        
         getUsersFromFirestore(withIds: memberIds) { (withUsers) in
             
             self.withUsers = withUsers
@@ -203,10 +276,16 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
             _ in
             UIImage(systemName: "paperclip")?.draw(in: CGRect(x: 0, y: 0, width: 22, height: 22))
         }
-        imgl = imgl.imageWithColor(color1: UIColor.getAppColor(.light))
+        imgl = imgl.imageWithColor(color1: UIColor(named: "outgoingBubbleColor")!)
         self.inputToolbar.contentView.leftBarButtonItem.setImage(imgl, for: .normal)
         
         navigationItem.largeTitleDisplayMode = .never
+        //
+        //            let navBarAppearance = UINavigationBarAppearance()
+        //        navBarAppearance.backgroundColor = nil
+        //        navBarAppearance.backIndicatorImage = nil
+        //             UINavigationBar.appearance(whenContainedInInstancesOf: [UINavigationController.self]).standardAppearance = navBarAppearance
+        //             UINavigationBar.appearance(whenContainedInInstancesOf: [UINavigationController.self]).scrollEdgeAppearance = navBarAppearance
         self.navigationItem.leftBarButtonItems = [UIBarButtonItem(image: UIImage(named: "Back"), style: .plain, target: self, action: #selector(self.backAction))]
         self.senderId = FUser.currentId()
         self.senderDisplayName = FUser.currentUser()!.firstname
@@ -236,8 +315,19 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         
         self.inputToolbar.contentView.rightBarButtonItem.setImage(img, for: .normal)
         self.inputToolbar.contentView.rightBarButtonItem.setTitle("", for: .normal)
-        self.inputToolbar.contentView.textView.backgroundColor = .systemBackground
+        self.inputToolbar.contentView.textView.backgroundColor = .clear
+        self.inputToolbar.setShadowImage(UIImage(), forToolbarPosition: .any)
         self.inputToolbar.contentView.textView.textColor = .label
+        self.inputToolbar.contentView.textView.placeHolder = "New message"
+        self.inputToolbar.contentView.textView.layer.borderColor = UIColor.clear.cgColor
+        // self.inputToolbar?.backgroundColor = .clear
+        //        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        //          self.navigationController?.navigationBar.shadowImage = UIImage()
+        //          self.navigationController?.navigationBar.backgroundColor = UIColor(named: "bwBackground")?.withAlphaComponent(0.9)
+        //          self.navigationController?.navigationBar.isTranslucent = true
+        //        self.inputToolbar?.setBackgroundImage(UIImage(), forToolbarPosition: .any, barMetrics: .default)
+        //self.inputToolbar?.backgroundColor = UIColor(named: "bwBackground")?.withAlphaComponent(0.9)
+        //self.inputToolbar?.isTranslucent = true
         
     }
     
@@ -245,7 +335,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     override func viewWillLayoutSubviews() {
         let value = UIInterfaceOrientation.portrait.rawValue
         UIDevice.current.setValue(value, forKey: "orientation")
-          
+        
     }
     
     func  createTypingObserver() {
@@ -311,7 +401,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         leftBarButtonView.addSubview(titleLabel)
         leftBarButtonView.addSubview(subTitleLabel)
         
-        let infoButton = UIBarButtonItem(image: UIImage(named: "info"), style: .plain, target: self, action: #selector(self.infoButtonPressed))
+        let infoButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain, target: self, action: #selector(self.infoButtonPressed))
         
         self.navigationItem.rightBarButtonItem = infoButton
         
@@ -412,7 +502,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         
         if withUsers.first == nil {
             subTitleLabel.text = "Deleted account"
-            titleLabel.text = "Sent User"
+            titleLabel.text = "Sllick User"
             avatarButton.setImage(UIImage(named: "avatarph"), for: .normal)
             self.inputToolbar.isHidden = true
             return
@@ -430,13 +520,30 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         
         titleLabel.text = withUser.fullname
         
-        if withUser.isOnline {
-            subTitleLabel.text = "Active now"
-        } else {
-            subTitleLabel.text = "Offline"
-        }
+        
+        
+        checkActivityStatus()
         
         avatarButton.addTarget(self, action: #selector(self.showUserProfile), for: .touchUpInside)
+    }
+    
+    func checkActivityStatus() {
+        Firestore.firestore().collection("status").whereField("userId", isEqualTo: withUsers.first!.objectId).addSnapshotListener { (snapshot, error) in
+            
+            guard let snapshot = snapshot else { return }
+            
+            if !snapshot.isEmpty {
+                let doc = snapshot.documents[0]
+                if doc["state"] as! String == "Online" {
+                    self.subTitleLabel.text = "Active now"
+                } else {
+                    let lastChanged = (doc["last_changed"] as! Timestamp)
+                    let timestamp = lastChanged.dateValue().timeIntervalSince1970
+                    let date = Date(timeIntervalSince1970: timestamp)
+                    self.subTitleLabel.text = "Active \(date.timeAgoSinceDate())"
+                }
+            }
+        }
     }
     
     func setUIForGroupChat() {
@@ -604,6 +711,9 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
             let message = messages[indexPath.row]
             var images = [SKPhoto]()
             let mediaItem = message.media as! JSQPhotoMediaItem
+            if mediaItem.image == nil {
+                return
+            }
             let photo = SKPhoto.photoWithImage(mediaItem.image!)
             images.append(photo)
             let browser = SKPhotoBrowser(photos: images)
@@ -715,22 +825,26 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     //MARK: JSQMessages Delegate functions
     //files image
     override func didPressAccessoryButton(_ sender: UIButton!) {
+        if !MyVariables.internetConnectionState {
+             self.showMessage("No internet connection", type: .warning, options: [.autoHide(false), .hideOnTap(false)])
+            return
+        }
         let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         let camera = Camera(delegate_: self)
         
         let takePhotoOrVideo = UIAlertAction(title: "Camera", style: .default) { (action) in
-            
+            checkCameraAccess(viewController: self)
             camera.PresentMultyCamera(target: self, canEdit: false)
         }
         
         let sharePhoto = UIAlertAction(title: "Photo Library", style: .default) { (action) in
-            
+            checkCameraAccess(viewController: self)
             camera.PresentPhotoLibrary(target: self, canEdit: false)
         }
         
         let shareVideo = UIAlertAction(title: "Video Library", style: .default) { (action) in
-            
+            checkCameraAccess(viewController: self)
             camera.PresentVideoLibrary(target: self, canEdit: false)
         }
         
@@ -751,7 +865,6 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         optionMenu.addAction(takePhotoOrVideo)
         optionMenu.addAction(sharePhoto)
         optionMenu.addAction(shareVideo)
-        optionMenu.addAction(shareLocation)
         optionMenu.addAction(cancelAction)
         
         //for iPad compatibility mode
@@ -774,13 +887,18 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     //send button
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
         
-        if text != "" {
+        if !text.trimmingCharacters(in: .whitespaces).isEmpty{
             print(text!)
             sendMessage(text: text, date: date, picture: nil, location: nil, video: nil, audio: nil)
             updateSendButton(isSend: false)
             self.collectionView.reloadData()
         }
         else {
+            if !MyVariables.internetConnectionState {
+                 self.showMessage("No internet connection", type: .warning, options: [.autoHide(false), .hideOnTap(false)])
+                  return
+              }
+             self.internetConnectionChanged()
             let audioVC = AudioViewController(delegate_: self)
             audioVC.presentAudioRecorder(target: self)
         }
@@ -800,7 +918,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     
     @objc func backAction() {
         removeListeners()
-        clearRecentCounter(chatRoomId: chatRoomId)
+        //clearRecentCounter(chatRoomId: chatRoomId)
         let i = navigationController?.viewControllers.firstIndex(of: self)
         if (navigationController?.viewControllers[i!-1] as? NewGroupViewController) != nil {
             self.navigationController?.popToRootViewController(animated: true)
@@ -810,12 +928,25 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         
     }
     
+    func listenForBlockStatus() {
+        reference(.User).document(memberIds.filter({ $0 != FUser.currentId()}).first!).addSnapshotListener { (document, error) in
+            
+            if let document = document {
+                if ((document[kBLOCKEDUSERID] as! [String]).contains(FUser.currentId())) {
+                    self.navigationController?.popToRootViewController(animated: true)
+                    
+                }
+            }
+            
+        }
+    }
+    
     //MARK: Custom send button
     func updateSendButton(isSend: Bool) {
         
         if isSend {
             var img = UIImage(systemName: "paperplane.fill")
-            img = img!.imageWithColor(color1: UIColor.getAppColor(.light))
+            img = img!.imageWithColor(color1: UIColor(named: "outgoingBubbleColor")!)
             self.inputToolbar.contentView.rightBarButtonItem.setImage(img, for: .normal)
         }
         else {
@@ -830,6 +961,10 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     
     override func textViewDidChange(_ textView: UITextView) {
         
+        if textView.text.trimmingCharacters(in: .whitespaces).isEmpty  {
+            return
+        }
+        
         if textView.text != "" {
             updateSendButton(isSend: true)
         }
@@ -841,7 +976,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     //MARK: Send messages
     
     func sendMessage(text: String?, date: Date, picture: UIImage?, location: String?, video: NSURL?, audio: String?) {
-        
+        print(membersToPush)
         var outgoingMessage: OutgoingMessage?
         let currentUser = FUser.currentUser()
         if isGroup! {
@@ -854,12 +989,11 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
             outgoingMessage = OutgoingMessage(message: encryptedText, senderId: currentUser!.objectId, senderName: currentUser!.firstname, date: date, status: kDELIVERED, type: kTEXT)
             JSQSystemSoundPlayer.jsq_playMessageSentSound()
             self.finishSendingMessage()
-            outgoingMessage!.sendMessage(chatRoomID: chatRoomId, messageDictionary: outgoingMessage!.messageDictionary, memberIds: memberIds, membersToPush: membersToPush, lastMessageType: kTEXT, isGroup: isGroup! ? true : false, groupName: isGroup! ? (group![kNAME] as! String) : "", chatTitle: titleLabel.text!)
+            outgoingMessage!.sendMessage(chatRoomID: chatRoomId, messageDictionary: outgoingMessage!.messageDictionary, memberIds: memberIds, membersToPush: membersToPush, lastMessageType: kTEXT, isGroup: isGroup! ? true : false, groupName: isGroup! ? (group![kNAME] as! String) : "", chatTitle: titleLabel.text!, plainMessage: text)
         }
         
         if let pic = picture {
-            
-            
+    
             uploadImage(image: pic, chatRoomId: chatRoomId, view: self.navigationController!.view) { (imageLink) in
                 
                 if imageLink != nil {
@@ -933,6 +1067,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         //update message status
         updatedChatListener = reference(.Message).document(FUser.currentId()).collection(chatRoomId).addSnapshotListener({ (snapshot, error) in
             
+         
             guard let snapshot = snapshot else { return }
             
             if !snapshot.isEmpty {
@@ -951,7 +1086,18 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         //get last 11 messages
         
         reference(.Message).document(FUser.currentId()).collection(chatRoomId).order(by: kDATE, descending: true).limit(to: 21).getDocuments(completion: { (snapshot, error) in
-            
+            self.internetConnectionChanged()
+            if let error = error {
+                self.gradientLoadingBar.fadeOut(duration: 0)
+                           if let errorCode = AuthErrorCode(rawValue: error._code) {
+                            switch errorCode.rawValue {
+                            case 8: self.showMessage("Transaction limit exceeded. Try again later.", type: .error, options: [.autoHide(false), .hideOnTap(false)])
+                            default: self.showMessage(kSOMETHINGWENTWRONG, type: .error, options: [.autoHide(false), .hideOnTap(false)]); print("LOCALIZED DESC: \(errorCode)")
+                             }
+                         }
+                self.inputToolbar.isUserInteractionEnabled = false
+                         return
+                     }
             guard let snapshot = snapshot else {
                 self.initialLoadComplete = true
                 self.listenForNewChat()
@@ -960,7 +1106,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
             let sorted = ((dictionaryFromSnapshots(snapshots: snapshot.documents)) as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: true)]) as! [NSDictionary]
             
             //remove bad messages
-            self.loadedMessages = self.removeSuspiciousMessages(allMessages: sorted)
+            self.loadedMessages = sorted
             self.insertMessages()
             self.finishReceivingMessage(animated: true)
             self.initialLoadComplete = true
@@ -971,7 +1117,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
             self.getPictureMessages()
             //get old messages in background
             self.getOldMessagesInBackground()
-            ProgressHUD.dismiss()
+            self.gradientLoadingBar.fadeOut()
             
         })
     }
@@ -987,6 +1133,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
             }
         }
     }
+
     
     func listenForNewChat() {
         
@@ -1184,15 +1331,24 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     }
     
     func checkForBackgroundImage() {
+        // navigationController?.navigationBar.setBackgroundImage(imageVIew.image!, for: .compact)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.isTranslucent = true
+        navigationController?.view.backgroundColor = UIColor.clear
+        navigationController?.navigationBar.backgroundColor = UIColor.clear
         if userDefaults.object(forKey: kBACKGROUBNDIMAGE) != nil {
             self.collectionView.backgroundColor = .clear
             let imageVIew = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
             imageVIew.image = UIImage(named: userDefaults.object(forKey: kBACKGROUBNDIMAGE) as! String)!
             imageVIew.contentMode = .scaleAspectFill
+            imageVIew.tag = 0
             self.view.insertSubview(imageVIew, at: 0)
+            //self.view.backgroundColor = UIColor(patternImage: imageVIew.image!)
+            
         } else {
             self.collectionView?.backgroundColor = .systemBackground
         }
+        
     }
     
     func getCurrentGroup(withId: String) {
@@ -1274,7 +1430,7 @@ extension Date {
 }
 
 extension DispatchQueue {
-
+    
     static func background(delay: Double = 0.0, background: (()->Void)? = nil, completion: (() -> Void)? = nil) {
         DispatchQueue.global(qos: .background).async {
             background?()
@@ -1285,5 +1441,5 @@ extension DispatchQueue {
             }
         }
     }
-
+    
 }

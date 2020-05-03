@@ -1,6 +1,6 @@
 //
 //  ContactsTableViewController.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 6.11.19.
 //  Copyright © 2019 com.isaselimi. All rights reserved.
@@ -115,18 +115,23 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
         loadAddedUsers()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+    }
+    
     override func viewDidDisappear(_ animated: Bool) {
         //        DispatchQueue.main.async {
         //            self.workItem?.cancel()
         //        }
-        ProgressHUD.dismiss()
+       
+           ProgressHUD.dismiss()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
     
         navigationItem.largeTitleDisplayMode = .never
-        
+        self.navigationController?.navigationBar.backItem?.title = ""
         navigationItem.searchController = searchController
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
@@ -193,6 +198,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! UserTableViewCell
         cell.accessoryType = .none
         var user: FUser
@@ -232,7 +238,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
 
-        view.tintColor = .secondarySystemBackground 
+        view.tintColor = .systemBackground
 
         let header : UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
         
@@ -244,7 +250,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
         if searchController.isActive && searchController.searchBar.text != "" {
             return nil
         } else {
-            return self.sectionTitleList
+            return nil // self.sectionTitleList
         }
     }
     
@@ -341,6 +347,10 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
            return true
     }
   
+    
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        cell.selectionStyle = .none
+    }
 
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) ->
@@ -468,7 +478,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
                 self.tableView.isUserInteractionEnabled = true
                 self.navigationItem.rightBarButtonItems?.last?.isEnabled = true
                 self.isSyncing = false
-                ProgressHUD.dismiss()
+                   ProgressHUD.dismiss()
             }
             
     }
@@ -476,7 +486,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
     
     //MARK: IBActions
     @objc func inviteButtonPressed() {
-        let text = "Hey! Let's chat on Sent \(kAPPURL)"
+        let text = "Hey! Let's chat on Sllick: <\(kAPPURL)>"
         
         let objectsToShare: [Any] = [text]
         
@@ -485,7 +495,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
         //for iPad
         activityViewController.popoverPresentationController?.sourceView = self.view
         
-        activityViewController.setValue("Let's chat on Sent", forKey: "subject")
+        activityViewController.setValue("Let's chat on Sllick", forKey: "subject")
         
         self.present(activityViewController, animated: true, completion: nil)
     }
@@ -518,66 +528,75 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
     
     //MARK: Load users
     func loadUsers() {
-        self.tableView.isUserInteractionEnabled = false
-        self.navigationItem.rightBarButtonItems?.last?.isEnabled = false
-        isSyncing = true
-        ProgressHUD.show("Syncing contacts...")
-        reference(.User).order(by: kFIRSTNAME, descending: false).getDocuments { (snapshot, error) in
+        checkContactsAccess(viewController: self) {
+            authorizationStatus in
             
-            
-            guard let snapshot = snapshot else {
-                ProgressHUD.dismiss()
-                self.tableView.isUserInteractionEnabled = true
-                self.navigationItem.rightBarButtonItems?.last?.isEnabled = true
-                self.isSyncing = false
-                return
-            }
-            self.tableView.isUserInteractionEnabled = false
-            self.navigationItem.rightBarButtonItems?.last?.isEnabled = false
-            self.currentContacts = self.matchedUsers
-            print(self.currentContacts!.count)
-            if !snapshot.isEmpty {
-                self.matchedUsers.removeAll()
-                self.users.removeAll()
-                self.sectionTitleList = []
-                
-                for userDictionary in snapshot.documents {
+            if authorizationStatus == .authorized {
+                self.tableView.isUserInteractionEnabled = false
+                self.navigationItem.rightBarButtonItems?.last?.isEnabled = false
+                self.isSyncing = true
+                ProgressHUD.show("Syncing contacts...")
+                reference(.User).order(by: kFIRSTNAME, descending: false).getDocuments { (snapshot, error) in
                     
-                    let userDictionary = userDictionary.data() as NSDictionary
                     
-                    let fUser = FUser(_dictionary: userDictionary)
-                    
-                    if fUser.objectId != FUser.currentId() {
-                        self.users.append(fUser)
+                    guard let snapshot = snapshot else {
+                        ProgressHUD.dismiss()
+                        self.tableView.isUserInteractionEnabled = true
+                        self.navigationItem.rightBarButtonItems?.last?.isEnabled = true
+                        self.isSyncing = false
+                        return
                     }
+                    self.tableView.isUserInteractionEnabled = false
+                    self.navigationItem.rightBarButtonItems?.last?.isEnabled = false
+                    self.currentContacts = self.matchedUsers
+                    print(self.currentContacts!.count)
+                    if !snapshot.isEmpty {
+                        self.matchedUsers.removeAll()
+                        self.users.removeAll()
+                        self.sectionTitleList = []
+                        
+                        for userDictionary in snapshot.documents {
+                            
+                            let userDictionary = userDictionary.data() as NSDictionary
+                            
+                            let fUser = FUser(_dictionary: userDictionary)
+                            
+                            if fUser.objectId != FUser.currentId() {
+                                self.users.append(fUser)
+                            }
+                        }
+                        
+                    }
+                    
+                    self.workItem = DispatchWorkItem {
+                        self.compareUsers()
+                        
+                        DispatchQueue.main.async {
+                            self.splitDataInToSection()
+                        }
+                    }
+                    let queue = DispatchQueue.global()
+                    queue.async {
+                        self.workItem?.perform()
+                    }
+                    
+                    
+                    
                 }
-                
             }
-            
-            self.workItem = DispatchWorkItem {
-                self.compareUsers()
-                
-                DispatchQueue.main.async {
-                    self.splitDataInToSection()
-                }
-            }
-            let queue = DispatchQueue.global()
-            queue.async {
-                self.workItem?.perform()
-            }
-            
-           
-            
         }
+        
     }
+    
+    
     
     func loadAddedUsers() {
    
-        ProgressHUD.show()
-        reference(.Contact).whereField("userID", isEqualTo: FUser.currentId()).getDocuments { (snapshot, error) in
+        //  ProgressHUD.show()
+        reference(.Contact).whereField("userID", isEqualTo: FUser.currentId()).addSnapshotListener { (snapshot, error) in
              
             guard let snapshot = snapshot else {
-                ProgressHUD.dismiss()
+                   ProgressHUD.dismiss()
                 self.tableView.isUserInteractionEnabled = true
                  self.navigationItem.rightBarButtonItems?.last?.isEnabled = true
                 return
@@ -612,7 +631,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
                 if !(self.isGroup || self.isInviting) {
                     self.navigationItem.rightBarButtonItems?.last?.isEnabled = true
                 }
-                ProgressHUD.dismiss()
+                   ProgressHUD.dismiss()
             }
         }
     }
@@ -724,7 +743,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
             print("NAME: \(currentUser.fullname)")
             self.allUsersGrouped[firstCharString]?.append(currentUser)
         }
-       // ProgressHUD.dismiss()
+       //    ProgressHUD.dismiss()
         UIView.transition(with: tableView, duration: 0.2, options: .transitionCrossDissolve, animations: {self.tableView.reloadData()}, completion: nil)
     }
     

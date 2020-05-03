@@ -1,6 +1,6 @@
 //
 //  EditProfileTableViewController.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 5.11.19.
 //  Copyright © 2019 com.isaselimi. All rights reserved.
@@ -69,7 +69,7 @@ class EditProfileTableViewController: UITableViewController,  UIImagePickerContr
              view.isUserInteractionEnabled = true
              self.view.addGestureRecognizer(viewTapGestureRecognizer)
         phoneNumberTextFld.displayMode = .list
-        phoneNumberTextFld.bo
+        
         phoneNumberTextFld.delegate = self
         phoneNumber = FUser.currentUser()!.phoneNumber
         navigationItem.largeTitleDisplayMode = .never
@@ -119,7 +119,7 @@ class EditProfileTableViewController: UITableViewController,  UIImagePickerContr
         if firstNameTextField.text != "" && lastNameTextField.text != "" && phoneNumberTextFld.text != "" {
             
             if phoneNumber == "Not Valid" {
-                ProgressHUD.showError("Phone number is not valid")
+                self.showMessage("Phone number is not valid", type: .error)
                 return
             }
             ProgressHUD.show("Saving...")
@@ -149,7 +149,8 @@ class EditProfileTableViewController: UITableViewController,  UIImagePickerContr
                 
                 if error != nil {
                     DispatchQueue.main.async {
-                        ProgressHUD.showError(error!.localizedDescription)
+                       // ProgressHUD.showError(error!.localizedDescription)
+                        self.showMessage("Could not update profile", type: .error)
                         print("could not update user \(error!.localizedDescription)")
                     }
                     return
@@ -181,7 +182,7 @@ class EditProfileTableViewController: UITableViewController,  UIImagePickerContr
             
             
         } else {
-            ProgressHUD.showError("All fields are required")
+            self.showMessage(kEMPTYFIELDS, type: .error)
         }
     }
     
@@ -214,12 +215,13 @@ class EditProfileTableViewController: UITableViewController,  UIImagePickerContr
                     
                     self.avatarImage = avatarImage
                     self.avatarImageView.image = avatarImage
-                    self.avatarImageView.maskCircle()
+                 
                 }
             }
         } else {
             avatarImageView.image = UIImage(named: "avatarph")
         }
+        self.avatarImageView.maskCircle()
     }
     
     

@@ -1,6 +1,6 @@
 //
 //  UsersTableViewController.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 18.10.19.
 //  Copyright © 2019 com.isaselimi. All rights reserved.
@@ -9,6 +9,7 @@
 import UIKit
 import FirebaseFirestore
 import ProgressHUD
+import GradientLoadingBar
 
 protocol UsersDelegate {
     func didAddNewContacts()
@@ -32,10 +33,14 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
     var scope = ""
     var lastDocumentSnapshot: DocumentSnapshot!
     var fetchingMore = false
+    private let gradientLoadingBar = GradientLoadingBar()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Users"
+        
+        gradientLoadingBar.gradientColors =  [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
         navigationItem.largeTitleDisplayMode = .never
         tableView.tableFooterView = UIView()
         navigationItem.searchController = searchController
@@ -53,6 +58,10 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        self.gradientLoadingBar.fadeOut(duration: 0)
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         if !firstLoad {
             getContacts()
@@ -65,7 +74,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
     func getContacts()  {
         reference(.Contact).whereField("userID", isEqualTo: FUser.currentId()).getDocuments { (snapshot, error) in
             if error != nil {
-                ProgressHUD.showError("Could not fetch contacts")
+                self.showMessage("Could not fetch users", type: .error)
                 return
             }
             guard snapshot != nil else {
@@ -132,7 +141,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
     
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        
+        let cell = tableView.cellForRow(at: indexPath)
         var tempUser: FUser
         
         if searchController.isActive && searchController.searchBar.text != "" {
@@ -194,7 +203,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
         let dict = ["contacts" : arr] as [String : Any]
         reference(.Contact).document(FUser.currentId()).updateData(dict) { (error) in
             if error != nil {
-                ProgressHUD.showError("COULD NOT DELETE")
+                self.showMessage("Could not delete", type: .error)
             } else {
                 ProgressHUD.showSuccess()
             }
@@ -210,7 +219,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
             reference(.Contact).document(FUser.currentId()).setData(dict) { (error) in
                 if error != nil {
                     print(error?.localizedDescription)
-                    ProgressHUD.showError("COULD NOT ADD CONTACT")
+                    self.showMessage("Could not add contact", type: .error)
                 } else {
                     ProgressHUD.showSuccess()
                 }
@@ -219,7 +228,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
             reference(.Contact).document(FUser.currentId()).updateData(dict) { (error) in
                 if error != nil {
                     print(error?.localizedDescription)
-                    ProgressHUD.showError("COULD NOT ADD CONTACT")
+                     self.showMessage("Could not add contact", type: .error)
                 } else {
                     ProgressHUD.showSuccess()
                 }
@@ -243,6 +252,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
         }
         cell.generateCellWith(fUser: user, indexPath: indexPath)
         cell.delegate = self
+        cell.selectionStyle = .none
         return cell
     }
     
@@ -262,7 +272,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
             return nil
         }
         else {
-            return sectionTitleList
+            return nil//sectionTitleList
         }
     }
     
@@ -272,7 +282,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
 
-         view.tintColor = .secondarySystemBackground
+         view.tintColor = .systemBackground
 
          let header : UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
          
@@ -294,6 +304,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
             user = users![indexPath.row]
         }
         
+        
         if !checkBlockedStatus(withUser: user){
             
             let chatVC = ChatViewController()
@@ -309,22 +320,22 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
             self.navigationController?.pushViewController(chatVC, animated: true)
         }
         else {
-            ProgressHUD.showError("This user is not available for chat")
+             self.showMessage("This user is not available for chat", type: .error)
         }
     }
     
  
     
     func loadUsers(filter: String) {
-        ProgressHUD.show()
+           self.gradientLoadingBar.fadeIn()
         
         var query: Query!
         
         switch filter {
         case kCITY:
-            query = reference(.User).whereField(kCITY, isEqualTo: FUser.currentUser()!.city).order(by: kFIRSTNAME, descending: false)
+            query = reference(.User).whereField(kCITY, isEqualTo: FUser.currentUser()!.city.capitalizingFirstLetter()).order(by: kFIRSTNAME, descending: false)
         case kCOUNTRY:
-            query = reference(.User).whereField(kCOUNTRY, isEqualTo: FUser.currentUser()!.country).order(by: kFIRSTNAME, descending: false)
+            query = reference(.User).whereField(kCOUNTRY, isEqualTo: FUser.currentUser()!.country.capitalizingFirstLetter()).order(by: kFIRSTNAME, descending: false)
         default:
             query = reference(.User).order(by: kFIRSTNAME, descending: false)
         }
@@ -335,12 +346,12 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
             self.allUsersGrouped = [:]
             if error != nil {
                 print(error!.localizedDescription)
-                ProgressHUD.dismiss()
+                    self.gradientLoadingBar.fadeOut()
                 self.tableView.reloadData()
                 return
             }
             
-            guard let snapshot = snapshot else { ProgressHUD.dismiss(); return }
+            guard let snapshot = snapshot else {     self.gradientLoadingBar.fadeOut(); return }
             
             if !snapshot.isEmpty {
                 
@@ -355,11 +366,11 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
                 
                 self.lastDocumentSnapshot = snapshot.documents.last!
                 self.splitDataIntoSections()
-                self.tableView.reloadData()
+                //self.tableView.reloadData()
             }
             
             self.tableView.reloadData()
-            ProgressHUD.dismiss()
+                self.gradientLoadingBar.fadeOut()
         }
     }
     
@@ -392,17 +403,18 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
             query = reference(.User).order(by: kFIRSTNAME, descending: false)
         }
         
-        query.limit(to: 5).start(afterDocument: lastDocumentSnapshot).getDocuments { (snapshot, error) in
+        query.limit(to: 6).start(afterDocument: lastDocumentSnapshot).getDocuments { (snapshot, error) in
             //self.allUsers = []
         
             if error != nil {
                 print(error!.localizedDescription)
-                ProgressHUD.dismiss()
+                    self.gradientLoadingBar.fadeOut()
+                self.fetchingMore = false
                 self.tableView.reloadData()
                 return
             }
             
-            guard let snapshot = snapshot else { ProgressHUD.dismiss(); return }
+            guard let snapshot = snapshot else {     self.gradientLoadingBar.fadeOut(); return }
             
             if !snapshot.isEmpty {
                 self.sectionTitleList = []
@@ -418,9 +430,9 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
                   
                   self.lastDocumentSnapshot = snapshot.documents.last!
                   self.splitDataIntoSections()
-                  self.tableView.reloadData()
+                 // self.tableView.reloadData()
               }
-              
+            self.fetchingMore = false
               self.tableView.reloadData()
       }
     }
@@ -454,7 +466,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
         reference(.UserKeywords).whereField("keywords", arrayContains: searchTxt).getDocuments { (snapshot, error) in
             print("hereeeeeeeeeeee")
             if error != nil {
-                ProgressHUD.showError("Could not fetch contacts")
+                self.showMessage("Could not fetch users", type: .error)
                 return
             }
             guard snapshot != nil else {

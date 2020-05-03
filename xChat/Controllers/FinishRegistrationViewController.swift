@@ -1,6 +1,6 @@
 //
 //  FinishRegistrationViewController.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 17.10.19.
 //  Copyright © 2019 com.isaselimi. All rights reserved.
@@ -10,6 +10,9 @@ import UIKit
 import ProgressHUD
 import ImagePicker
 import FlagPhoneNumber
+import Firebase
+import GradientLoadingBar
+import OneSignal
 
 class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, FPNTextFieldDelegate  {
     
@@ -19,6 +22,7 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
     var password: String!
     var avatarImage: UIImage?
     var viewTapGestureRecognizer = UITapGestureRecognizer()
+    private let gradientLoadingBar = GradientLoadingBar()
     
     @IBOutlet weak var avatarImageView: UIImageView!
     @IBOutlet weak var nameTextField: UITextField!
@@ -35,16 +39,20 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
     override func viewDidLoad() {
         super.viewDidLoad()
         viewTapGestureRecognizer.addTarget(self, action: #selector(viewTap))
+          gradientLoadingBar.gradientColors =  [UIColor.getAppColor(.light), UIColor.getAppColor(.dark), UIColor.getAppColor(.light), UIColor.getAppColor(.dark)]
         view.isUserInteractionEnabled = true
-        topView.addBottomBorderWithColor(color: .opaqueSeparator, width: 0.5)
+//      topView.addBottomBorderWithColor(color: .opaqueSeparator, width: 0.5)
         self.view.addGestureRecognizer(viewTapGestureRecognizer)
         avatarImageView.maskCircle()
         avatarImageView.isUserInteractionEnabled = true
         phoneTextField.displayMode = .list
         phoneTextField.delegate = self
+        countryCode = (phoneTextField.selectedCountry?.code)!.rawValue
        // phoneTextField.setCountries(including: [.KS])
         print(email!, password!)
     }
+    
+    
     
     func fpnDisplayCountryList() {
         let listController: FPNCountryListViewController = FPNCountryListViewController(style: .insetGrouped)
@@ -77,27 +85,37 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
     
     @IBAction func doneButtonPressed(_ sender: Any) {
         dismissKeyboard()
-        ProgressHUD.show("Registering...")
+        self.gradientLoadingBar.fadeIn()
         
         if allFieldsAreFilled() {
             
             if phoneNumber == "Not Valid" {
-                ProgressHUD.showError("Phone number is not valid")
+                self.gradientLoadingBar.fadeOut()
+                self.showMessage("Phone number is not valid", type: .error)
                 return
             }
             FUser.registerUserWith(email: email, password: password, firstName: nameTextField.text!, lastName: surnameTextField.text!) { (error) in
                 
                 if error != nil {
-                    ProgressHUD.dismiss()
-                    ProgressHUD.showError(error!.localizedDescription)
+                    self.gradientLoadingBar.fadeOut()
+                       ProgressHUD.dismiss()
+                    if let errCode = AuthErrorCode(rawValue: error!._code) {
+                        switch errCode {
+                        case .emailAlreadyInUse: self.showMessage("Email already in use", type: .error)
+                        case .invalidEmail: self.showMessage("Invalid email", type: .error)
+                        default: self.showMessage("An error occurred", type: .error)
+                        }
+                    }
                 }
                 else {
+                    self.gradientLoadingBar.fadeOut()
                     self.registerUser()
                 }
             }
         }
         else {
-            ProgressHUD.showError("All fields are required")
+            self.gradientLoadingBar.fadeOut()
+            self.showMessage("All fields are required", type: .error)
         }
         
     }
@@ -130,7 +148,7 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
         updateCurrentUserInFirestore(withValues: withValues) { (error) in
             
             if error != nil {
-                ProgressHUD.showError(error!.localizedDescription)
+                self.showMessage(kSOMETHINGWENTWRONG, type: .error)
                 
                 return
             }
@@ -138,7 +156,7 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
             print(FUser.currentUser()!.fullname.lowercased())
             let keywords = Array(createKeywords(word: FUser.currentUser()!.fullname.lowercased()))
             reference(.UserKeywords).addDocument(data: ["userId" : FUser.currentUser()!.objectId, "keywords" : keywords])
-            ProgressHUD.dismiss()
+               ProgressHUD.dismiss()
         }
     }
     
@@ -148,10 +166,14 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
         dismissKeyboard()
         
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: USER_DID_LOGIN_NOTIFICATION), object: nil, userInfo:  [kUSERID : FUser.currentId()])
-        
-        let mainView = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(identifier: "mainApplication") as! UITabBarController
-        
-        self.present(mainView, animated: true, completion: nil)
+        customizeNavigationBar(colorName: "bwBackground")
+            let mainView = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(identifier: "mainApplication") as! UITabBarController
+              let scene = UIApplication.shared.connectedScenes.first
+                   if let sd : SceneDelegate = (scene?.delegate as? SceneDelegate) {
+                       OneSignal.sendTag("userId", value: FUser.currentId())
+                              sd.setRootViewController(mainView)
+                      sd.window!.makeKeyAndVisible()
+                   }
     }
     
     func allFieldsAreFilled() -> Bool {

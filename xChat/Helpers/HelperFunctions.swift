@@ -1,14 +1,16 @@
 //
 //  HelperFunctions.swift
-//  iChat
+//  Sllick
 //
-//  Created by David Kababyan on 08/06/2018.
-//  Copyright © 2018 David Kababyan. All rights reserved.
+//  Created by Isa  Selimi on 15.10.19.
+//  Copyright © 2019 com.isaselimi. All rights reserved.
 //
 
 import Foundation
 import UIKit
 import FirebaseFirestore
+import AVFoundation
+import Contacts
 
 //MARK: GLOBAL FUNCTIONS
 private let dateFormat = "yyyyMMddHHmmss"
@@ -101,6 +103,31 @@ func imageFromData(pictureData: String, withBlock: (_ image: UIImage?) -> Void) 
 //    return elapsed!
 //}
 
+func timeElapsed(seconds: Int) -> String {
+    var elapsed: String!
+    
+        if (seconds < 60) {
+            elapsed = "just now"
+        } else if (seconds < 60 * 60) {
+            let minutes = Int(seconds / 60)
+    
+            let minText = "m"
+            elapsed = "\(minutes)\(minText)"
+    
+        } else if (seconds < 24 * 60 * 60) {
+            let hours = Int(seconds / (60 * 60))
+            let hourText = "h"
+            elapsed = "\(hours)\(hourText)"
+        } else {
+            let currentDateFormater = dateFormatter()
+            currentDateFormater.dateFormat = "dd/MM/YYYY"
+    
+            elapsed = "more than a day ago)"
+        }
+    
+    return elapsed
+}
+
 func timeElapsed(date: Date) -> String {
     
     let seconds = NSDate().timeIntervalSince(date)
@@ -163,9 +190,10 @@ func dataImageFromString(pictureString: String, withBlock: (_ image: Data?) -> V
 func dictionaryFromSnapshots(snapshots: [DocumentSnapshot]) -> [NSDictionary] {
     
     var allMessages: [NSDictionary] = []
-    for snapshot in snapshots{
-        allMessages.append(snapshot.data() as! NSDictionary)
-    }
+//    for snapshot in snapshots{
+//        allMessages.append(snapshot.data() as! NSDictionary)
+//    }
+    allMessages = snapshots.map({ $0.data()! as NSDictionary })
     return allMessages
 }
 
@@ -500,7 +528,8 @@ extension UIColor {
         case .dark:
             return UIColor(hexString: kAPPLIGHTCOLORSTRING)
         case .light:
-             return UIColor(hexString: kAPPDARKCOLORSTRING)
+             //return UIColor(hexString: kAPPDARKCOLORSTRING)
+            return UIColor(named: "outgoingBubbleColor")!
         }
     }
 }
@@ -628,4 +657,89 @@ extension UIBarButtonItem {
         return menuBarItem
     }
 }
+
+func customizeNavigationBar(color: UIColor = .systemBackground, colorName: String = "bwBackground", alpha: Double = 0.9) {
+         
+    let navBarAppearance = UINavigationBarAppearance()
+    navBarAppearance.configureWithOpaqueBackground()
+    navBarAppearance.backgroundColor = UIColor(named: colorName)?.withAlphaComponent(CGFloat(alpha))
+    navBarAppearance.backgroundImage = UIImage()
+    navBarAppearance.shadowImage = nil
+    navBarAppearance.shadowColor = nil
+    UINavigationBar.appearance(whenContainedInInstancesOf: [UINavigationController.self]).standardAppearance = navBarAppearance
+    UINavigationBar.appearance(whenContainedInInstancesOf: [UINavigationController.self]).scrollEdgeAppearance = navBarAppearance
+}
+
+extension Array {
+    func chunked(into size: Int) -> [[Element]] {
+        return stride(from: 0, to: count, by: size).map {
+            Array(self[$0 ..< Swift.min($0 + size, count)])
+        }
+    }
+}
+
+
+
+func checkCameraAccess(viewController: UIViewController) {
+    switch AVCaptureDevice.authorizationStatus(for: .video) {
+    case .denied:
+        print("Denied, request permission from settings")
+        presentCameraSettings(viewController: viewController)
+    case .restricted:
+        print("Restricted, device owner must approve")
+    case .authorized:
+        print("Authorized, proceed")
+    case .notDetermined:
+        AVCaptureDevice.requestAccess(for: .video) { success in
+            if success {
+                print("Permission granted, proceed")
+            } else {
+                print("Permission denied")
+            }
+        }
+    }
+}
+
+
+
+func presentCameraSettings(viewController: UIViewController) {
+    let alertController = UIAlertController(title: "Access denied",
+                                  message: "Open settings to change permission",
+                                  preferredStyle: .alert)
+    alertController.addAction(UIAlertAction(title: "Cancel", style: .default))
+    alertController.addAction(UIAlertAction(title: "Settings", style: .cancel) { _ in
+        if let url = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(url, options: [:], completionHandler: { _ in
+                // Handle
+            })
+        }
+    })
+
+    viewController.present(alertController, animated: true)
+}
+
+func checkContactsAccess(viewController: UIViewController, completion: @escaping (CNAuthorizationStatus) -> Void) {
+    switch CNContactStore.authorizationStatus(for: .contacts) {
+    case .authorized:
+        print("Authorized, proceed")
+        completion(.authorized)
+    case .denied:
+        presentCameraSettings(viewController: viewController)
+        completion(.denied)
+    case .restricted, .notDetermined:
+        CNContactStore().requestAccess(for: .contacts) { granted, error in
+            if granted {
+                print("Permission granted, proceed")
+                completion(.authorized)
+            } else {
+                DispatchQueue.main.async {
+                    print("Permission denied")
+                    completion(.denied)
+                }
+            }
+        }
+    }
+    completion(.denied)
+}
+
 

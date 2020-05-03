@@ -1,14 +1,16 @@
 //
 //  FUser.swift
-//  iChat
+//  Sllick
 //
-//  Created by David Kababyan on 08/06/2018.
-//  Copyright © 2018 David Kababyan. All rights reserved.
+//  Created by Isa  Selimi on 15.10.19.
+//  Copyright © 2019 com.isaselimi. All rights reserved.
 //
 
 import Foundation
 import FirebaseAuth
 import FirebaseFirestore
+import Firebase
+import OneSignal
 
 class FUser: Equatable{
     static func == (lhs: FUser, rhs: FUser) -> Bool {
@@ -165,7 +167,7 @@ class FUser: Equatable{
     
     class func currentId() -> String {
         
-        return Auth.auth().currentUser!.uid
+         return Auth.auth().currentUser!.uid
     }
     
     class func currentUser () -> FUser? {
@@ -346,13 +348,69 @@ func fetchCurrentUserFromFirestore(userId: String) {
             
             UserDefaults.standard.setValue(snapshot.data(), forKeyPath: kCURRENTUSER)
             UserDefaults.standard.synchronize()
-            
+            OneSignal.sendTag("userId", value: FUser.currentId())
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: "UserSavedLocally"), object: nil, userInfo: nil)
+           // startActivityMonitoring()
             
         }
         
     }
     
+}
+
+func startActivityMonitoring() {
+    let userId = Auth.auth().currentUser?.uid
+         
+         let userStatusDatabaseRef = Database.database().reference(withPath: "status/" + userId!)
+         
+         let isOfflineForDatabase = ["state" : "Offline", "last_changed" : ServerValue.timestamp(), "userId" : userId!] as [String : Any]
+         let isOnlineForDatabase = ["state" : "Online", "last_changed" : ServerValue.timestamp(), "userId" : userId!] as [String : Any]
+         
+         Database.database().reference(withPath: ".info/connected").observe(.value) { (snapshot) in
+                  if snapshot.value == nil {
+                      //userStatusDatabaseRef.setValue(isOfflineForDatabase)
+                   return
+                  }
+                  userStatusDatabaseRef.onDisconnectSetValue(isOfflineForDatabase) { (error, dbref) in
+                     // userStatusDatabaseRef.setValue(isOnlineForDatabase)
+                      userStatusDatabaseRef.setValue(isOnlineForDatabase)
+                  }
+              }
+         
+         
+         let userStatusFirestoreRef = Firestore.firestore().document("/status/" + userId!)
+         
+         let isOnlineForFirestore = ["state" : "Online", "last_changed" : FieldValue.serverTimestamp(), "userId" : userId!] as [String : Any]
+         let isOfflineForFirestore = ["state" : "Offline", "last_changed" : FieldValue.serverTimestamp(), "userId" : userId!] as [String : Any]
+    
+//        userStatusFirestoreRef.addSnapshotListener(includeMetadataChanges: true) { (snapshot, error) in
+//            
+//            guard let snapshot = snapshot else { return }
+//            
+//            if snapshot.data() != nil {
+//                let isOnline = snapshot.data()!["state"] as! String == "Online"
+//                         if isOnline {
+//                             print("O     N     L     I      N     E")
+//                         }else {
+//                             print(" O O O O F  L I N  N E E E E")
+//                         }
+//                     }
+//            }
+     
+         
+         Database.database().reference(withPath: ".info/connected").observe(.value) { (snapshot) in
+             
+             if snapshot.value == nil {
+                 userStatusFirestoreRef.setData(isOfflineForFirestore)
+                 return
+             }
+             
+             userStatusDatabaseRef.onDisconnectSetValue(isOfflineForDatabase) { (error, dbred) in
+                 userStatusDatabaseRef.setValue(isOnlineForDatabase)
+                 userStatusFirestoreRef.setData(isOnlineForFirestore)
+             }
+         }
+         
 }
 
 func fetchUser(withId userId: String, completion: @escaping (FUser) -> Void) {

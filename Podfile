@@ -30,6 +30,11 @@ target 'xChat' do
   pod 'OneSignal'
   pod 'SinchRTC'
 
+  pod 'NVActivityIndicatorView'
+pod 'GradientLoadingBar', '~> 2.0'
+pod 'GSMessages'
+pod 'ReachabilitySwift'
+
 target 'OneSignalNotificationServiceExtension' do
 use_frameworks!
   pod 'OneSignal', '>= 2.11.2', '< 3.0'

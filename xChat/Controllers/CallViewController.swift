@@ -1,6 +1,6 @@
 //
 //  CallViewController.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 21.3.20.
 //  Copyright © 2020 com.isaselimi. All rights reserved.
@@ -16,6 +16,8 @@ class CallViewController: UIViewController, SINCallDelegate {
     var durationTimer: Timer! = nil
     var _call: SINCall!
     var callAnswered = false
+    var callingName: String?
+    var callingImage: UIImage?
     let appDelegate = UIApplication.shared.delegate as! AppDelegate
     
     @IBOutlet weak var fullNameLabel: UILabel!
@@ -28,8 +30,13 @@ class CallViewController: UIViewController, SINCallDelegate {
     @IBOutlet weak var declineCallButtonOutlet: UIButton!
     
     override func viewWillAppear(_ animated: Bool) {
-        fullNameLabel.text = "Unknown"
         let id =  _call.remoteUserId
+        if let callingName = self.callingName {
+            fullNameLabel.text = callingName
+        }
+        if let callingImage = self.callingImage {
+            self.avatarImageView.image = callingImage
+        }
         getUsersFromFirestore(withIds: [id!]) { (allUsers) in
             if allUsers.count > 0 {
                 let user = allUsers.first!
@@ -51,7 +58,8 @@ class CallViewController: UIViewController, SINCallDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+  
+          self.avatarImageView.maskCircle()
         _call.delegate = self
         if _call.direction == SINCallDirection.incoming {
         
@@ -61,9 +69,10 @@ class CallViewController: UIViewController, SINCallDelegate {
             
         } else {
             callAnswered = true
+               showButtons()
             //show buttons
             setCallTime(text: "Calling...")
-            showButtons()
+         
             
         }
     }

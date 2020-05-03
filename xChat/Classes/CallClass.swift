@@ -1,6 +1,6 @@
 //
 //  CallClass.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 18.3.20.
 //  Copyright © 2020 com.isaselimi. All rights reserved.

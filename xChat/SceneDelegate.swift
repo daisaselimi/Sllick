@@ -1,6 +1,6 @@
 //
 //  SceneDelegate.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 15.10.19.
 //  Copyright © 2019 com.isaselimi. All rights reserved.
@@ -31,6 +31,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
+        self.window?.backgroundColor = .systemBackground
         guard let _ = (scene as? UIWindowScene) else { return }
         let launchedBefore = UserDefaults.standard.bool(forKey: "launchedBefore")
         
@@ -45,14 +46,23 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
             
             Auth.auth().removeStateDidChangeListener(self.authListener!)
             
+            if Auth.auth().currentUser == nil {
+
+                self.window!.showMessage("Transaction limit exceeded. Please try again later.", type: .error)
+          
+                      
+            }
             if user != nil && UserDefaults.standard.object(forKey: kCURRENTUSER) != nil  {
+                customizeNavigationBar(colorName: "bwBackground")
                 DispatchQueue.main.async {
                     print("App")
                     ProgressHUD.hudColor(.clear)
                     ProgressHUD.statusColor(.label)
+                    OneSignal.sendTag("userId", value: FUser.currentId())
                     self.goToView(named: kMAINAPPLICATION)
                 }
             } else {
+                customizeNavigationBar(colorName: "bcg")
                 print("Welcome")
                 ProgressHUD.hudColor(.clear)
                 ProgressHUD.statusColor(.label)
@@ -169,7 +179,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
     
     func sceneDidBecomeActive(_ scene: UIScene) {
         
-        UIApplication.shared.applicationIconBadgeNumber = 0
+       // UIApplication.shared.applicationIconBadgeNumber = 0
         var top = self.window?.rootViewController
         
         while top?.presentedViewController != nil {
@@ -324,9 +334,24 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
         }
         
         let callVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "CallVC") as! CallViewController
-        
-        callVC._call = call
-        top?.present(callVC, animated: true, completion: nil)
+        let id =  call.remoteUserId
+      
+        getUsersFromFirestore(withIds: [id!]) { (allUsers) in
+            if allUsers.count > 0 {
+                let user = allUsers.first!
+                callVC.callingName = user.fullname
+                imageFromData(pictureData: user.avatar) { (image) in
+                    if image != nil {
+                        callVC.callingImage = image!.circleMasked
+                    } else {
+                        callVC.callingImage = UIImage(named: "avatarph")
+                    }
+                    callVC._call = call
+                    top?.present(callVC, animated: true, completion: nil)
+                }
+            }
+        }
+      
         
         
     }
@@ -376,6 +401,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
         } else {
             //self.push.application(application, didReceiveRemoteNotification: userInfo)
         }
+    }
+    
+    func setRootViewController(_ vc: UIViewController, animated: Bool = true) {
+        guard animated, let window = self.window else {
+            self.window?.rootViewController = vc
+            self.window?.makeKeyAndVisible()
+            return
+        }
+
+        window.rootViewController = vc
+        window.makeKeyAndVisible()
+        UIView.transition(with: window,
+                          duration: 0.3,
+                          options: .transitionCrossDissolve,
+                          animations: nil,
+                          completion: nil)
     }
     
 }

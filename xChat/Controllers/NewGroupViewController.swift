@@ -1,6 +1,6 @@
 //
 //  NewGroupViewController.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 9.11.19.
 //  Copyright © 2019 com.isaselimi. All rights reserved.
@@ -52,6 +52,10 @@ class NewGroupViewController: UIViewController, UICollectionViewDataSource, UICo
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
         return allMembers.count
+    }
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

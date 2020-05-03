@@ -1,6 +1,6 @@
 //
 //  GroupMemberCollectionViewCell.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 9.11.19.
 //  Copyright © 2019 com.isaselimi. All rights reserved.

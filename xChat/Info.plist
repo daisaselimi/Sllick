@@ -21,19 +21,15 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppleMusicUsageDescription</key>
-	<string>xChat needs to use your media library</string>
+	<string>Sllick needs to use your media library</string>
 	<key>NSCameraUsageDescription</key>
-	<string>xChat needs to use your camera</string>
+	<string>Sllick needs to use your camera</string>
 	<key>NSContactsUsageDescription</key>
-	<string>xChats needs to use your contacts</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>xSent needs your location to send your location as a message</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>xChat needs to use your location</string>
+	<string>Sllick needs to use your contacts</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>xChat needs to use your microphone</string>
+	<string>Sllick needs to use your microphone</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>xChat needs to use your photo library</string>
+	<string>Sllick needs to use your photo library</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -1,6 +1,6 @@
 //
 //  Badges.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 22.3.20.
 //  Copyright © 2020 com.isaselimi. All rights reserved.
@@ -45,8 +45,14 @@ func setBadges(controller: UITabBarController) {
         
         if badge != 0 {
             controller.tabBar.items![0].badgeValue = "\(badge)"
+            UIApplication.shared.applicationIconBadgeNumber = badge
         } else {
             controller.tabBar.items![0].badgeValue = nil
+            UIApplication.shared.applicationIconBadgeNumber = 0
         }
     }
+}
+
+func setTabItemTitle(controller: UITabBarController, title: String) {
+    controller.tabBar.items![1].title = title
 }

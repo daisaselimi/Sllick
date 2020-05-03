@@ -1,6 +1,6 @@
 //
 //  Group.swift
-//  xChat
+//  Sllick
 //
 //  Created by Isa  Selimi on 10.11.19.
 //  Copyright © 2019 com.isaselimi. All rights reserved.
@@ -12,6 +12,7 @@ import FirebaseFirestore
 class Group {
     
     let groupDictionary: NSMutableDictionary
+ 
     
     init(groupId: String, subject: String, ownerId: String, members: [String], avatar: String) {
         
