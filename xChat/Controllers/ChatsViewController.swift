@@ -31,7 +31,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     var updateActivityTabBar = true
     var loadActiveTabOnce = false
     var activeUsersListeners: [ListenerRegistration] = []
-       private let gradientLoadingBar = GradientLoadingBar()
+    private let gradientLoadingBar = GradientLoadingBar()
     var quotaDidExceed = false
     
     
@@ -87,19 +87,21 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
         
         let contactsBy10 = contacts.chunked(into: 10)
+        var index = 0
         
         for i in 0...contactsBy10.count - 1 {
             activeUsersListeners.append(Firestore.firestore().collection("status").whereField("userId", in: contactsBy10[i]).addSnapshotListener { (snapshot, error) in
+               
                 guard let snapshot = snapshot else {
                     print("NO SNAPSHOT -----------------_!!!")
                     return
                 }
-                
+                 
                 if !snapshot.isEmpty {
                     
                     if self.firstFetchOfOnlineUsers {
-                        if i == 0  {
-
+                        if index == 0  {
+                            
                             self.usersOnline = []
                         }
                         let documents = snapshot.documents
@@ -112,14 +114,14 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                             }
                         }
                         if self.updateActivityTabBar {
-                            if i == contactsBy10.count - 1 {
+                            if index == contactsBy10.count - 1 {
                                 setTabItemTitle(controller: self.tabBarController!, title: "Active (\(self.usersOnline.count))")
-                                                     self.updateActivityTabBar = false
+                                self.updateActivityTabBar = false
                             }
-                     
+                            
                         }
-                        if i == contactsBy10.count - 1 {
-
+                        if index == contactsBy10.count - 1 {
+                            
                             self.firstFetchOfOnlineUsers = false
                         }
                     } else {
@@ -151,10 +153,11 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                             }
                         }
                     }
-                    if i == contactsBy10.count - 1 {
-                          self.recentChatsTableView.reloadData()
+                    if index == contactsBy10.count - 1 {
+                        self.recentChatsTableView.reloadData()
                     }
-                  
+                
+                    
                 } else {
                     print("SNAPSHOT EMPTY !!! -------")
                     if self.usersOnline.count > 0 {
@@ -162,22 +165,24 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                     }
                     
                 }
+                    index += 1
             })
         }
         
-
+        
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         //        navigationItem.leftBarButtonItem = UIBarButtonItem.menuButton(self, action: #selector(presentSettings), image: UIImage(named: "avatarph")!)
         //addNoInternetConnectionLabel(height: 0)
-      internetConnectionChanged()
+        
         navigationItem.largeTitleDisplayMode = .never
-    
-         gradientLoadingBar.gradientColors =  [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
+        loadUserDefaults()
+        gradientLoadingBar.gradientColors =  [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
         loadContacts()
-              loadRecentChats()
+        loadRecentChats()
+        internetConnectionChanged()
         //setTabItemTitle(controller: self.tabBarController!, title: "Active (0)")
         
         
@@ -202,19 +207,19 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                                                name: NSNotification.Name(rawValue: "UpdatedProfilePicture"), object: nil)
         
         NotificationCenter.default.addObserver(self,
-                                                      selector: #selector(internetConnectionChanged),
-                                                      name: .internetConnectionState, object: nil)
-
+                                               selector: #selector(internetConnectionChanged),
+                                               name: .internetConnectionState, object: nil)
+        
         
         self.tabBarController?.tabBar.layer.borderWidth = 0.50
         self.tabBarController?.tabBar.layer.borderColor = UIColor.clear.cgColor
         self.tabBarController?.tabBar.clipsToBounds = true
         
         
-//        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-//        self.navigationController?.navigationBar.shadowImage = UIImage()
-//        self.navigationController?.navigationBar.backgroundColor = UIColor(named: "bwBackground")?.withAlphaComponent(0.9)
-//        self.navigationController?.navigationBar.isTranslucent = true
+        //        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        //        self.navigationController?.navigationBar.shadowImage = UIImage()
+        //        self.navigationController?.navigationBar.backgroundColor = UIColor(named: "bwBackground")?.withAlphaComponent(0.9)
+        //        self.navigationController?.navigationBar.isTranslucent = true
         
         self.tabBarController?.tabBar.backgroundImage = UIImage()
         self.tabBarController?.tabBar.shadowImage = UIImage()
@@ -261,7 +266,9 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     @objc func setupLeftBarButtons() {
         //        navigationItem.leftBarButtonItem = UIBarButtonItem.menuButton(self, action: #selector(presentSettings), image: UIImage(named: "avatarph")!)
+        
         if let currentUser = FUser.currentUser() {
+                       NotificationCenter.default.post(name: NSNotification.Name(rawValue: USER_DID_LOGIN_NOTIFICATION), object: nil, userInfo:  [kUSERID : FUser.currentId()])
             if currentUser.avatar != "" {
                 
                 imageFromData(pictureData: currentUser.avatar) { (avatarImage) in
@@ -287,9 +294,9 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     @objc func presentSettings() {
         if !quotaDidExceed {
-                 performSegue(withIdentifier: "presentSettingsNav", sender: self)
+            performSegue(withIdentifier: "presentSettingsNav", sender: self)
         }
-   
+        
     }
     
     @objc func updateProfilePicture(_ notification: Notification) {
@@ -302,38 +309,38 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     @objc func internetConnectionChanged() {
         if !MyVariables.internetConnectionState {
-            self.recentChatsTableView.showTableHeaderView(header: getTableViewHeader(title: "No internet connection", backgroundColor: .systemGray6))
+            self.recentChatsTableView.showTableHeaderView(header: getTableViewHeader(title: "No internet connection", backgroundColor: .systemGray6, textColor: .label))
         }
         else {
             self.recentChatsTableView.hideTableHeaderView()
         }
     }
     
-    func getTableViewHeader(title: String, backgroundColor: UIColor) -> UILabel {
+    func getTableViewHeader(title: String, backgroundColor: UIColor, textColor: UIColor) -> UILabel {
         let label = UILabel(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: 30))
         label.textAlignment = .center
         label.text = title
         label.backgroundColor = backgroundColor
-        label.textColor = .label
+        label.textColor = textColor
         label.font =  UIFont.boldSystemFont(ofSize: 14)
         return label
     }
     
     override func viewDidDisappear(_ animated: Bool) {
-            self.gradientLoadingBar.fadeOut()
+        self.gradientLoadingBar.fadeOut()
     }
     
-//    override func viewWillLayoutSubviews() {
-//             if #available(iOS 13, *)
-//              {
-//                  let statusBar = UIView(frame: (UIApplication.shared.keyWindow?.windowScene?.statusBarManager?.statusBarFrame)!)
-//                  statusBar.backgroundColor = UIColor(named: "bwBackground")?.withAlphaComponent(0.9)
-//                  UIApplication.shared.keyWindow?.addSubview(statusBar)
-//              }
-//    }
+    //    override func viewWillLayoutSubviews() {
+    //             if #available(iOS 13, *)
+    //              {
+    //                  let statusBar = UIView(frame: (UIApplication.shared.keyWindow?.windowScene?.statusBarManager?.statusBarFrame)!)
+    //                  statusBar.backgroundColor = UIColor(named: "bwBackground")?.withAlphaComponent(0.9)
+    //                  UIApplication.shared.keyWindow?.addSubview(statusBar)
+    //              }
+    //    }
     override func viewDidLayoutSubviews() {
         // setTableViewHeader()
-   
+        
         recentChatsTableView.separatorStyle = .none
         recentChatsTableView.separatorColor = .clear
     }
@@ -342,7 +349,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         //navigationItem.hidesSearchBarWhenScrolling = false
         
         self.tabBarController?.tabBar.isHidden = false
-  
+        
         recentChatsTableView.tableFooterView = UIView() //remove table lines when there's nothing to show
     }
     
@@ -352,7 +359,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     override func viewWillDisappear(_ animated: Bool) {
         
-       // recentListener.remove()
+        // recentListener.remove()
     }
     
     @IBAction func createNewChatButtonPressed(_ sender: Any) {
@@ -559,7 +566,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     func loadRecentChats() {
         
         if !firstLoad {
-               self.gradientLoadingBar.fadeIn()
+            self.gradientLoadingBar.fadeIn()
             firstLoad = true
         }
         
@@ -585,9 +592,9 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             
             startActivityMonitoring()
             
-  
+            
             guard let snapshot = snapshot else { return }
-         
+            
             
             self.recentChats = []
             
@@ -617,10 +624,10 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 }
                 self.recentChatsTableView.reloadData()
                 
-                    self.gradientLoadingBar.fadeOut()
+                self.gradientLoadingBar.fadeOut()
             } else {
                 self.recentChatsTableView.setEmptyMessage("No chats to show")
-                    self.gradientLoadingBar.fadeOut()
+                self.gradientLoadingBar.fadeOut()
             }
         })
     }
@@ -632,20 +639,23 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         self.tabBarController?.selectedIndex = 0
         self.navigationController?.navigationBar.isUserInteractionEnabled = false;
         navigationItem.rightBarButtonItems?.forEach({ $0.isEnabled = false })
-           navigationItem.leftBarButtonItems?.forEach({ $0.isEnabled = false })
+        navigationItem.leftBarButtonItems?.forEach({ $0.isEnabled = false })
         self.tabBarController?.tabBar.items?.forEach({ $0.isEnabled = false })
         //        if self.searchController.isActive {
-//            self.searchController.isActive = false
-//            self.searchController.definesPresentationContext = false
-//            self.searchController.dismiss(animated: false, completion: nil)
-//        }
+        //            self.searchController.isActive = false
+        //            self.searchController.definesPresentationContext = false
+        //            self.searchController.dismiss(animated: false, completion: nil)
+        //        }
         
-       /// self.recentChatsTableView.isUserInteractionEnabled = false;
+        /// self.recentChatsTableView.isUserInteractionEnabled = false;
         self.recentListener.remove()
         //NotificationCenter.default.removeObserver(self, name: .internetConnectionState, object: nil)
         self.removeAllNotifications()
-        self.recentChatsTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
-       self.recentChatsTableView.showTableHeaderView(header: getTableViewHeader(title: "Transaction limt exceeded. Try again later", backgroundColor: .systemPink))
+        if recentChatsTableView.numberOfRows(inSection: 0) > 0 {
+              self.recentChatsTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+        }
+      
+        self.recentChatsTableView.showTableHeaderView(header: getTableViewHeader(title: "Transaction limt exceeded. Try again later.", backgroundColor: .systemPink, textColor: .white))
         
     }
     
@@ -902,6 +912,22 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 }
             }
             
+        }
+        
+    }
+    
+    func loadUserDefaults() {
+        
+        let darkModeStatus = userDefaults.bool(forKey: kDARKMODESTATUS)
+        
+        if darkModeStatus{
+            UIApplication.shared.windows.forEach { (window) in
+                window.overrideUserInterfaceStyle = .dark
+            }
+        } else {
+            UIApplication.shared.windows.forEach { (window) in
+                window.overrideUserInterfaceStyle = .light
+            }
         }
         
     }

@@ -75,6 +75,7 @@ class SINCallKitProvider: NSObject, CXProviderDelegate {
             
             _provider.reportCall(with: UUID(uuidString: call.callId)!, endedAt: call.details.endedTime, reason: cause)
             
+    
             
             if self.callExist(callId: call.callId) {
                 print("CallDidEnd, removing \(call.callId)")
@@ -163,7 +164,7 @@ class SINCallKitProvider: NSObject, CXProviderDelegate {
     
     func provider(_ provider: CXProvider, didDeactivate audioSession: AVAudioSession) {
         
-        print("did diactivate audio session")
+        print("did deactivate audio session")
     }
     
     

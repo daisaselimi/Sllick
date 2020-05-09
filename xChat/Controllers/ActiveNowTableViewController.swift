@@ -101,10 +101,10 @@ class ActiveNowTableViewController: UITableViewController {
         
         
         let contactsBy10 = contacts.chunked(into: 10)
-        
+        var index = 0
         for i in 0...contactsBy10.count - 1 {
             print(" H E E E E R E E E E \(i)")
-            activeUsersListeners.append(Firestore.firestore().collection("status").whereField("userId", in: contactsBy10[i] ).addSnapshotListener { (snapshot, error) in
+            activeUsersListeners.append(Firestore.firestore().collection("status").whereField("userId", in: contactsBy10[i] ).order(by: "userId", descending: true).addSnapshotListener { (snapshot, error) in
                  print("CONTACTS::::::::::\(contactsBy10[i])")
                  guard let snapshot = snapshot else {
                      print("NO SNAPSHOT -----------------_!!!")
@@ -114,7 +114,7 @@ class ActiveNowTableViewController: UITableViewController {
                  if !snapshot.isEmpty {
                      
                      if self.firstFetchOfOnlineUsers {
-                        if i == 0 {
+                        if index == 0 {
 
                             self.usersOnline = []
                         }
@@ -127,7 +127,7 @@ class ActiveNowTableViewController: UITableViewController {
                                  self.usersOnline.append(userId)
                              }
                          }
-                        if i == contactsBy10.count - 1 {
+                        if index == contactsBy10.count - 1 {
                                self.firstFetchOfOnlineUsers = false
                         }
                       
@@ -155,7 +155,7 @@ class ActiveNowTableViewController: UITableViewController {
                          }
                      }
                         print("U S E R S O N L I N E: \(self.usersOnline)")
-                    if i == contactsBy10.count - 1 {
+                    if index == contactsBy10.count - 1 {
                             self.loadUsers()
                     }
                     
@@ -167,6 +167,7 @@ class ActiveNowTableViewController: UITableViewController {
                     }
                    
                  }
+                  index += 1
              })
         }
         

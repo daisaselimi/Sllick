@@ -13,6 +13,7 @@ import FirebaseAuth
 import FirebaseFirestore
 import PushKit
 import OneSignal
+import CallKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINCallClientDelegate, SINManagedPushDelegate, PKPushRegistryDelegate   {
     
@@ -31,7 +32,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-        self.window?.backgroundColor = .systemBackground
+         self.window?.overrideUserInterfaceStyle = .dark
+        self.window?.backgroundColor = .black
         guard let _ = (scene as? UIWindowScene) else { return }
         let launchedBefore = UserDefaults.standard.bool(forKey: "launchedBefore")
         
@@ -41,17 +43,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
             UserDefaults.standard.set(true, forKey: kSHOWAVATAR)
             UserDefaults.standard.set(true, forKey: "launchedBefore")
         }
-        loadUserDefaults()
+       
+       // loadUserDefaults()
         authListener = Auth.auth().addStateDidChangeListener({ (auth, user) in
             
             Auth.auth().removeStateDidChangeListener(self.authListener!)
             
-            if Auth.auth().currentUser == nil {
-
-                self.window!.showMessage("Transaction limit exceeded. Please try again later.", type: .error)
-          
-                      
-            }
+//            if Auth.auth().currentUser == nil {
+//
+//                self.window!.showMessage("Transaction limit exceeded. Try again later.", type: .error)
+//
+//
+//            }
             if user != nil && UserDefaults.standard.object(forKey: kCURRENTUSER) != nil  {
                 customizeNavigationBar(colorName: "bwBackground")
                 DispatchQueue.main.async {
@@ -60,9 +63,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
                     ProgressHUD.statusColor(.label)
                     OneSignal.sendTag("userId", value: FUser.currentId())
                     self.goToView(named: kMAINAPPLICATION)
+                    //self.loadUserDefaults()
                 }
             } else {
                 customizeNavigationBar(colorName: "bcg")
+                self.window?.overrideUserInterfaceStyle = .dark
                 print("Welcome")
                 ProgressHUD.hudColor(.clear)
                 ProgressHUD.statusColor(.label)
@@ -95,7 +100,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
         
         self.voipRegistration()
         
-        self.push = Sinch.managedPush(with: .production)
+        self.push = Sinch.managedPush(with: .development)
         self.push.delegate = self
         self.push.setDesiredPushTypeAutomatically()
         
@@ -158,9 +163,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
     
     func goToView(named name: String) {
         
-        if name == kMAINAPPLICATION {
-            NotificationCenter.default.post(name: NSNotification.Name(rawValue: USER_DID_LOGIN_NOTIFICATION), object: nil, userInfo:  [kUSERID : FUser.currentId()])
-        }
+//        if name == kMAINAPPLICATION {
+//            NotificationCenter.default.post(name: NSNotification.Name(rawValue: USER_DID_LOGIN_NOTIFICATION), object: nil, userInfo:  [kUSERID : FUser.currentId()])
+//        }
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let initialViewController = storyboard.instantiateViewController(withIdentifier: name)
         self.window?.rootViewController = initialViewController
@@ -240,9 +245,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
             rctBadgeHangler.remove()
         }
         
-        updateCurrentUserInFirestore(withValues: [kISONLINE : false]) { (error) in
-            
-        }
+//        updateCurrentUserInFirestore(withValues: [kISONLINE : false]) { (error) in
+//
+//        }
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
@@ -271,6 +276,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
             self.handleRemoteNotification(userInfo: payload as NSDictionary)
         }
     }
+    
     
     func handleRemoteNotification(userInfo: NSDictionary) {
         print("got rem not")
@@ -383,7 +389,23 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
     
     func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType) {
         print("did get incoming push")
-        self.handleRemoteNotification(userInfo: payload.dictionaryPayload as NSDictionary)
+        let caller = "Sllick Call"
+        
+        let update = CXCallUpdate()
+        update.remoteHandle = CXHandle(type: .generic, value: caller)
+        let uuidString = payload.dictionaryPayload["callUUID"] as? String
+       // let callUUID = UUID(uuidString: uuidString!)
+        
+//        callKitProvider._provider.reportNewIncomingCall(with: UUID(), update: update) { (error) in
+//            if error != nil {
+//                print("error call \(error!.localizedDescription)")
+//            } else {
+                 self.handleRemoteNotification(userInfo: payload.dictionaryPayload as NSDictionary)
+         //   }
+      //  }
+          
+            
+            
     }
     
     //MARK: PushNotification functions

@@ -39,7 +39,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Users"
-        
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         gradientLoadingBar.gradientColors =  [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
         navigationItem.largeTitleDisplayMode = .never
         tableView.tableFooterView = UIView()
@@ -92,7 +92,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
     
     
     // MARK: - Table view data source
-
+    
     @IBAction func filterSegmentValueChanged(_ sender: UISegmentedControl) {
         searchController.isActive = false
         switch sender.selectedSegmentIndex {
@@ -104,13 +104,13 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
         case 1:
             loadUsers(filter: kCOUNTRY)
             scope = kCOUNTRY
-             fetchingMore = false
-             lastDocumentSnapshot = nil
+            fetchingMore = false
+            lastDocumentSnapshot = nil
         case 2:
             loadUsers(filter: "")
             scope = ""
-             fetchingMore = false
-             lastDocumentSnapshot = nil
+            fetchingMore = false
+            lastDocumentSnapshot = nil
         default:
             return
         }
@@ -228,7 +228,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
             reference(.Contact).document(FUser.currentId()).updateData(dict) { (error) in
                 if error != nil {
                     print(error?.localizedDescription)
-                     self.showMessage("Could not add contact", type: .error)
+                    self.showMessage("Could not add contact", type: .error)
                 } else {
                     ProgressHUD.showSuccess()
                 }
@@ -281,14 +281,14 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
     }
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-
-         view.tintColor = .systemBackground
-
-         let header : UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
-         
-         header.textLabel?.textColor = .label
-
-     }
+        
+        view.tintColor = .systemBackground
+        
+        let header : UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
+        
+        header.textLabel?.textColor = .label
+        
+    }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
@@ -320,14 +320,14 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
             self.navigationController?.pushViewController(chatVC, animated: true)
         }
         else {
-             self.showMessage("This user is not available for chat", type: .error)
+            self.showMessage("This user is not available for chat", type: .error)
         }
     }
     
- 
+    
     
     func loadUsers(filter: String) {
-           self.gradientLoadingBar.fadeIn()
+        self.gradientLoadingBar.fadeIn()
         
         var query: Query!
         
@@ -346,7 +346,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
             self.allUsersGrouped = [:]
             if error != nil {
                 print(error!.localizedDescription)
-                    self.gradientLoadingBar.fadeOut()
+                self.gradientLoadingBar.fadeOut()
                 self.tableView.reloadData()
                 return
             }
@@ -370,27 +370,27 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
             }
             
             self.tableView.reloadData()
-                self.gradientLoadingBar.fadeOut()
+            self.gradientLoadingBar.fadeOut()
         }
     }
     
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
-           let offsetY = scrollView.contentOffset.y
-           let contentHeight = scrollView.contentSize.height
-           //print("offsetY: \(offsetY) | contHeight-scrollViewHeight: \(contentHeight-scrollView.frame.height)")
-           if offsetY > contentHeight - scrollView.frame.height - 50 {
-               // Bottom of the screen is reached
-               if !fetchingMore {
-                   if lastDocumentSnapshot != nil {
-                       paginateData()
-                   }
-               }
-           }
-       }
+        let offsetY = scrollView.contentOffset.y
+        let contentHeight = scrollView.contentSize.height
+        //print("offsetY: \(offsetY) | contHeight-scrollViewHeight: \(contentHeight-scrollView.frame.height)")
+        if offsetY > contentHeight - scrollView.frame.height - 50 {
+            // Bottom of the screen is reached
+            if !fetchingMore {
+                if lastDocumentSnapshot != nil {
+                    paginateData()
+                }
+            }
+        }
+    }
     
     func paginateData() {
-          fetchingMore = true
-          print("hereeeee")
+        fetchingMore = true
+        print("hereeeee")
         
         var query: Query!
         
@@ -405,10 +405,10 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
         
         query.limit(to: 6).start(afterDocument: lastDocumentSnapshot).getDocuments { (snapshot, error) in
             //self.allUsers = []
-        
+            
             if error != nil {
                 print(error!.localizedDescription)
-                    self.gradientLoadingBar.fadeOut()
+                self.gradientLoadingBar.fadeOut()
                 self.fetchingMore = false
                 self.tableView.reloadData()
                 return
@@ -418,23 +418,23 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
             
             if !snapshot.isEmpty {
                 self.sectionTitleList = []
-                        self.allUsersGrouped = [:]
+                self.allUsersGrouped = [:]
                 for userDictionary in snapshot.documents {
                     let userDictionary = userDictionary.data() as NSDictionary
                     let fUser = FUser(_dictionary: userDictionary)
                     
                     if(fUser.objectId != FUser.currentId() && !fUser.blockedUsers.contains(FUser.currentUser()!.objectId)) {
                         self.allUsers.append(fUser)
-                      }
-                  }
-                  
-                  self.lastDocumentSnapshot = snapshot.documents.last!
-                  self.splitDataIntoSections()
-                 // self.tableView.reloadData()
-              }
+                    }
+                }
+                
+                self.lastDocumentSnapshot = snapshot.documents.last!
+                self.splitDataIntoSections()
+                // self.tableView.reloadData()
+            }
             self.fetchingMore = false
-              self.tableView.reloadData()
-      }
+            self.tableView.reloadData()
+        }
     }
     
     
@@ -444,12 +444,12 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
     
     func updateSearchResults(for searchController: UISearchController) {
         
-      
+        
         NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(filterContentForSearchText), object: nil)
-         searchTxt = searchController.searchBar.text!.lowercased().removeExtraSpaces()
+        searchTxt = searchController.searchBar.text!.lowercased().removeExtraSpaces()
         self.perform(#selector(filterContentForSearchText), with: nil, afterDelay: 0.5)
-   
-      
+        
+        
     }
     
     
@@ -462,7 +462,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
         filteredUsers = []
         tableView.reloadData()
         
-       
+        
         reference(.UserKeywords).whereField("keywords", arrayContains: searchTxt).getDocuments { (snapshot, error) in
             print("hereeeeeeeeeeee")
             if error != nil {

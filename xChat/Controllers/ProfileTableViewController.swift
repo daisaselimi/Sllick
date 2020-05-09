@@ -109,11 +109,14 @@ class ProfileTableViewController: UITableViewController {
     //MARK: IBactions
     
     @IBAction func callButtonPressed(_ sender: Any) {
-        callUser()
-        let currentUser = FUser.currentUser()!
-        
-        let call = CallClass(_callerId: currentUser.objectId, _withUserId: user!.objectId, _callerFullName: currentUser.fullname, _withUserFullName: user!.fullname)
-        call.saveCallInBackground()
+        if checkMicPermission(viewController: self) {
+            callUser()
+            let currentUser = FUser.currentUser()!
+            
+            let call = CallClass(_callerId: currentUser.objectId, _withUserId: user!.objectId, _callerFullName: currentUser.fullname, _withUserFullName: user!.fullname)
+            call.saveCallInBackground()
+        }
+
         
     }
     
@@ -201,29 +204,39 @@ class ProfileTableViewController: UITableViewController {
     }
     
     @IBAction func blockUserPressed(_ sender: Any) {
-        var currentBlockedIds = FUser.currentUser()!.blockedUsers
-        if currentBlockedIds.contains(user!.objectId) {
-            let index = currentBlockedIds.firstIndex(of: user!.objectId)
-            currentBlockedIds.remove(at: index!)
-        }
-        else {
-            currentBlockedIds.append(user!.objectId)
-        }
-        updateCurrentUserInFirestore(withValues: [kBLOCKEDUSERID : currentBlockedIds]) { (error) in
-            
-            if error != nil {
-                print("error updating user \(error)")
-                return
+        let alertController = UIAlertController(title: nil,
+                                                message: "Are you sure you want to block them?",
+                                                preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alertController.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+            var currentBlockedIds = FUser.currentUser()!.blockedUsers
+            if currentBlockedIds.contains(self.user!.objectId) {
+                let index = currentBlockedIds.firstIndex(of: self.user!.objectId)
+                currentBlockedIds.remove(at: index!)
             }
-            
-            self.updateBlockStatus()
-            blockUser(userToBlock: self.user!)
-            self.removeFromContacts(ofUser: FUser.currentId(), user: self.user!.objectId)
-            self.removeFromContacts(ofUser: self.user!.objectId, user: FUser.currentId())
-            self.navigationController?.popToRootViewController(animated: true)
-        }
+            else {
+                currentBlockedIds.append(self.user!.objectId)
+            }
+            updateCurrentUserInFirestore(withValues: [kBLOCKEDUSERID : currentBlockedIds]) { (error) in
+                
+                if error != nil {
+                    print("error updating user \(error)")
+                    return
+                }
+                
+                self.updateBlockStatus()
+                blockUser(userToBlock: self.user!)
+                self.removeFromContacts(ofUser: FUser.currentId(), user: self.user!.objectId)
+                self.removeFromContacts(ofUser: self.user!.objectId, user: FUser.currentId())
+                self.navigationController?.popToRootViewController(animated: true)
+            }
+        })
+        alertController.view.tintColor = UIColor(named: "outgoingBubbleColor")
+        self.present(alertController, animated: true)
         
     }
+    
+    
     
     func removeFromContacts(ofUser: String, user: String) {
         //navigationItem.rightBarButtonItems?.first?.isEnabled = false

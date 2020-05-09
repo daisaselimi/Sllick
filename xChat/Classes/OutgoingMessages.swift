@@ -62,7 +62,7 @@ class OutgoingMessage {
             case kVIDEO: pushText = "Sent a video."
             case kLOCATION: pushText = "Sent their location."
         default:
-            pushText = plainMessage != "" ? plainMessage : "Sent a messag."
+            pushText = plainMessage != "" ? plainMessage : "Sent a message."
         }
         
         sendPushNotification(membersToPush: membersToPush, message: pushText, isGroup: isGroup, groupName: groupName, memberIds: memberIds, chatRoomId: chatRoomID, titleName: chatTitle)

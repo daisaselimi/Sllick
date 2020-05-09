@@ -208,35 +208,39 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        tableView.isUserInteractionEnabled = false
         
-        var user: FUser!
-        var userId: String!
-        if searchController.isActive && searchController.searchBar.text != "" {
-            if filteredCalls[indexPath.row].callerId == FUser.currentId() {
-                userId = filteredCalls[indexPath.row].withUserId
-            } else {
-                userId = filteredCalls[indexPath.row].callerId
-            }
+        if checkMicPermission(viewController: self) {
+            tableView.isUserInteractionEnabled = false
             
-            getUsersFromFirestore(withIds: [userId]) { (users) in
-                user = users[0]
-                self.callUser(user: user)
-                tableView.isUserInteractionEnabled = true
-            }
-        } else {
-            if allCalls[indexPath.row].callerId == FUser.currentId() {
-                userId = allCalls[indexPath.row].withUserId
+            var user: FUser!
+            var userId: String!
+            if searchController.isActive && searchController.searchBar.text != "" {
+                if filteredCalls[indexPath.row].callerId == FUser.currentId() {
+                    userId = filteredCalls[indexPath.row].withUserId
+                } else {
+                    userId = filteredCalls[indexPath.row].callerId
+                }
+                
+                getUsersFromFirestore(withIds: [userId]) { (users) in
+                    user = users[0]
+                    self.callUser(user: user)
+                    tableView.isUserInteractionEnabled = true
+                }
             } else {
-                userId = allCalls[indexPath.row].callerId
-            }
-            
-            getUsersFromFirestore(withIds: [userId]) { (users) in
-                user = users[0]
-                self.callUser(user: user)
-                tableView.isUserInteractionEnabled = true
+                if allCalls[indexPath.row].callerId == FUser.currentId() {
+                    userId = allCalls[indexPath.row].withUserId
+                } else {
+                    userId = allCalls[indexPath.row].callerId
+                }
+                
+                getUsersFromFirestore(withIds: [userId]) { (users) in
+                    user = users[0]
+                    self.callUser(user: user)
+                    tableView.isUserInteractionEnabled = true
+                }
             }
         }
+        
         
     }
     
@@ -249,17 +253,21 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
     }
     
     func callUser(user: FUser) {
-        let currentUser = FUser.currentUser()!
         
-        let callToSave = CallClass(_callerId: currentUser.objectId, _withUserId: user.objectId, _callerFullName: currentUser.fullname, _withUserFullName: user.fullname)
-       
-        let userToCall = user.objectId
-        let call = callClient()?.callUser(withId: userToCall)
-        let callVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(identifier: "CallVC") as! CallViewController
-        callVC._call = call
-        callVC.callingName = user.fullname
-        self.present(callVC, animated: true, completion: nil)
-         callToSave.saveCallInBackground()
+        if checkMicPermission(viewController: self) {
+            let currentUser = FUser.currentUser()!
+            
+            let callToSave = CallClass(_callerId: currentUser.objectId, _withUserId: user.objectId, _callerFullName: currentUser.fullname, _withUserFullName: user.fullname)
+            
+            let userToCall = user.objectId
+            let call = callClient()?.callUser(withId: userToCall)
+            let callVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(identifier: "CallVC") as! CallViewController
+            callVC._call = call
+            callVC.callingName = user.fullname
+            self.present(callVC, animated: true, completion: nil)
+            callToSave.saveCallInBackground()
+        }
+        
     }
     
     

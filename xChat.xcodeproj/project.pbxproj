@@ -284,6 +284,7 @@
 		7F85E7F8241E880800333662 /* OneSignalNotificationServiceExtension */ = {
 			isa = PBXGroup;
 			children = (
+				7F50AE9924265C7400CE11A7 /* xChat-Bridging-Header.h */,
 				7F0BED94241E9D6B00785646 /* OneSignalNotificationServiceExtension.entitlements */,
 				7F85E7F9241E880800333662 /* NotificationService.swift */,
 				7F85E7FB241E880800333662 /* Info.plist */,
@@ -333,7 +334,6 @@
 				7F4023D923C292700001CB65 /* gr_ls.png */,
 				7FFB472A2356069F00CC10A2 /* Info.plist */,
 				7F3FD5DE2356686500354313 /* GoogleService-Info.plist */,
-				7F50AE9924265C7400CE11A7 /* xChat-Bridging-Header.h */,
 			);
 			path = xChat;
 			sourceTree = "<group>";
@@ -798,6 +798,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = xChat/SentDebug.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = C2FCSXGG97;
 				INFOPLIST_FILE = xChat/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -805,7 +806,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.isaselimii.xChat;
 				PRODUCT_NAME = Sllick;
 				SUPPORTS_MACCATALYST = NO;
@@ -825,6 +826,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = xChat/Sent.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = C2FCSXGG97;
 				INFOPLIST_FILE = xChat/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -832,7 +834,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.isaselimii.xChat;
 				PRODUCT_NAME = Sllick;
 				SUPPORTS_MACCATALYST = NO;

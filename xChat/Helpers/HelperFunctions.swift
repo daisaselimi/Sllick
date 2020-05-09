@@ -680,32 +680,62 @@ extension Array {
 
 
 
-func checkCameraAccess(viewController: UIViewController) {
+func checkCameraAccess(viewController: UIViewController, completion: @escaping(CNAuthorizationStatus) -> ()) {
     switch AVCaptureDevice.authorizationStatus(for: .video) {
     case .denied:
         print("Denied, request permission from settings")
-        presentCameraSettings(viewController: viewController)
+        presentSettings(viewController: viewController, titleText: "Camera and media access denied")
+        completion(.denied)
     case .restricted:
         print("Restricted, device owner must approve")
+        completion(.denied)
     case .authorized:
         print("Authorized, proceed")
+        completion(.authorized)
     case .notDetermined:
         AVCaptureDevice.requestAccess(for: .video) { success in
             if success {
                 print("Permission granted, proceed")
+                completion(.authorized)
             } else {
                 print("Permission denied")
+                completion(.denied)
             }
         }
     }
 }
 
+func checkMicPermission(viewController: UIViewController) -> Bool {
+
+    var permissionCheck: Bool = false
+
+    switch AVAudioSession.sharedInstance().recordPermission {
+    case AVAudioSessionRecordPermission.granted:
+        permissionCheck = true
+    case AVAudioSessionRecordPermission.denied:
+        permissionCheck = false
+        presentSettings(viewController: viewController, titleText: "Microphone access denied")
+    case AVAudioSessionRecordPermission.undetermined:
+        AVAudioSession.sharedInstance().requestRecordPermission({ (granted) in
+            if granted {
+                permissionCheck = true
+            } else {
+                permissionCheck = false
+            }
+        })
+    default:
+        break
+    }
+
+    return permissionCheck
+}
 
 
-func presentCameraSettings(viewController: UIViewController) {
-    let alertController = UIAlertController(title: "Access denied",
-                                  message: "Open settings to change permission",
-                                  preferredStyle: .alert)
+
+func presentSettings(viewController: UIViewController, titleText: String) {
+    let alertController = UIAlertController(title: titleText,
+                                            message: "Open settings to change permission",
+                                            preferredStyle: .alert)
     alertController.addAction(UIAlertAction(title: "Cancel", style: .default))
     alertController.addAction(UIAlertAction(title: "Settings", style: .cancel) { _ in
         if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -714,7 +744,7 @@ func presentCameraSettings(viewController: UIViewController) {
             })
         }
     })
-
+    
     viewController.present(alertController, animated: true)
 }
 
@@ -724,7 +754,7 @@ func checkContactsAccess(viewController: UIViewController, completion: @escaping
         print("Authorized, proceed")
         completion(.authorized)
     case .denied:
-        presentCameraSettings(viewController: viewController)
+        presentSettings(viewController: viewController, titleText: "Contacts access denied")
         completion(.denied)
     case .restricted, .notDetermined:
         CNContactStore().requestAccess(for: .contacts) { granted, error in
@@ -741,5 +771,7 @@ func checkContactsAccess(viewController: UIViewController, completion: @escaping
     }
     completion(.denied)
 }
+
+
 
 

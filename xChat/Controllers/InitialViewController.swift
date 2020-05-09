@@ -14,13 +14,16 @@ class InitialViewController: UIViewController {
     @IBOutlet weak var signupButton: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.navigationController?.overrideUserInterfaceStyle = .dark
+        self.view.window?.overrideUserInterfaceStyle = .dark
+        //self.view.window?.overrideUserInterfaceStyle = .dark
         loginButton.backgroundColor = UIColor.getAppColor(.light)
         signupButton.backgroundColor = UIColor.getAppColor(.dark)
         // Do any additional setup after loading the view.
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        
+         // self.view.window?.overrideUserInterfaceStyle = .dark
         self.navigationController?.isNavigationBarHidden = true
     }
     

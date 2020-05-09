@@ -29,8 +29,11 @@ class FinishRegistrationTableViewController: UITableViewController, ImagePickerD
     override func viewDidLoad() {
         super.viewDidLoad()
      gradientLoadingBar.gradientColors =  [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
+        phoneTextField.attributedPlaceholder = NSAttributedString(string: phoneTextField.placeholder ?? "",
+                                                                  attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
+        phoneTextField.textColor = .white
         viewTapGestureRecognizer.addTarget(self, action: #selector(viewTap))
-
+        
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 107, bottom: 0, right: 0)
         view.isUserInteractionEnabled = true
         //      topView.addBottomBorderWithColor(color: .opaqueSeparator, width: 0.5)

@@ -125,7 +125,15 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+      
+        
+        
         setNavigationBarAppearance()
+        if MyVariables.wasShowingVariableInChat {
+                 self.inputToolbar.contentView.textView.becomeFirstResponder()
+            }
+    
+       
         if let viewWithTag = self.view.viewWithTag(0) {
             viewWithTag.isHidden = false
         }
@@ -162,11 +170,18 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     }
     
     
-    
-    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        
+        if inputToolbar.contentView.textView.isFirstResponder {
+            MyVariables.wasShowingVariableInChat = true
+         
+        } else {
+            MyVariables.wasShowingVariableInChat = false
+        }
+           inputToolbar.contentView.textView.resignFirstResponder()
         recentListener?.remove()
+        
         gradientLoadingBar.fadeOut(duration: 0)
         if let viewWithTag = self.view.viewWithTag(0) {
             if  userDefaults.object(forKey: kBACKGROUBNDIMAGE) != nil {
@@ -201,13 +216,17 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         incomingBubble = JSQMessagesBubbleImageFactory()?.incomingMessagesBubbleImage(with: UIColor(named: "incomingBubbleColor"))
     }
     
-    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+          self.view.window?.backgroundColor = .black
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         //internetConnectionChanged()
  
         checkForBackgroundImage()
+        MyVariables.wasShowingVariableInChat = false
         clearRecentCounter(chatRoomId: chatRoomId)
         
         NotificationCenter.default.addObserver(self,
@@ -629,6 +648,23 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         }
     }
     
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForMessageBubbleTopLabelAt indexPath: IndexPath!) -> CGFloat {
+        if messages[indexPath.row].senderId != FUser.currentId() && isGroup! {
+             return 30
+        }
+        return 10
+       
+    }
+    
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
+        if messages[indexPath.row].senderId == FUser.currentId() || !isGroup!{
+             return NSAttributedString(string: "")
+        }
+        
+        
+        return NSAttributedString(string: messages[indexPath.row].senderDisplayName)
+    }
+    
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForCellTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
         if prevD == nil {
@@ -701,11 +737,14 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         }
     }
     
+    
+
+    
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, didTapMessageBubbleAt indexPath: IndexPath!) {
         
         let messageDictionary = objectMessages[indexPath.row]
         let messageType = messageDictionary[kTYPE] as! String
-        
+
         switch messageType {
         case kPICTURE:
             let message = messages[indexPath.row]
@@ -834,18 +873,33 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         let camera = Camera(delegate_: self)
         
         let takePhotoOrVideo = UIAlertAction(title: "Camera", style: .default) { (action) in
-            checkCameraAccess(viewController: self)
-            camera.PresentMultyCamera(target: self, canEdit: false)
+            checkCameraAccess(viewController: self) {
+                accessStatus in
+                if accessStatus == .authorized {
+                    camera.PresentMultyCamera(target: self, canEdit: false)
+                }
+            }
+            
         }
         
         let sharePhoto = UIAlertAction(title: "Photo Library", style: .default) { (action) in
-            checkCameraAccess(viewController: self)
-            camera.PresentPhotoLibrary(target: self, canEdit: false)
+            checkCameraAccess(viewController: self) {
+                accessStatus in
+                if accessStatus == .authorized {
+                    camera.PresentPhotoLibrary(target: self, canEdit: false)
+                }
+            }
+            
         }
         
         let shareVideo = UIAlertAction(title: "Video Library", style: .default) { (action) in
-            checkCameraAccess(viewController: self)
-            camera.PresentVideoLibrary(target: self, canEdit: false)
+            checkCameraAccess(viewController: self) {
+                accessStatus in
+                if accessStatus == .authorized {
+                    camera.PresentVideoLibrary(target: self, canEdit: false)
+                }
+            }
+            
         }
         
         let shareLocation = UIAlertAction(title: "Share Location", style: .default) { (action) in
@@ -929,15 +983,21 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     }
     
     func listenForBlockStatus() {
-        reference(.User).document(memberIds.filter({ $0 != FUser.currentId()}).first!).addSnapshotListener { (document, error) in
-            
-            if let document = document {
-                if ((document[kBLOCKEDUSERID] as! [String]).contains(FUser.currentId())) {
-                    self.navigationController?.popToRootViewController(animated: true)
+        if let  member = memberIds.filter({ $0 != FUser.currentId()}).first {
+            reference(.User).document(member).addSnapshotListener { (document, error) in
+                if error != nil {
+                    return
+                }
+                if let document = document {
+                    if !document.data()!.isEmpty {
+                        if ((document[kBLOCKEDUSERID] as! [String]).contains(FUser.currentId())) {
+                            self.navigationController?.popToRootViewController(animated: true)
+                            
+                        }
+                    }
                     
                 }
             }
-            
         }
     }
     

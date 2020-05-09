@@ -30,7 +30,7 @@ class SettingsTableViewController: UITableViewController{
     override func viewWillAppear(_ animated: Bool) {
            let scene = UIApplication.shared.connectedScenes.first
                       if let sd : SceneDelegate = (scene?.delegate as? SceneDelegate) {
-                        sd.window!.backgroundColor = UIColor(named: "statusBarColor")
+                        sd.window!.backgroundColor = .black
                       }
     }
     
@@ -140,13 +140,14 @@ class SettingsTableViewController: UITableViewController{
     func presentWelcomeView() {
         
         let mainView = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(identifier: "navInit") 
-            let scene = UIApplication.shared.connectedScenes.first
-                 if let sd : SceneDelegate = (scene?.delegate as? SceneDelegate) {
-                        customizeNavigationBar(colorName: "bcg")
-                            sd.setRootViewController(mainView)
-                    sd.window!.makeKeyAndVisible()
-                 }
+        let scene = UIApplication.shared.connectedScenes.first
+        if let sd : SceneDelegate = (scene?.delegate as? SceneDelegate) {
+            customizeNavigationBar(colorName: "bcg")
+            sd.setRootViewController(mainView)
+            sd.window!.makeKeyAndVisible()
+        }
     }
+    
     @IBAction func showAvatarSwitchValueChanged(_ sender: UISwitch) {
         avatarSwitchStatus = sender.isOn
         saveUserDefaults()
@@ -275,7 +276,7 @@ class SettingsTableViewController: UITableViewController{
               
               let loUser: String = FUser.currentId()
               let logOutAction = UIAlertAction(title: "Log Out", style: .destructive) { (alert) in
-                  updateUserInFirestore(userId: loUser, withValues: [kISONLINE : false]) { (error) in
+                  updateUserInFirestore(userId: loUser, withValues: [kPUSHID : ""]) { (error) in
                       
                   }
                   FUser.logOutCurrentUser { (success) in

@@ -22,6 +22,7 @@ class WelcomeViewController: UIViewController {
    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
            gradientLoadingBar.gradientColors =  [UIColor.getAppColor(.light), UIColor.getAppColor(.dark), UIColor.getAppColor(.light), UIColor.getAppColor(.dark)]
         welcomeLabel.textColor = UIColor.getAppColor(.dark)
         signUpButton.backgroundColor = UIColor.getAppColor(.light)
@@ -36,6 +37,7 @@ class WelcomeViewController: UIViewController {
   
     
     override func viewWillAppear(_ animated: Bool) {
+     
         passwordTextField.text = ""
         repeatPasswordTextField.text = ""
         self.navigationController?.isNavigationBarHidden = false

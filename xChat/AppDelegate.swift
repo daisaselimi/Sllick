@@ -34,6 +34,10 @@ struct MyVariables {
             NotificationCenter.default.post(name: .internetConnectionState, object: nil)
         }
     }
+    
+    static var wasShowingVariableInChat = false
+    
+    static var isSyncingContacts = false
 }
 
 @UIApplicationMain
@@ -259,7 +263,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             reachability = try Reachability()
             reachability.whenReachable = { reachability in
                 if reachability.connection == .wifi {
-                    print("- - - - - - -- - - - - - - - - - - - - - - - -Reachable via WiFi")
+                    print("- - - - - - -- - - - - - - - - - - - - - - - -Reachable via WiFiiiiii")
                 } else {
                     print("- - - - - - - - - - - - - - - - - - - - - -- - Reachable via Cellular")
                 }
@@ -312,9 +316,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
     
     func applicationWillTerminate(_ application: UIApplication) {
-        updateUserInFirestore(userId: FUser.currentId(), withValues: [kISONLINE : false]) { (error) in
-            
-        }
+//        updateUserInFirestore(userId: FUser.currentId(), withValues: [kISONLINE : false]) { (error) in
+//
+//        }
     }
     
     //    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {

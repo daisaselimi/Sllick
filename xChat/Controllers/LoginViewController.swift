@@ -226,6 +226,7 @@ class LoginViewController: UIViewController {
     func goToApp() {
         clearTextFields()
         dismissKeyboard()
+           NotificationCenter.default.post(name: NSNotification.Name(rawValue: USER_DID_LOGIN_NOTIFICATION), object: nil, userInfo:  [kUSERID : FUser.currentId()])
         customizeNavigationBar(colorName: "bwBackground")
              let mainView = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(identifier: "mainApplication") as! UITabBarController
            let scene = UIApplication.shared.connectedScenes.first

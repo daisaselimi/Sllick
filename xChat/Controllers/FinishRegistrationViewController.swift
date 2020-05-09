@@ -39,6 +39,9 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
     override func viewDidLoad() {
         super.viewDidLoad()
         viewTapGestureRecognizer.addTarget(self, action: #selector(viewTap))
+        overrideUserInterfaceStyle = .light
+        let textAttributes = [NSAttributedString.Key.foregroundColor:UIColor.white]
+        navigationController?.navigationBar.titleTextAttributes = textAttributes
           gradientLoadingBar.gradientColors =  [UIColor.getAppColor(.light), UIColor.getAppColor(.dark), UIColor.getAppColor(.light), UIColor.getAppColor(.dark)]
         view.isUserInteractionEnabled = true
 //      topView.addBottomBorderWithColor(color: .opaqueSeparator, width: 0.5)
