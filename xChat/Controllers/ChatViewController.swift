@@ -252,7 +252,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         
         titleLabel.text = initialWithUser ?? ""
         avatarButton.setImage(initialImage!, for: .normal)
-        subTitleLabel.text = isGroup! ? "Group chat" : "Sent messenger"
+        subTitleLabel.text = isGroup! ? "Group chat" : "Sllick Chat"
         
         if let isPartOfGr = isPartOfGroup {
             if !isPartOfGr {
