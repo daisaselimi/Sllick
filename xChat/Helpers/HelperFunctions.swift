@@ -713,8 +713,8 @@ func checkMicPermission(viewController: UIViewController) -> Bool {
     case AVAudioSessionRecordPermission.granted:
         permissionCheck = true
     case AVAudioSessionRecordPermission.denied:
-        permissionCheck = false
         presentSettings(viewController: viewController, titleText: "Microphone access denied")
+        permissionCheck = false
     case AVAudioSessionRecordPermission.undetermined:
         AVAudioSession.sharedInstance().requestRecordPermission({ (granted) in
             if granted {
@@ -770,6 +770,25 @@ func checkContactsAccess(viewController: UIViewController, completion: @escaping
         }
     }
     completion(.denied)
+}
+
+
+struct MyVariables {
+    static var globalContactsVariable: [String] = [] {
+           didSet {
+               NotificationCenter.default.post(name: .globalContactsVariable, object: nil)
+           }
+       }
+    
+    static var internetConnectionState: Bool = true {
+        didSet {
+            NotificationCenter.default.post(name: .internetConnectionState, object: nil)
+        }
+    }
+    
+    static var wasShowingVariableInChat = false
+    
+    static var isSyncingContacts = false
 }
 
 

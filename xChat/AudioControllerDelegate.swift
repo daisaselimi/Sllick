@@ -11,7 +11,7 @@ import Foundation
 class AudioContollerDelegate: NSObject, SINAudioControllerDelegate {
     
     var muted: Bool!
-    var speaker: Bool!//not needed
+    var speaker: Bool!
     
     func audioControllerMuted(_ audioController: SINAudioController!) {
         self.muted = true

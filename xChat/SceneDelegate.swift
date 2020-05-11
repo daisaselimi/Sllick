@@ -32,7 +32,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-         self.window?.overrideUserInterfaceStyle = .dark
+        self.window?.overrideUserInterfaceStyle = .dark
         self.window?.backgroundColor = .black
         guard let _ = (scene as? UIWindowScene) else { return }
         let launchedBefore = UserDefaults.standard.bool(forKey: "launchedBefore")
@@ -43,18 +43,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
             UserDefaults.standard.set(true, forKey: kSHOWAVATAR)
             UserDefaults.standard.set(true, forKey: "launchedBefore")
         }
-       
-       // loadUserDefaults()
+        
+        // loadUserDefaults()
         authListener = Auth.auth().addStateDidChangeListener({ (auth, user) in
             
             Auth.auth().removeStateDidChangeListener(self.authListener!)
             
-//            if Auth.auth().currentUser == nil {
-//
-//                self.window!.showMessage("Transaction limit exceeded. Try again later.", type: .error)
-//
-//
-//            }
+            //            if Auth.auth().currentUser == nil {
+            //
+            //                self.window!.showMessage("Transaction limit exceeded. Try again later.", type: .error)
+            //
+            //
+            //            }
             if user != nil && UserDefaults.standard.object(forKey: kCURRENTUSER) != nil  {
                 customizeNavigationBar(colorName: "bwBackground")
                 DispatchQueue.main.async {
@@ -100,7 +100,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
         
         self.voipRegistration()
         
-        self.push = Sinch.managedPush(with: .development)
+        self.push = Sinch.managedPush(with: .production)
         self.push.delegate = self
         self.push.setDesiredPushTypeAutomatically()
         
@@ -163,9 +163,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
     
     func goToView(named name: String) {
         
-//        if name == kMAINAPPLICATION {
-//            NotificationCenter.default.post(name: NSNotification.Name(rawValue: USER_DID_LOGIN_NOTIFICATION), object: nil, userInfo:  [kUSERID : FUser.currentId()])
-//        }
+        //        if name == kMAINAPPLICATION {
+        //            NotificationCenter.default.post(name: NSNotification.Name(rawValue: USER_DID_LOGIN_NOTIFICATION), object: nil, userInfo:  [kUSERID : FUser.currentId()])
+        //        }
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let initialViewController = storyboard.instantiateViewController(withIdentifier: name)
         self.window?.rootViewController = initialViewController
@@ -184,7 +184,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
     
     func sceneDidBecomeActive(_ scene: UIScene) {
         
-       // UIApplication.shared.applicationIconBadgeNumber = 0
+        // UIApplication.shared.applicationIconBadgeNumber = 0
         var top = self.window?.rootViewController
         
         while top?.presentedViewController != nil {
@@ -245,9 +245,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
             rctBadgeHangler.remove()
         }
         
-//        updateCurrentUserInFirestore(withValues: [kISONLINE : false]) { (error) in
-//
-//        }
+        //        updateCurrentUserInFirestore(withValues: [kISONLINE : false]) { (error) in
+        //
+        //        }
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
@@ -341,7 +341,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
         
         let callVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "CallVC") as! CallViewController
         let id =  call.remoteUserId
-      
+        
         getUsersFromFirestore(withIds: [id!]) { (allUsers) in
             if allUsers.count > 0 {
                 let user = allUsers.first!
@@ -357,7 +357,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
                 }
             }
         }
-      
+        
         
         
     }
@@ -387,27 +387,71 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
         
     }
     
-    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType) {
+    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
         print("did get incoming push")
-        let caller = "Sllick Call"
         
-        let update = CXCallUpdate()
-        update.remoteHandle = CXHandle(type: .generic, value: caller)
-        let uuidString = payload.dictionaryPayload["callUUID"] as? String
-       // let callUUID = UUID(uuidString: uuidString!)
+        //        let update = CXCallUpdate()
+        //        update.remoteHandle = CXHandle(type: .generic, value: caller)
+        //        let uuidString = payload.dictionaryPayload["callUUID"] as? String
+        //        let callUUID = UUID(uuidString: uuidString!)
+        //
+        //        callKitProvider._provider.reportNewIncomingCall(with: UUID(), update: update) { (error) in
+        //            if error != nil {
+        //                print("error call \(error!.localizedDescription)")
+        //            } else {
+        //
+        //            }
+        //        }
         
-//        callKitProvider._provider.reportNewIncomingCall(with: UUID(), update: update) { (error) in
-//            if error != nil {
-//                print("error call \(error!.localizedDescription)")
-//            } else {
-                 self.handleRemoteNotification(userInfo: payload.dictionaryPayload as NSDictionary)
-         //   }
-      //  }
-          
-            
-            
+        if type == .voIP {
+            if let handle = payload.dictionaryPayload["handle"] as? String{
+                let callUpdate = CXCallUpdate()
+                callUpdate.remoteHandle = CXHandle(type: .generic,value: handle)
+                let callId = UUID()
+                
+                callKitProvider._provider.reportCall(with: callId, updated: callUpdate)
+                callKitProvider._provider.reportNewIncomingCall(with: callId, update: callUpdate) { (error) in
+                    completion()
+                }
+                // Set up connection with your services here for call management
+                self.handleRemoteNotification(userInfo: payload.dictionaryPayload as NSDictionary)
+            }
+        }
     }
     
+//    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType) {
+//        print("did get incoming push")
+//        let caller = "Sllick Call"
+//
+//        //        let update = CXCallUpdate()
+//        //        update.remoteHandle = CXHandle(type: .generic, value: caller)
+//        //        let uuidString = payload.dictionaryPayload["callUUID"] as? String
+//        //        let callUUID = UUID(uuidString: uuidString!)
+//        //
+//        //        callKitProvider._provider.reportNewIncomingCall(with: UUID(), update: update) { (error) in
+//        //            if error != nil {
+//        //                print("error call \(error!.localizedDescription)")
+//        //            } else {
+//        //
+//        //            }
+//        //        }
+//
+//        if type == .voIP {
+//            if let handle = payload.dictionaryPayload["handle"] as? String{
+//                let callUpdate = CXCallUpdate()
+//                callUpdate.remoteHandle = CXHandle(type: .phoneNumber,value: handle)
+//                let callId = UUID()
+//
+//                callKitProvider._provider.reportNewIncomingCall(with: callId, update: callUpdate) { (error) in
+//                    //
+//                }
+//                // Set up connection with your services here for call management
+//                self.handleRemoteNotification(userInfo: payload.dictionaryPayload as NSDictionary)
+//            }
+//
+//        }
+//
+//    }
     //MARK: PushNotification functions
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
@@ -431,7 +475,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
             self.window?.makeKeyAndVisible()
             return
         }
-
+        
         window.rootViewController = vc
         window.makeKeyAndVisible()
         UIView.transition(with: window,

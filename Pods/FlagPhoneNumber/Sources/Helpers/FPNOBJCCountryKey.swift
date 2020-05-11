@@ -43,6 +43,7 @@ import Foundation
 	case BI
 	case BJ
 	case KH
+    case KS
 	case CM
 	case CA
 	case CV

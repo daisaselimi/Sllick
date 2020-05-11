@@ -87,10 +87,8 @@ class BlockedUsersViewController: UIViewController, UITableViewDataSource, UITab
     
     //UserTableViewCell delegate
     func didTapAvatarImage(indexPath: IndexPath) {
-         
-        let profileVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "profileView") as! ProfileTableViewController
-        profileVC.user = blockedUsers[indexPath.row]
-        self.navigationController?.pushViewController(profileVC, animated: true)
+       return
+        
      }
     
 }

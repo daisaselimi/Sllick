@@ -41,6 +41,7 @@ class SINCallKitProvider: NSObject, CXProviderDelegate {
         
     }
     
+    
     func reportNewIncomingCall (call: SINCall) {
         var caller = "Sllick Call"
         if let call = call.headers[kFULLNAME] {

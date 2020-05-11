@@ -22,24 +22,6 @@ extension NSNotification.Name {
     static let internetConnectionState = NSNotification.Name(Bundle.main.bundleIdentifier! + ".internetConnectionState")
 }
 
-struct MyVariables {
-    static var globalContactsVariable: [String] = [] {
-           didSet {
-               NotificationCenter.default.post(name: .globalContactsVariable, object: nil)
-           }
-       }
-    
-    static var internetConnectionState: Bool = true {
-        didSet {
-            NotificationCenter.default.post(name: .internetConnectionState, object: nil)
-        }
-    }
-    
-    static var wasShowingVariableInChat = false
-    
-    static var isSyncingContacts = false
-}
-
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     
@@ -66,7 +48,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         setupUIForAlerts()
         GradientLoadingBar.shared.gradientColors = [UIColor.getAppColor(.light), .systemTeal, UIColor.getAppColor(.dark)]
         
-       UIBarButtonItem.appearance().setBackButtonTitlePositionAdjustment(UIOffset(horizontal: -1000.0, vertical: 0.0), for: .default)
+       //UIBarButtonItem.appearance().setBackButtonTitlePositionAdjustment(UIOffset(horizontal: -1000.0, vertical: 0.0), for: .default)
        // print(FUser.currentUser()!.objectId)
 
    

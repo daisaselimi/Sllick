@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0F7F161376C752BD63E467FD /* Pods_xChat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A7D190803A5E92949C307E1 /* Pods_xChat.framework */; };
 		7F0BED96242296D600785646 /* CallTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F0BED95242296D600785646 /* CallTableViewCell.swift */; };
 		7F0BED982422980500785646 /* CallClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F0BED972422980500785646 /* CallClass.swift */; };
 		7F0BED9A2422A07900785646 /* CallTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F0BED992422A07900785646 /* CallTableViewController.swift */; };
@@ -75,8 +76,7 @@
 		7FFB47262356069F00CC10A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7FFB47252356069F00CC10A2 /* Assets.xcassets */; };
 		7FFB47292356069F00CC10A2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7FFB47272356069F00CC10A2 /* LaunchScreen.storyboard */; };
 		7FFB473123560C4E00CC10A2 /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FFB473023560C4E00CC10A2 /* WelcomeViewController.swift */; };
-		8D00A2A5C00B94F2632DF552 /* Pods_xChat_OneSignalNotificationServiceExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 08447E8B99D8E8C3F7CA190B /* Pods_xChat_OneSignalNotificationServiceExtension.framework */; };
-		9106AFD8397E70C73CB120CE /* Pods_xChat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12E629AFB5FCCF0B1FB78DCA /* Pods_xChat.framework */; };
+		D08DEFEDCCF78F0D8F865F51 /* Pods_xChat_OneSignalNotificationServiceExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25E4526AFA98872D6CD99570 /* Pods_xChat_OneSignalNotificationServiceExtension.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -104,12 +104,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		01F1AA938655E8ACF10AFAC7 /* Pods-xChat-OneSignalNotificationServiceExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xChat-OneSignalNotificationServiceExtension.debug.xcconfig"; path = "Target Support Files/Pods-xChat-OneSignalNotificationServiceExtension/Pods-xChat-OneSignalNotificationServiceExtension.debug.xcconfig"; sourceTree = "<group>"; };
-		08447E8B99D8E8C3F7CA190B /* Pods_xChat_OneSignalNotificationServiceExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xChat_OneSignalNotificationServiceExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		12E629AFB5FCCF0B1FB78DCA /* Pods_xChat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xChat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		4E8A34B85396EDA471CFD5F5 /* Pods-xChat-OneSignalNotificationServiceExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xChat-OneSignalNotificationServiceExtension.release.xcconfig"; path = "Target Support Files/Pods-xChat-OneSignalNotificationServiceExtension/Pods-xChat-OneSignalNotificationServiceExtension.release.xcconfig"; sourceTree = "<group>"; };
-		58A192B63C73349E0CB04FD2 /* Pods-xChat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xChat.release.xcconfig"; path = "Target Support Files/Pods-xChat/Pods-xChat.release.xcconfig"; sourceTree = "<group>"; };
-		6AF8A5768E1793C27BD221EA /* Pods-xChat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xChat.debug.xcconfig"; path = "Target Support Files/Pods-xChat/Pods-xChat.debug.xcconfig"; sourceTree = "<group>"; };
+		25E4526AFA98872D6CD99570 /* Pods_xChat_OneSignalNotificationServiceExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xChat_OneSignalNotificationServiceExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3F50345186598689EB4A2221 /* Pods-xChat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xChat.debug.xcconfig"; path = "Target Support Files/Pods-xChat/Pods-xChat.debug.xcconfig"; sourceTree = "<group>"; };
+		58A0FFFBB3302E3BEDE41E41 /* Pods-xChat-OneSignalNotificationServiceExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xChat-OneSignalNotificationServiceExtension.release.xcconfig"; path = "Target Support Files/Pods-xChat-OneSignalNotificationServiceExtension/Pods-xChat-OneSignalNotificationServiceExtension.release.xcconfig"; sourceTree = "<group>"; };
+		5A7D190803A5E92949C307E1 /* Pods_xChat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_xChat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F0BED94241E9D6B00785646 /* OneSignalNotificationServiceExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OneSignalNotificationServiceExtension.entitlements; sourceTree = "<group>"; };
 		7F0BED95242296D600785646 /* CallTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallTableViewCell.swift; sourceTree = "<group>"; };
 		7F0BED972422980500785646 /* CallClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallClass.swift; sourceTree = "<group>"; };
@@ -185,6 +183,8 @@
 		7FFB47282356069F00CC10A2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7FFB472A2356069F00CC10A2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7FFB473023560C4E00CC10A2 /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
+		86106619F530E76549C57284 /* Pods-xChat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xChat.release.xcconfig"; path = "Target Support Files/Pods-xChat/Pods-xChat.release.xcconfig"; sourceTree = "<group>"; };
+		C8AC1DB5E35C718B331DA413 /* Pods-xChat-OneSignalNotificationServiceExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-xChat-OneSignalNotificationServiceExtension.debug.xcconfig"; path = "Target Support Files/Pods-xChat-OneSignalNotificationServiceExtension/Pods-xChat-OneSignalNotificationServiceExtension.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -192,7 +192,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8D00A2A5C00B94F2632DF552 /* Pods_xChat_OneSignalNotificationServiceExtension.framework in Frameworks */,
+				D08DEFEDCCF78F0D8F865F51 /* Pods_xChat_OneSignalNotificationServiceExtension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -202,7 +202,7 @@
 			files = (
 				7F50AE9E24265D0E00CE11A7 /* PushKit.framework in Frameworks */,
 				7F5DBD7B237AFB3F00D4D1CC /* ImagePicker.framework in Frameworks */,
-				9106AFD8397E70C73CB120CE /* Pods_xChat.framework in Frameworks */,
+				0F7F161376C752BD63E467FD /* Pods_xChat.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -341,10 +341,10 @@
 		C2093FB9ADD9EE7F556B36FE /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				6AF8A5768E1793C27BD221EA /* Pods-xChat.debug.xcconfig */,
-				58A192B63C73349E0CB04FD2 /* Pods-xChat.release.xcconfig */,
-				01F1AA938655E8ACF10AFAC7 /* Pods-xChat-OneSignalNotificationServiceExtension.debug.xcconfig */,
-				4E8A34B85396EDA471CFD5F5 /* Pods-xChat-OneSignalNotificationServiceExtension.release.xcconfig */,
+				3F50345186598689EB4A2221 /* Pods-xChat.debug.xcconfig */,
+				86106619F530E76549C57284 /* Pods-xChat.release.xcconfig */,
+				C8AC1DB5E35C718B331DA413 /* Pods-xChat-OneSignalNotificationServiceExtension.debug.xcconfig */,
+				58A0FFFBB3302E3BEDE41E41 /* Pods-xChat-OneSignalNotificationServiceExtension.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -354,8 +354,8 @@
 			children = (
 				7F50AE9D24265D0E00CE11A7 /* PushKit.framework */,
 				7F5DBD7A237AFB3F00D4D1CC /* ImagePicker.framework */,
-				12E629AFB5FCCF0B1FB78DCA /* Pods_xChat.framework */,
-				08447E8B99D8E8C3F7CA190B /* Pods_xChat_OneSignalNotificationServiceExtension.framework */,
+				5A7D190803A5E92949C307E1 /* Pods_xChat.framework */,
+				25E4526AFA98872D6CD99570 /* Pods_xChat_OneSignalNotificationServiceExtension.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -367,7 +367,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7F85E7FF241E880800333662 /* Build configuration list for PBXNativeTarget "OneSignalNotificationServiceExtension" */;
 			buildPhases = (
-				0C1E6A38E712A2FEB06172FA /* [CP] Check Pods Manifest.lock */,
+				77418FF29792656875170C73 /* [CP] Check Pods Manifest.lock */,
 				7F85E7F3241E880800333662 /* Sources */,
 				7F85E7F4241E880800333662 /* Frameworks */,
 				7F85E7F5241E880800333662 /* Resources */,
@@ -385,12 +385,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 7FFB472D2356069F00CC10A2 /* Build configuration list for PBXNativeTarget "xChat" */;
 			buildPhases = (
-				9908E35241B7759A887F1189 /* [CP] Check Pods Manifest.lock */,
+				37125F529EE80270647CA862 /* [CP] Check Pods Manifest.lock */,
 				7FFB47152356069E00CC10A2 /* Sources */,
 				7FFB47162356069E00CC10A2 /* Frameworks */,
 				7FFB47172356069E00CC10A2 /* Resources */,
-				BB669C44EBB0CBA23A1054D8 /* [CP] Embed Pods Frameworks */,
 				7F85E802241E880800333662 /* Embed App Extensions */,
+				861C033569C2D6D7C71DC9F0 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -467,29 +467,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		0C1E6A38E712A2FEB06172FA /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-xChat-OneSignalNotificationServiceExtension-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		9908E35241B7759A887F1189 /* [CP] Check Pods Manifest.lock */ = {
+		37125F529EE80270647CA862 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -511,7 +489,29 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		BB669C44EBB0CBA23A1054D8 /* [CP] Embed Pods Frameworks */ = {
+		77418FF29792656875170C73 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-xChat-OneSignalNotificationServiceExtension-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		861C033569C2D6D7C71DC9F0 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -633,13 +633,14 @@
 /* Begin XCBuildConfiguration section */
 		7F85E800241E880800333662 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 01F1AA938655E8ACF10AFAC7 /* Pods-xChat-OneSignalNotificationServiceExtension.debug.xcconfig */;
+			baseConfigurationReference = C8AC1DB5E35C718B331DA413 /* Pods-xChat-OneSignalNotificationServiceExtension.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = C2FCSXGG97;
 				INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -655,13 +656,14 @@
 		};
 		7F85E801241E880800333662 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4E8A34B85396EDA471CFD5F5 /* Pods-xChat-OneSignalNotificationServiceExtension.release.xcconfig */;
+			baseConfigurationReference = 58A0FFFBB3302E3BEDE41E41 /* Pods-xChat-OneSignalNotificationServiceExtension.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = C2FCSXGG97;
 				INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -791,7 +793,7 @@
 		};
 		7FFB472E2356069F00CC10A2 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6AF8A5768E1793C27BD221EA /* Pods-xChat.debug.xcconfig */;
+			baseConfigurationReference = 3F50345186598689EB4A2221 /* Pods-xChat.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -806,7 +808,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.1;
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.isaselimii.xChat;
 				PRODUCT_NAME = Sllick;
 				SUPPORTS_MACCATALYST = NO;
@@ -819,7 +821,7 @@
 		};
 		7FFB472F2356069F00CC10A2 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 58A192B63C73349E0CB04FD2 /* Pods-xChat.release.xcconfig */;
+			baseConfigurationReference = 86106619F530E76549C57284 /* Pods-xChat.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -834,7 +836,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.1;
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.isaselimii.xChat;
 				PRODUCT_NAME = Sllick;
 				SUPPORTS_MACCATALYST = NO;

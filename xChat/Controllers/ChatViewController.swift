@@ -228,7 +228,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         checkForBackgroundImage()
         MyVariables.wasShowingVariableInChat = false
         clearRecentCounter(chatRoomId: chatRoomId)
-        
+        self.inputToolbar.contentView.rightBarButtonItem.isEnabled = true
         NotificationCenter.default.addObserver(self,
                                                              selector: #selector(internetConnectionChanged),
                                                              name: .internetConnectionState, object: nil)
@@ -328,7 +328,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
             _ in
             UIImage(systemName: "mic.fill")?.draw(in: CGRect(x: 0, y: 0, width: 22, height: 25))
         }
-        img = img.imageWithColor(color1: UIColor.getAppColor(.light))
+        img = img.imageWithColor(color1: UIColor(named: "outgoingBubbleColor")!)
         
         
         
@@ -864,6 +864,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     //MARK: JSQMessages Delegate functions
     //files image
     override func didPressAccessoryButton(_ sender: UIButton!) {
+    
         if !MyVariables.internetConnectionState {
              self.showMessage("No internet connection", type: .warning, options: [.autoHide(false), .hideOnTap(false)])
             return
@@ -940,7 +941,6 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     
     //send button
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
-        
         if !text.trimmingCharacters(in: .whitespaces).isEmpty{
             print(text!)
             sendMessage(text: text, date: date, picture: nil, location: nil, video: nil, audio: nil)
@@ -1014,16 +1014,17 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
                 _ in
                 UIImage(systemName: "mic.fill")?.draw(in: CGRect(x: 0, y: 0, width: 22, height: 25))
             }
-            img = img.imageWithColor(color1: UIColor.getAppColor(.light))
+            img = img.imageWithColor(color1: UIColor(named: "outgoingBubbleColor")!)
             self.inputToolbar.contentView.rightBarButtonItem.setImage(img, for: .normal)
         }
+         self.inputToolbar.contentView.rightBarButtonItem.isEnabled = true
     }
     
     override func textViewDidChange(_ textView: UITextView) {
         
-        if textView.text.trimmingCharacters(in: .whitespaces).isEmpty  {
-            return
-        }
+//        if textView.text.trimmingCharacters(in: .whitespaces).isEmpty  {
+//            return
+//        }
         
         if textView.text != "" {
             updateSendButton(isSend: true)
@@ -1031,6 +1032,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         else {
             updateSendButton(isSend: false)
         }
+        
     }
     
     //MARK: Send messages
@@ -1392,13 +1394,15 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     
     func checkForBackgroundImage() {
         // navigationController?.navigationBar.setBackgroundImage(imageVIew.image!, for: .compact)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.isTranslucent = true
-        navigationController?.view.backgroundColor = UIColor.clear
-        navigationController?.navigationBar.backgroundColor = UIColor.clear
+//        navigationController?.navigationBar.shadowImage = UIImage()
+//        navigationController?.navigationBar.isTranslucent = true
+//        navigationController?.view.backgroundColor = UIColor.clear
+//        navigationController?.navigationBar.backgroundColor = UIColor.clear
         if userDefaults.object(forKey: kBACKGROUBNDIMAGE) != nil {
             self.collectionView.backgroundColor = .clear
-            let imageVIew = UIImageView(frame: CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height))
+            let width = UIScreen.main.bounds.width
+            let height = UIScreen.main.bounds.height
+            let imageVIew = UIImageView(frame: CGRect(x: 0, y: 0, width: width, height: height))
             imageVIew.image = UIImage(named: userDefaults.object(forKey: kBACKGROUBNDIMAGE) as! String)!
             imageVIew.contentMode = .scaleAspectFill
             imageVIew.tag = 0

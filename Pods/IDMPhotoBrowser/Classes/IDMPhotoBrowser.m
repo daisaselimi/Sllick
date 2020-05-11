@@ -378,10 +378,10 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     [_applicationWindow addSubview:resizableImageView];
     _senderViewForAnimation.hidden = YES;
 
-    void (^completion)(void) = ^() {
+    void (^completion)() = ^() {
         self.view.alpha = 1.0f;
-        self->_pagingScrollView.alpha = 1.0f;
-        resizableImageView.backgroundColor = [UIColor colorWithWhite:(self->_useWhiteBackgroundColor) ? 1 : 0 alpha:1];
+        _pagingScrollView.alpha = 1.0f;
+        resizableImageView.backgroundColor = [UIColor colorWithWhite:(_useWhiteBackgroundColor) ? 1 : 0 alpha:1];
         [fadeView removeFromSuperview];
         [resizableImageView removeFromSuperview];
     };
@@ -435,10 +435,10 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     [_applicationWindow addSubview:resizableImageView];
     self.view.hidden = YES;
 
-    void (^completion)(void) = ^() {
-        self->_senderViewForAnimation.hidden = NO;
-        self->_senderViewForAnimation = nil;
-        self->_scaleImage = nil;
+    void (^completion)() = ^() {
+        _senderViewForAnimation.hidden = NO;
+        _senderViewForAnimation = nil;
+        _scaleImage = nil;
 
         [fadeView removeFromSuperview];
         [resizableImageView removeFromSuperview];
@@ -520,8 +520,8 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
         [_delegate photoBrowser:self willDismissAtPageIndex:_currentPageIndex];
 
     [self dismissViewControllerAnimated:animated completion:^{
-        if ([self->_delegate respondsToSelector:@selector(photoBrowser:didDismissAtPageIndex:)])
-            [self->_delegate photoBrowser:self didDismissAtPageIndex:self->_currentPageIndex];
+        if ([_delegate respondsToSelector:@selector(photoBrowser:didDismissAtPageIndex:)])
+            [_delegate photoBrowser:self didDismissAtPageIndex:_currentPageIndex];
 
 //		if (SYSTEM_VERSION_LESS_THAN(@"8.0"))
 //		{
@@ -1227,8 +1227,8 @@ NSLocalizedStringFromTableInBundle((key), nil, [NSBundle bundleWithPath:[[NSBund
     [UIView animateWithDuration:(animated ? 0.1 : 0) animations:^(void) {
         CGFloat alpha = hidden ? 0 : 1;
         [self.navigationController.navigationBar setAlpha:alpha];
-        [self->_toolbar setAlpha:alpha];
-        [self->_doneButton setAlpha:alpha];
+        [_toolbar setAlpha:alpha];
+        [_doneButton setAlpha:alpha];
         for (UIView *v in captionViews) v.alpha = alpha;
     } completion:^(BOOL finished) {}];
 

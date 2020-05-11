@@ -555,14 +555,15 @@
  "code": "KI"
  },
  {
- "name": "Kosovo",
- "dial_code": "+383",
- "code": "KS"
- },
- {
  "name": "Korea, Democratic People's Republic of Korea",
  "dial_code": "+850",
  "code": "KP"
+ },
+ {
+     "name": "Kosovo",
+     "dial_code": "+383",
+     "code": "KS"
+     
  },
  {
  "name": "Korea, Republic of South Korea",

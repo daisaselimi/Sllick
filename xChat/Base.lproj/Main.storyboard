@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Wnm-6u-UKt">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Wnm-6u-UKt">
     <device id="retina5_5" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="collection view cell content view" minToolsVersion="11.0"/>
@@ -579,7 +579,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Name" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="1L6-Wo-MOe">
-                                                    <rect key="frame" x="107" y="14.666666666666664" width="257" height="21"/>
+                                                    <rect key="frame" x="107" y="14" width="257" height="22"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <textInputTraits key="textInputTraits" autocapitalizationType="words"/>
@@ -611,7 +611,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Last name" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="UXi-Jk-hmZ">
-                                                    <rect key="frame" x="108" y="14.666666666666664" width="256" height="21"/>
+                                                    <rect key="frame" x="108" y="14" width="256" height="22"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <textInputTraits key="textInputTraits" autocapitalizationType="words"/>
@@ -644,7 +644,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Country" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="t9o-S2-o68">
-                                                    <rect key="frame" x="107" y="14.666666666666664" width="257" height="21"/>
+                                                    <rect key="frame" x="107" y="14" width="257" height="22"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <textInputTraits key="textInputTraits" autocapitalizationType="words"/>
@@ -683,7 +683,7 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="City" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="K9o-pT-IHt">
-                                                    <rect key="frame" x="107" y="14.666666666666664" width="257" height="21"/>
+                                                    <rect key="frame" x="107" y="14" width="257" height="22"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <textInputTraits key="textInputTraits" autocapitalizationType="words"/>
@@ -1833,7 +1833,7 @@
             <objects>
                 <tableViewController hidesBottomBarWhenPushed="YES" id="KPO-bf-j7m" customClass="EditProfileTableViewController" customModule="Sllick" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="insetGrouped" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" sectionFooterHeight="1" id="HdB-Km-hWS">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="716"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <sections>
@@ -1892,7 +1892,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Name" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="NmK-Fp-gWo">
-                                                    <rect key="frame" x="130" y="14.666666666666664" width="220" height="21"/>
+                                                    <rect key="frame" x="130" y="14" width="220" height="22"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="220" id="LA7-MU-arJ"/>
                                                     </constraints>
@@ -1922,7 +1922,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Last name" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="J5b-GU-nUJ">
-                                                    <rect key="frame" x="130" y="14.666666666666664" width="220" height="21"/>
+                                                    <rect key="frame" x="130" y="14" width="220" height="22"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="220" id="2yb-e8-pqE"/>
                                                     </constraints>
@@ -2021,7 +2021,7 @@
             <objects>
                 <viewController hidesBottomBarWhenPushed="YES" id="4UU-gB-9hC" customClass="T_CViewController" customModule="Sllick" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="dPR-sV-ttV">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="716"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c6k-Uh-eCN">
@@ -2301,7 +2301,7 @@ We reserve all rights to terminate accounts, edit or remove content and cancel o
             <objects>
                 <tableViewController id="80W-lD-L24" customClass="ChangeEmailTableViewController" customModule="Sllick" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="CaA-13-ano">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="716"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" name="bwBackground"/>
                         <sections>
@@ -2388,7 +2388,7 @@ We reserve all rights to terminate accounts, edit or remove content and cancel o
             <objects>
                 <tableViewController id="tbO-Nf-8V6" customClass="ChangePasswordTableViewController" customModule="Sllick" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="k7H-We-8NR">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="716"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" name="bwBackground"/>
                         <sections>
@@ -2496,7 +2496,7 @@ We reserve all rights to terminate accounts, edit or remove content and cancel o
             <objects>
                 <tableViewController interfaceStyle="dark" id="4vv-3o-rxI" customClass="SettingsTableViewController" customModule="Sllick" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="XRp-Iq-vs0">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="716"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" name="bwBackground"/>
                         <sections>
@@ -2805,7 +2805,7 @@ We reserve all rights to terminate accounts, edit or remove content and cancel o
                             <tableViewSection headerTitle="About" id="Fh8-Ai-seM">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" rowHeight="50" id="kLU-Xo-82E">
-                                        <rect key="frame" x="0.0" y="664.33333396911621" width="374" height="50"/>
+                                        <rect key="frame" x="20" y="664.33333396911621" width="374" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="kLU-Xo-82E" id="ceL-e0-3Ba">
                                             <rect key="frame" x="0.0" y="0.0" width="343" height="50"/>
@@ -2839,7 +2839,7 @@ We reserve all rights to terminate accounts, edit or remove content and cancel o
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="50" id="ryo-sR-5Qu">
-                                        <rect key="frame" x="0.0" y="714.33333396911621" width="374" height="50"/>
+                                        <rect key="frame" x="20" y="714.33333396911621" width="374" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ryo-sR-5Qu" id="OmX-4s-qY8">
                                             <rect key="frame" x="0.0" y="0.0" width="374" height="50"/>
@@ -2878,7 +2878,7 @@ We reserve all rights to terminate accounts, edit or remove content and cancel o
                             <tableViewSection headerTitle="Presence" id="Bdh-V4-krl">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="50" id="mgb-5s-Aha">
-                                        <rect key="frame" x="0.0" y="820.33333396911621" width="374" height="50"/>
+                                        <rect key="frame" x="20" y="820.33333396911621" width="374" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="mgb-5s-Aha" id="jlU-tK-cJ0">
                                             <rect key="frame" x="0.0" y="0.0" width="374" height="50"/>
@@ -2909,7 +2909,7 @@ We reserve all rights to terminate accounts, edit or remove content and cancel o
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="50" id="hdT-Fo-nJ2">
-                                        <rect key="frame" x="0.0" y="870.33333396911621" width="374" height="50"/>
+                                        <rect key="frame" x="20" y="870.33333396911621" width="374" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="hdT-Fo-nJ2" id="MM3-N6-1dh">
                                             <rect key="frame" x="0.0" y="0.0" width="374" height="50"/>
@@ -2970,7 +2970,7 @@ We reserve all rights to terminate accounts, edit or remove content and cancel o
             <objects>
                 <tableViewController title="Account" id="LlD-uG-G5R" customClass="AccountTableViewController" customModule="Sllick" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" id="HyN-PZ-7X4">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="716"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" name="bwBackground"/>
                         <sections>
@@ -3144,7 +3144,7 @@ We reserve all rights to terminate accounts, edit or remove content and cancel o
             <objects>
                 <viewController storyboardIdentifier="blockedUsersView" hidesBottomBarWhenPushed="YES" id="T5U-dC-XV0" customClass="BlockedUsersViewController" customModule="Sllick" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="7NK-Ls-UMO">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="716"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="70" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="lzy-aL-27r">
@@ -3227,7 +3227,7 @@ We reserve all rights to terminate accounts, edit or remove content and cancel o
             <objects>
                 <collectionViewController hidesBottomBarWhenPushed="YES" id="rcO-nK-9h1" customClass="BackgroundsCollectionViewController" customModule="Sllick" customModuleProvider="target" sceneMemberID="viewController">
                     <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="Axz-VB-3gu">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="716"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" name="bwBackground"/>
                         <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="JxC-Yr-esJ">
@@ -3405,7 +3405,7 @@ We reserve all rights to terminate accounts, edit or remove content and cancel o
         <!--Navigation Controller-->
         <scene sceneID="ehj-UQ-Jgl">
             <objects>
-                <navigationController storyboardIdentifier="navInit" modalPresentationStyle="fullScreen" id="CDz-Su-syR" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="navInit" definesPresentationContext="YES" modalPresentationStyle="fullScreen" id="CDz-Su-syR" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="C8L-2i-0pE">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -3618,47 +3618,48 @@ We reserve all rights to terminate accounts, edit or remove content and cancel o
             <point key="canvasLocation" x="2911.594202898551" y="1267.663043478261"/>
         </scene>
     </scenes>
+    <color key="tintColor" name="outgoingBubbleColor"/>
     <resources>
         <image name="3xsent" width="100" height="100"/>
         <image name="addGroup" width="21.333333969116211" height="21.333333969116211"/>
         <image name="answer" width="250.33332824707031" height="250.33332824707031"/>
-        <image name="arrow.right.circle.fill" catalog="system" width="64" height="60"/>
-        <image name="arrowshape.turn.up.right.circle.fill" catalog="system" width="64" height="60"/>
+        <image name="arrow.right.circle.fill" catalog="system" width="128" height="121"/>
+        <image name="arrowshape.turn.up.right.circle.fill" catalog="system" width="128" height="121"/>
         <image name="avatarPlaceholder" width="101" height="101"/>
         <image name="avatarph" width="300" height="300"/>
-        <image name="bell.circle.fill" catalog="system" width="64" height="60"/>
+        <image name="bell.circle.fill" catalog="system" width="128" height="121"/>
         <image name="bg1" width="1125" height="2436"/>
         <image name="bg9" width="1125" height="2436"/>
         <image name="cancel" width="25" height="25"/>
-        <image name="ellipses.bubble.fill" catalog="system" width="64" height="54"/>
+        <image name="ellipses.bubble.fill" catalog="system" width="128" height="110"/>
         <image name="groupBubble" width="20" height="20"/>
         <image name="groupBubble1" width="29" height="29"/>
         <image name="groupph" width="656" height="618"/>
         <image name="hangup" width="250" height="250"/>
         <image name="key" width="64" height="64"/>
-        <image name="list.dash" catalog="system" width="64" height="42"/>
+        <image name="list.dash" catalog="system" width="128" height="85"/>
         <image name="mail" width="64" height="64"/>
-        <image name="message" catalog="system" width="64" height="56"/>
-        <image name="message.circle.fill" catalog="system" width="64" height="60"/>
-        <image name="message.fill" catalog="system" width="64" height="56"/>
-        <image name="minus.circle.fill" catalog="system" width="64" height="60"/>
-        <image name="moon.circle.fill" catalog="system" width="64" height="60"/>
+        <image name="message" catalog="system" width="128" height="113"/>
+        <image name="message.circle.fill" catalog="system" width="128" height="121"/>
+        <image name="message.fill" catalog="system" width="128" height="113"/>
+        <image name="minus.circle.fill" catalog="system" width="128" height="121"/>
+        <image name="moon.circle.fill" catalog="system" width="128" height="121"/>
         <image name="mute" width="256" height="256"/>
-        <image name="pencil.circle" catalog="system" width="64" height="60"/>
-        <image name="person" catalog="system" width="64" height="58"/>
-        <image name="person.crop.circle" catalog="system" width="64" height="60"/>
-        <image name="person.fill" catalog="system" width="64" height="60"/>
-        <image name="phone" catalog="system" width="64" height="56"/>
-        <image name="phone.circle.fill" catalog="system" width="64" height="60"/>
-        <image name="phone.fill" catalog="system" width="64" height="56"/>
-        <image name="rectangle.grid.3x2.fill" catalog="system" width="64" height="50"/>
+        <image name="pencil.circle" catalog="system" width="128" height="121"/>
+        <image name="person" catalog="system" width="128" height="117"/>
+        <image name="person.crop.circle" catalog="system" width="128" height="121"/>
+        <image name="person.fill" catalog="system" width="128" height="120"/>
+        <image name="phone" catalog="system" width="128" height="115"/>
+        <image name="phone.circle.fill" catalog="system" width="128" height="121"/>
+        <image name="phone.fill" catalog="system" width="128" height="114"/>
+        <image name="rectangle.grid.3x2.fill" catalog="system" width="128" height="101"/>
         <image name="sent-no-bg" width="500" height="500"/>
-        <image name="slash.circle.fill" catalog="system" width="64" height="60"/>
+        <image name="slash.circle.fill" catalog="system" width="128" height="121"/>
         <image name="speaker" width="256" height="256"/>
-        <image name="square.and.pencil" catalog="system" width="64" height="58"/>
-        <image name="trash.circle.fill" catalog="system" width="64" height="60"/>
+        <image name="square.and.pencil" catalog="system" width="128" height="118"/>
+        <image name="trash.circle.fill" catalog="system" width="128" height="121"/>
         <image name="user" width="64" height="64"/>
-        <image name="xmark.circle.fill" catalog="system" width="64" height="60"/>
+        <image name="xmark.circle.fill" catalog="system" width="128" height="121"/>
         <namedColor name="bcg">
             <color red="0.0" green="0.20000000298023224" blue="0.22699999809265137" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
@@ -3675,5 +3676,4 @@ We reserve all rights to terminate accounts, edit or remove content and cancel o
             <color red="0.97500002384185791" green="0.97500002384185791" blue="0.97500002384185791" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
-    <color key="tintColor" name="outgoingBubbleColor"/>
 </document>
