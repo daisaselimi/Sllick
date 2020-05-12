@@ -21,10 +21,13 @@ class ActiveNowTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        getContacts()
+        // getContacts()
         //self.title = "Active now"
         self.tableView.tableFooterView = UIView()
         tableView.separatorStyle = .none
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onlineUsersChanged),
+                                               name: .onlineUsersNotification, object: nil)
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
         
@@ -34,162 +37,171 @@ class ActiveNowTableViewController: UITableViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-  
-              getContacts()
-      
-    }
-    
-    
-    
-    func getContacts()  {
-        
-        reference(.Contact).whereField("userID", isEqualTo: FUser.currentId()).addSnapshotListener { (snapshot, error) in
-            
-            if error != nil {
-                return
-            }
-            guard snapshot != nil else {
-                return
-            }
-            if !snapshot!.isEmpty {
-                for userDictionary in snapshot!.documents {
-                    let userDictionary = userDictionary.data() as NSDictionary
-                    
-                    self.contacts = (userDictionary["contacts"] as! [String])
-                  
-                }
-                  self.firstFetchOfOnlineUsers = true
-               
-                
-            } else {
-                self.contacts = []
-            }
-            // self.activeUsersListener?.remove()
-            self.activeUsersListeners.forEach({ $0.remove() })
-            self.activeUsersListeners.removeAll()
-            self.checkOnlineStatus()
-        }
         
         
+        usersOnline = MyVariables.usersOnline
+        loadUsers()
+        // getContacts()
         
     }
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let user = activeNow[indexPath.row]
-        
-        
-        let chatVC = ChatViewController()
-        chatVC.titleName = user.firstname
-        chatVC.membersToPush = [FUser.currentId(), user.objectId]
-        chatVC.memberIds = [FUser.currentId(), user.objectId]
-        chatVC.chatRoomId = startPrivateChat(user1: FUser.currentUser()!, user2: user)
-        chatVC.isGroup = false
-        chatVC.initialWithUser = user.fullname
-        chatVC.initialImage = (tableView.cellForRow(at: indexPath) as! ActiveUserTableViewCell).avatarImageView.image
-        chatVC.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(chatVC, animated: true)
+    
+    @objc func onlineUsersChanged() {
+        usersOnline = MyVariables.usersOnline
+        loadUsers()
+        //tableView.reloadData()
     }
     
-    func checkOnlineStatus() {
-        print("here")
-       
-        if  contacts.isEmpty {
-            self.usersOnline = []
-            loadUsers()
-            return
-        }
-        
-        
-        let contactsBy10 = contacts.chunked(into: 10)
-        var index = 0
-        for i in 0...contactsBy10.count - 1 {
-            print(" H E E E E R E E E E \(i)")
-            activeUsersListeners.append(Firestore.firestore().collection("status").whereField("userId", in: contactsBy10[i] ).order(by: "userId", descending: true).addSnapshotListener { (snapshot, error) in
-                 print("CONTACTS::::::::::\(contactsBy10[i])")
-                 guard let snapshot = snapshot else {
-                     print("NO SNAPSHOT -----------------_!!!")
-                     return
-                 }
-                 
-                 if !snapshot.isEmpty {
-                     
-                     if self.firstFetchOfOnlineUsers {
-                        if index == 0 {
-
-                            self.usersOnline = []
-                        }
-                         let documents = snapshot.documents
-                         
-                         for doc in documents {
-                             let userId = doc["userId"] as! String
-                             
-                             if doc["state"] as! String == "Online" {
-                                 self.usersOnline.append(userId)
-                             }
-                         }
-                        if index == contactsBy10.count - 1 {
-                               self.firstFetchOfOnlineUsers = false
-                        }
-                      
-                     } else {
-                         snapshot.documentChanges.forEach { (docChange) in
-                             if docChange.type == .modified {
-                                 print("-----------------------------------------User \(docChange.document.documentID) is \(docChange.document["state"] as! String)")
-                                 let userId = docChange.document["userId"] as! String
-                                 
-                                 if docChange.document["state"] as! String == "Online" {
-                                     
-                                     if !self.usersOnline.contains(userId) {
-                                         self.usersOnline.append(userId)
-                                     }
-                                     
-                                 } else {
-                                     
-                                     if let idx = self.usersOnline.firstIndex(of: userId) {
-                                         print("RERERER ERE R E R E RE REMOVED")
-                                         self.usersOnline.remove(at: idx)
-                                     }
-                                 }
-                                 
-                             }
-                         }
-                     }
-                        print("U S E R S O N L I N E: \(self.usersOnline)")
-                    if index == contactsBy10.count - 1 {
-                            self.loadUsers()
-                    }
-                    
-                    
-                 } else {
-                     print("SNAPSHOT EMPTY !!! -------")
-                    if self.usersOnline.count > 0 {
-                         self.loadUsers()
-                    }
-                   
-                 }
-                  index += 1
-             })
-        }
-        
-
-    }
     
+//    func getContacts()  {
+//
+//        reference(.Contact).whereField("userID", isEqualTo: FUser.currentId()).addSnapshotListener { (snapshot, error) in
+//
+//            if error != nil {
+//                return
+//            }
+//            guard snapshot != nil else {
+//                return
+//            }
+//            if !snapshot!.isEmpty {
+//                for userDictionary in snapshot!.documents {
+//                    let userDictionary = userDictionary.data() as NSDictionary
+//
+//                    self.contacts = (userDictionary["contacts"] as! [String])
+//
+//                }
+//                self.firstFetchOfOnlineUsers = true
+//
+//
+//            } else {
+//                self.contacts = []
+//            }
+//            // self.activeUsersListener?.remove()
+//            self.activeUsersListeners.forEach({ $0.remove() })
+//            self.activeUsersListeners.removeAll()
+//            self.checkOnlineStatus()
+//        }
+//
+//
+//
+//    }
+//
+//    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        let user = activeNow[indexPath.row]
+//
+//
+//        let chatVC = ChatViewController()
+//        chatVC.titleName = user.firstname
+//        chatVC.membersToPush = [FUser.currentId(), user.objectId]
+//        chatVC.memberIds = [FUser.currentId(), user.objectId]
+//        chatVC.chatRoomId = startPrivateChat(user1: FUser.currentUser()!, user2: user)
+//        chatVC.isGroup = false
+//        chatVC.initialWithUser = user.fullname
+//        chatVC.initialImage = (tableView.cellForRow(at: indexPath) as! ActiveUserTableViewCell).avatarImageView.image
+//        chatVC.hidesBottomBarWhenPushed = true
+//        self.navigationController?.pushViewController(chatVC, animated: true)
+//    }
+//
+//    func checkOnlineStatus() {
+//        print("here")
+//
+//        if  contacts.isEmpty {
+//            self.usersOnline = []
+//            loadUsers()
+//            return
+//        }
+//
+//
+//        let contactsBy10 = contacts.chunked(into: 10)
+//        var index = 0
+//        for i in 0...contactsBy10.count - 1 {
+//            print(" H E E E E R E E E E \(i)")
+//            activeUsersListeners.append(Firestore.firestore().collection("status").whereField("userId", in: contactsBy10[i] ).order(by: "userId", descending: true).addSnapshotListener { (snapshot, error) in
+//                print("CONTACTS::::::::::\(contactsBy10[i])")
+//                guard let snapshot = snapshot else {
+//                    print("NO SNAPSHOT -----------------_!!!")
+//                    return
+//                }
+//
+//                if !snapshot.isEmpty {
+//
+//                    if self.firstFetchOfOnlineUsers {
+//                        if index == 0 {
+//
+//                            self.usersOnline = []
+//                        }
+//                        let documents = snapshot.documents
+//
+//                        for doc in documents {
+//                            let userId = doc["userId"] as! String
+//
+//                            if doc["state"] as! String == "Online" {
+//                                self.usersOnline.append(userId)
+//                            }
+//                        }
+//                        if index == contactsBy10.count - 1 {
+//                            self.firstFetchOfOnlineUsers = false
+//                        }
+//
+//                    } else {
+//                        snapshot.documentChanges.forEach { (docChange) in
+//                            if docChange.type == .modified {
+//                                print("-----------------------------------------User \(docChange.document.documentID) is \(docChange.document["state"] as! String)")
+//                                let userId = docChange.document["userId"] as! String
+//
+//                                if docChange.document["state"] as! String == "Online" {
+//
+//                                    if !self.usersOnline.contains(userId) {
+//                                        self.usersOnline.append(userId)
+//                                    }
+//
+//                                } else {
+//
+//                                    if let idx = self.usersOnline.firstIndex(of: userId) {
+//                                        print("RERERER ERE R E R E RE REMOVED")
+//                                        self.usersOnline.remove(at: idx)
+//                                    }
+//                                }
+//
+//                            }
+//                        }
+//                    }
+//                    print("U S E R S O N L I N E: \(self.usersOnline)")
+//                    if index == contactsBy10.count - 1 {
+//                        self.loadUsers()
+//                    }
+//
+//
+//                } else {
+//                    print("SNAPSHOT EMPTY !!! -------")
+//                    if self.usersOnline.count > 0 {
+//                        self.loadUsers()
+//                    }
+//
+//                }
+//                index += 1
+//            })
+//        }
+//
+//
+//    }
+//
     func loadUsers() {
         print(usersOnline.count)
         if usersOnline.count == 0 {
             activeNow = []
             setTabItemTitle(controller: self.tabBarController!, title: "Active (0)")
-
+            
             tableView.reloadData()
         } else {
             setTabItemTitle(controller: self.tabBarController!, title: "Active (\(self.usersOnline.count))")
             getUsersFromFirestore(withIds: usersOnline) { (users) in
-                    self.activeNow = users
+                self.activeNow = users
                 
-                    self.tableView.reloadData()
-                }
+                self.tableView.reloadData()
+            }
         }
-     
+        
     }
     
     

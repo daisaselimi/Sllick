@@ -789,6 +789,12 @@ struct MyVariables {
     static var wasShowingVariableInChat = false
     
     static var isSyncingContacts = false
+    
+    static var usersOnline: [String] = [] {
+        didSet {
+            NotificationCenter.default.post(name: .onlineUsersNotification, object: nil)
+        }
+    }
 }
 
 

@@ -55,6 +55,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     var loadedMessages: [NSDictionary] = []
     var allPictureMessages: [String] = []
     var initialLoadComplete = false
+    var firstLoading = true
     
     var recentListener: ListenerRegistration!
     
@@ -86,6 +87,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     
     var outgoingBubble: JSQMessagesBubbleImage?
     var incomingBubble: JSQMessagesBubbleImage?
+    var activityListener: ListenerRegistration!
     
     private let gradientLoadingBar = GradientLoadingBar()
     
@@ -126,7 +128,11 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
       
-        
+        if !(MyVariables.globalContactsVariable.contains((memberIds.filter({ $0 != FUser.currentId() }))[0])) {
+            self.subTitleLabel.text = "Sllick Chat"
+        } else {
+            checkActivityStatus()
+        }
         
         setNavigationBarAppearance()
         if MyVariables.wasShowingVariableInChat {
@@ -194,6 +200,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         //        AppDelegate.AppUtility.lockOrientation(UIInterfaceOrientationMask.all)
         //        removeListeners()
         //newChatListener.remove()
+        activityListener?.remove()
         clearRecentCounter(chatRoomId: chatRoomId)
     }
     
@@ -547,7 +554,17 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     }
     
     func checkActivityStatus() {
-        Firestore.firestore().collection("status").whereField("userId", isEqualTo: withUsers.first!.objectId).addSnapshotListener { (snapshot, error) in
+        
+        if firstLoading {
+            firstLoading = false
+            return
+            
+        }
+        if !(MyVariables.globalContactsVariable.contains((memberIds.filter({ $0 != FUser.currentId() }))[0])) {
+            return
+        }
+        
+       activityListener = Firestore.firestore().collection("status").whereField("userId", isEqualTo: withUsers.first!.objectId).addSnapshotListener { (snapshot, error) in
             
             guard let snapshot = snapshot else { return }
             

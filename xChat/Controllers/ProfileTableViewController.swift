@@ -29,6 +29,7 @@ class ProfileTableViewController: UITableViewController {
     var profilePicture: UIImage!
     var isInContacts: Bool!
     private var observer: NSObjectProtocol!
+    var activityListener: ListenerRegistration!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -88,6 +89,10 @@ class ProfileTableViewController: UITableViewController {
             self.isInContacts = false
         }
         self.checkActivityStatus()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        activityListener?.remove()
     }
     
     deinit {
@@ -182,7 +187,7 @@ class ProfileTableViewController: UITableViewController {
     }
     
     func checkActivityStatus() {
-        Firestore.firestore().collection("status").whereField("userId", isEqualTo: user?.objectId).addSnapshotListener { (snapshot, error) in
+       activityListener = Firestore.firestore().collection("status").whereField("userId", isEqualTo: user?.objectId).addSnapshotListener { (snapshot, error) in
             
             guard let snapshot = snapshot else { return }
             

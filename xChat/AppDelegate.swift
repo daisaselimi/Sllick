@@ -20,6 +20,7 @@ import SystemConfiguration
 extension NSNotification.Name {
     static let globalContactsVariable = NSNotification.Name(Bundle.main.bundleIdentifier! + ".globalContactsVariable")
     static let internetConnectionState = NSNotification.Name(Bundle.main.bundleIdentifier! + ".internetConnectionState")
+    static let onlineUsersNotification = NSNotification.Name(Bundle.main.bundleIdentifier! + ".onlineUsersNotification")
 }
 
 @UIApplicationMain

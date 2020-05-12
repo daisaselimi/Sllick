@@ -403,20 +403,51 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
         //            }
         //        }
         
+//        if type == .voIP {
+//            if let handle = payload.dictionaryPayload["handle"] as? String{
+//                let callUpdate = CXCallUpdate()
+//                callUpdate.remoteHandle = CXHandle(type: .generic,value: handle)
+//                let callId = UUID()
+//
+//                callKitProvider._provider.reportCall(with: callId, updated: callUpdate)
+//                callKitProvider._provider.reportNewIncomingCall(with: callId, update: callUpdate) { (error) in
+//                    completion()
+//                }
+//                // Set up connection with your services here for call management
+//                self.handleRemoteNotification(userInfo: payload.dictionaryPayload as NSDictionary)
+//            }
+//
+//        }
+        
         if type == .voIP {
-            if let handle = payload.dictionaryPayload["handle"] as? String{
-                let callUpdate = CXCallUpdate()
-                callUpdate.remoteHandle = CXHandle(type: .generic,value: handle)
-                let callId = UUID()
-                
-                callKitProvider._provider.reportCall(with: callId, updated: callUpdate)
-                callKitProvider._provider.reportNewIncomingCall(with: callId, update: callUpdate) { (error) in
-                    completion()
-                }
-                // Set up connection with your services here for call management
-                self.handleRemoteNotification(userInfo: payload.dictionaryPayload as NSDictionary)
+            // Extract the call information from the push notification payload
+            if let handle = payload.dictionaryPayload["handle"] as? String,
+                  let uuidString = payload.dictionaryPayload["callUUID"] as? String,
+                  let callUUID = UUID(uuidString: uuidString) {
+
+               // Configure the call information data structures.
+               let callUpdate = CXCallUpdate()
+               let phoneNumber = CXHandle(type: .phoneNumber, value: handle)
+               callUpdate.remoteHandle = phoneNumber
+                      
+               // Report the call to CallKit, and let it display the call UI.
+                callKitProvider._provider.reportNewIncomingCall(with: callUUID,
+                           update: callUpdate, completion: { (error) in
+                  if error == nil {
+                     // If the system allows the call to proceed, make a data record for it.
+                    // let newCall = VoipCall(callUUID, phoneNumber: phoneNumber)
+                     return
+                  }
+
+                  // Tell PushKit that the notification is handled.
+                  completion()
+               })
+                      
+               // Asynchronously register with the telephony server and
+               // process the call. Report updates to CallKit as needed.
+               self.handleRemoteNotification(userInfo: payload.dictionaryPayload as NSDictionary)
             }
-        }
+         }
     }
     
 //    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType) {
