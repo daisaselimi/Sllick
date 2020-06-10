@@ -12,7 +12,7 @@ import FirebaseFirestore
 import ProgressHUD
 
 class ContactsTableViewController: UITableViewController, UISearchResultsUpdating, UserTableViewCellDelegate, UsersDelegate {
-
+    
     
     
     
@@ -85,11 +85,11 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
             self.navigationItem.rightBarButtonItems?.last?.isEnabled = false
             return
         }
-//        if !firstLoad {
-//            reloadContacts()
-//        } else {
-//            firstLoad = false
-//        }
+        //        if !firstLoad {
+        //            reloadContacts()
+        //        } else {
+        //            firstLoad = false
+        //        }
         
         //to remove empty cell lines
         tableView.tableFooterView = UIView()
@@ -116,20 +116,20 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         //        DispatchQueue.main.async {
         //            self.workItem?.cancel()
         //        }
-       
-           ProgressHUD.dismiss()
+        
+        ProgressHUD.dismiss()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-    
+        
         navigationItem.largeTitleDisplayMode = .never
         self.navigationController?.navigationBar.backItem?.title = ""
         navigationItem.searchController = searchController
@@ -141,14 +141,14 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
         loadAddedUsers()
     }
     
-
+    
     override func viewWillLayoutSubviews() {
         tableView.separatorStyle = .none
     }
     
     
     override func viewDidAppear(_ animated: Bool) {
-       
+        
     }
     
     //MARK: TableViewDataSource
@@ -162,7 +162,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
     }
     
     func checkForNoData() {
-
+        
         if self.matchedUsers.count == 0 {
             if !self.isGroup {
                 self.tableView.setEmptyMessage("No contacts to show. Tap sync button to start syncing your contacts")
@@ -223,7 +223,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
         
         cell.delegate = self
         cell.generateCellWith(fUser: user, indexPath: indexPath)
-     
+        
         return cell
     }
     
@@ -237,13 +237,13 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
     }
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-
+        
         view.tintColor = .systemBackground
-
+        
         let header : UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
         
         header.textLabel?.textColor = .label
-
+        
     }
     
     override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
@@ -275,7 +275,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
         else {
             let users = self.allUsersGrouped[sectionTitle]
             userToChat = users![indexPath.row]
-        
+            
         }
         
         //for inviting
@@ -289,22 +289,22 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
             }
             return
         }
-      
+        
         if isGroup || isInviting {
             if let cell = tableView.cellForRow(at: indexPath) {
-                  
-                  if selectedUser.contains(userToChat.objectId){
-                      cell.accessoryType = .none
-                      let index = selectedUser.firstIndex(of: userToChat.objectId)
-                      selectedUser.remove(at: index!)
-                  } else {
-                      cell.accessoryType = .checkmark
-                      selectedUser.append(userToChat.objectId)
-                  }
-              }
+                
+                if selectedUser.contains(userToChat.objectId){
+                    cell.accessoryType = .none
+                    let index = selectedUser.firstIndex(of: userToChat.objectId)
+                    selectedUser.remove(at: index!)
+                } else {
+                    cell.accessoryType = .checkmark
+                    selectedUser.append(userToChat.objectId)
+                }
+            }
         }
-  
-
+        
+        
         
         if !isGroup {
             if !checkBlockedStatus(withUser: userToChat) {
@@ -344,19 +344,19 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
     }
     
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-           return true
+        return true
     }
-  
+    
     
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         cell.selectionStyle = .none
     }
-
+    
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) ->
         UISwipeActionsConfiguration? {
-          
-               var contactUser: FUser
+            
+            var contactUser: FUser
             
             if searchController.isActive && searchController.searchBar.text != "" {
                 contactUser = filteredMatchedUsers[indexPath.row]
@@ -365,63 +365,63 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
                 
                 contactUser = matchedUsers[indexPath.row]
             }
-        
-        let removeContact = UIContextualAction(style: .normal, title: nil) { (ac, view, succes) in
-            if self.searchController.isActive && self.searchController.searchBar.text != "" {
-                self.filteredMatchedUsers.remove(at: indexPath.row)
-                let objectId = contactUser.objectId
-                self.removeContact(id: objectId)
-                let contactFirstLetter = contactUser.firstname.first?.uppercased()
-                if self.allUsersGrouped[contactFirstLetter!]?.count == 1 {
-                    self.sectionTitleList.removeAll { (letter) -> Bool in
-                        letter == contactFirstLetter!
+            
+            let removeContact = UIContextualAction(style: .normal, title: nil) { (ac, view, succes) in
+                if self.searchController.isActive && self.searchController.searchBar.text != "" {
+                    self.filteredMatchedUsers.remove(at: indexPath.row)
+                    let objectId = contactUser.objectId
+                    self.removeContact(id: objectId)
+                    let contactFirstLetter = contactUser.firstname.first?.uppercased()
+                    if self.allUsersGrouped[contactFirstLetter!]?.count == 1 {
+                        self.sectionTitleList.removeAll { (letter) -> Bool in
+                            letter == contactFirstLetter!
+                        }
                     }
-                }
-                self.allUsersGrouped[contactFirstLetter!] = self.removeFromArray(array: self.allUsersGrouped[contactFirstLetter!]!, withId: objectId)
-                self.matchedUsers = self.removeFromArray(array: self.matchedUsers, withId: objectId)
-                if self.memberIdsOfGroupChat.contains(objectId) {
-                    let index = self.memberIdsOfGroupChat.firstIndex(of: objectId)
-                    self.memberIdsOfGroupChat.remove(at: index!)
-                    self.membersOfGroupChat.remove(at: index!)
-                    self.navigationItem.rightBarButtonItem?.isEnabled = self.memberIdsOfGroupChat.count > 0
-                }
-                
-                
-                self.splitDataInToSection()
-            }
-            else {
-                let sectionTitle = self.sectionTitleList[indexPath.section]
-                let users = self.allUsersGrouped[sectionTitle]
-                let objectId = users![indexPath.row].objectId
-                self.removeContact(id: users![indexPath.row].objectId)
-                if self.allUsersGrouped[sectionTitle]?.count == 1 {
+                    self.allUsersGrouped[contactFirstLetter!] = self.removeFromArray(array: self.allUsersGrouped[contactFirstLetter!]!, withId: objectId)
+                    self.matchedUsers = self.removeFromArray(array: self.matchedUsers, withId: objectId)
+                    if self.memberIdsOfGroupChat.contains(objectId) {
+                        let index = self.memberIdsOfGroupChat.firstIndex(of: objectId)
+                        self.memberIdsOfGroupChat.remove(at: index!)
+                        self.membersOfGroupChat.remove(at: index!)
+                        self.navigationItem.rightBarButtonItem?.isEnabled = self.memberIdsOfGroupChat.count > 0
+                    }
                     
-                    self.sectionTitleList.remove(at: indexPath.section)
+                    
+                    self.splitDataInToSection()
                 }
-                self.allUsersGrouped[sectionTitle] = self.removeFromArray(array: self.allUsersGrouped[sectionTitle]!, withId: objectId)
-                self.matchedUsers = self.removeFromArray(array: self.matchedUsers, withId: objectId)
-                if self.memberIdsOfGroupChat.contains(objectId) {
-                    let index = self.memberIdsOfGroupChat.firstIndex(of: objectId)
-                    self.memberIdsOfGroupChat.remove(at: index!)
-                    self.membersOfGroupChat.remove(at: index!)
-                     self.navigationItem.rightBarButtonItem?.isEnabled = self.memberIdsOfGroupChat.count > 0
+                else {
+                    let sectionTitle = self.sectionTitleList[indexPath.section]
+                    let users = self.allUsersGrouped[sectionTitle]
+                    let objectId = users![indexPath.row].objectId
+                    self.removeContact(id: users![indexPath.row].objectId)
+                    if self.allUsersGrouped[sectionTitle]?.count == 1 {
+                        
+                        self.sectionTitleList.remove(at: indexPath.section)
+                    }
+                    self.allUsersGrouped[sectionTitle] = self.removeFromArray(array: self.allUsersGrouped[sectionTitle]!, withId: objectId)
+                    self.matchedUsers = self.removeFromArray(array: self.matchedUsers, withId: objectId)
+                    if self.memberIdsOfGroupChat.contains(objectId) {
+                        let index = self.memberIdsOfGroupChat.firstIndex(of: objectId)
+                        self.memberIdsOfGroupChat.remove(at: index!)
+                        self.membersOfGroupChat.remove(at: index!)
+                        self.navigationItem.rightBarButtonItem?.isEnabled = self.memberIdsOfGroupChat.count > 0
+                    }
+                    self.splitDataInToSection()
                 }
-                self.splitDataInToSection()
             }
-        }
-        
-        removeContact.backgroundColor = UIColor.systemBackground
-        var img = UIGraphicsImageRenderer(size: CGSize(width: 26, height: 25)).image {
-            _ in
-            UIImage(systemName: "person.badge.minus")?.draw(in: CGRect(x: 0, y: 0, width: 26, height: 25))
-        }
-        img = img.imageWithColor(color1: .systemRed)
-        removeContact.image = img
-        return  UISwipeActionsConfiguration(actions: [removeContact])
-        
+            
+            removeContact.backgroundColor = UIColor.systemBackground
+            var img = UIGraphicsImageRenderer(size: CGSize(width: 26, height: 25)).image {
+                _ in
+                UIImage(systemName: "person.badge.minus")?.draw(in: CGRect(x: 0, y: 0, width: 26, height: 25))
+            }
+            img = img.imageWithColor(color1: .systemRed)
+            removeContact.image = img
+            return  UISwipeActionsConfiguration(actions: [removeContact])
+            
     }
     
-   
+    
     
     func removeFromArray(array: [FUser], withId: String) -> [FUser] {
         var tempArr = array
@@ -467,20 +467,20 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
         matchedUsers.mergeElements(newElements: currentContacts!)
         matchedUsers = matchedUsers.sorted { $0.fullname < $1.fullname }
         print("MMMMAAACHHEHEDDDDDD: \(matchedUsers.count)")
-
-            
-            let dict = ["userID" : FUser.currentId(), "contacts" : self.matchedUsers.map{ $0.objectId } ] as [String : Any]
-            
-            reference(.Contact).document(FUser.currentId()).setData(dict) { (error) in
-                if error != nil  {
-                    ProgressHUD.showError("Couldnt save contacts")
-                }
-                self.tableView.isUserInteractionEnabled = true
-                self.navigationItem.rightBarButtonItems?.last?.isEnabled = true
-                self.isSyncing = false
-                   ProgressHUD.dismiss()
+        
+        
+        let dict = ["userID" : FUser.currentId(), "contacts" : self.matchedUsers.map{ $0.objectId } ] as [String : Any]
+        
+        reference(.Contact).document(FUser.currentId()).setData(dict) { (error) in
+            if error != nil  {
+                ProgressHUD.showError("Couldnt save contacts")
             }
-            
+            self.tableView.isUserInteractionEnabled = true
+            self.navigationItem.rightBarButtonItems?.last?.isEnabled = true
+            self.isSyncing = false
+            ProgressHUD.dismiss()
+        }
+        
     }
     
     
@@ -532,73 +532,70 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
             authorizationStatus in
             
             if authorizationStatus == .authorized {
-                self.tableView.isUserInteractionEnabled = false
-                self.navigationItem.rightBarButtonItems?.last?.isEnabled = false
-                self.isSyncing = true
-                ProgressHUD.show("Syncing contacts...")
-                reference(.User).order(by: kFIRSTNAME, descending: false).getDocuments { (snapshot, error) in
-                    
-                    
-                    guard let snapshot = snapshot else {
-                        ProgressHUD.dismiss()
-                        self.tableView.isUserInteractionEnabled = true
-                        self.navigationItem.rightBarButtonItems?.last?.isEnabled = true
-                        self.isSyncing = false
-                        return
-                    }
+                DispatchQueue.main.async {
                     self.tableView.isUserInteractionEnabled = false
                     self.navigationItem.rightBarButtonItems?.last?.isEnabled = false
-                    self.currentContacts = self.matchedUsers
-                    print(self.currentContacts!.count)
-                    if !snapshot.isEmpty {
-                        self.matchedUsers.removeAll()
-                        self.users.removeAll()
-                        self.sectionTitleList = []
+                    self.isSyncing = true
+                    ProgressHUD.show("Syncing contacts...")
+                    reference(.User).order(by: kFIRSTNAME, descending: false).getDocuments { (snapshot, error) in
                         
-                        for userDictionary in snapshot.documents {
+                        
+                        guard let snapshot = snapshot else {
+                            ProgressHUD.dismiss()
+                            self.tableView.isUserInteractionEnabled = true
+                            self.navigationItem.rightBarButtonItems?.last?.isEnabled = true
+                            self.isSyncing = false
+                            return
+                        }
+                        self.tableView.isUserInteractionEnabled = false
+                        self.navigationItem.rightBarButtonItems?.last?.isEnabled = false
+                        self.currentContacts = self.matchedUsers
+                        print(self.currentContacts!.count)
+                        if !snapshot.isEmpty {
+                            self.matchedUsers.removeAll()
+                            self.users.removeAll()
+                            self.sectionTitleList = []
                             
-                            let userDictionary = userDictionary.data() as NSDictionary
+                            for userDictionary in snapshot.documents {
+                                
+                                let userDictionary = userDictionary.data() as NSDictionary
+                                
+                                let fUser = FUser(_dictionary: userDictionary)
+                                
+                                if fUser.objectId != FUser.currentId() {
+                                    self.users.append(fUser)
+                                }
+                            }
                             
-                            let fUser = FUser(_dictionary: userDictionary)
+                        }
+                        
+                        self.workItem = DispatchWorkItem {
+                            self.compareUsers()
                             
-                            if fUser.objectId != FUser.currentId() {
-                                self.users.append(fUser)
+                            DispatchQueue.main.async {
+                                self.splitDataInToSection()
                             }
                         }
-                        
-                    }
-                    
-                    self.workItem = DispatchWorkItem {
-                        self.compareUsers()
-                        
-                        DispatchQueue.main.async {
-                            self.splitDataInToSection()
+                        let queue = DispatchQueue.global()
+                        queue.async {
+                            self.workItem?.perform()
                         }
                     }
-                    let queue = DispatchQueue.global()
-                    queue.async {
-                        self.workItem?.perform()
-                    }
-                    
-                    
-                    
                 }
             }
         }
-        
     }
     
     
-    
     func loadAddedUsers() {
-   
+        
         //  ProgressHUD.show()
         reference(.Contact).whereField("userID", isEqualTo: FUser.currentId()).addSnapshotListener { (snapshot, error) in
-             
+            
             guard let snapshot = snapshot else {
-                   ProgressHUD.dismiss()
+                ProgressHUD.dismiss()
                 self.tableView.isUserInteractionEnabled = true
-                 self.navigationItem.rightBarButtonItems?.last?.isEnabled = true
+                self.navigationItem.rightBarButtonItems?.last?.isEnabled = true
                 return
             }
             
@@ -612,7 +609,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
                 if contactsForUser.count == 0 {
                     self.tableView.isUserInteractionEnabled = true
                     if !(self.isGroup || self.isInviting) {
-                       self.navigationItem.rightBarButtonItems?.last?.isEnabled = true
+                        self.navigationItem.rightBarButtonItems?.last?.isEnabled = true
                     }
                     self.splitDataInToSection()
                 } else {
@@ -626,12 +623,12 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
                     }
                 }
             } else if snapshot.isEmpty {
-
+                
                 self.checkForNoData()
                 if !(self.isGroup || self.isInviting) {
                     self.navigationItem.rightBarButtonItems?.last?.isEnabled = true
                 }
-                   ProgressHUD.dismiss()
+                ProgressHUD.dismiss()
             }
         }
     }
@@ -709,7 +706,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
         
         // set section title "" at initial
         var sectionTitle: String = ""
-
+        
         self.checkForNoData()
         // iterate all records from array
         print("from sdis: \(self.matchedUsers.count)")
@@ -734,7 +731,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
                 
                 // append title within section title list
                 if !sectionTitleList.contains(sectionTitle) {
-
+                    
                     self.sectionTitleList.append(sectionTitle)
                 }
             }
@@ -743,7 +740,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
             print("NAME: \(currentUser.fullname)")
             self.allUsersGrouped[firstCharString]?.append(currentUser)
         }
-       //    ProgressHUD.dismiss()
+        //    ProgressHUD.dismiss()
         UIView.transition(with: tableView, duration: 0.2, options: .transitionCrossDissolve, animations: {self.tableView.reloadData()}, completion: nil)
     }
     
@@ -820,20 +817,20 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
     }
     
     func updateGroup(group: NSDictionary) {
-         let tempMembers = currentMembersIds + memberIdsOfGroupChat
-         let tempMembersToPush = group[kMEMBERSTOPUSH] as! [String] + memberIdsOfGroupChat
-         
-         let withValues = [kMEMBERS : tempMembers, kMEMBERSTOPUSH : tempMembersToPush]
-         
-         Group.updateGroup(groupId: group[kGROUPID] as! String, withValues: withValues)
-         
-         createRecentsForNewMembers(groupId: group[kGROUPID] as! String, groupName: group[kNAME] as! String, membersToPush: tempMembersToPush, avatar: group[kAVATAR] as! String)
-         
+        let tempMembers = currentMembersIds + memberIdsOfGroupChat
+        let tempMembersToPush = group[kMEMBERSTOPUSH] as! [String] + memberIdsOfGroupChat
+        
+        let withValues = [kMEMBERS : tempMembers, kMEMBERSTOPUSH : tempMembersToPush]
+        
+        Group.updateGroup(groupId: group[kGROUPID] as! String, withValues: withValues)
+        
+        createRecentsForNewMembers(groupId: group[kGROUPID] as! String, groupName: group[kNAME] as! String, membersToPush: tempMembersToPush, avatar: group[kAVATAR] as! String)
+        
         updateExistingRecentWithNewValues(forMembers: tempMembers, chatRoomId: group[kGROUPID] as! String, withValues: withValues)
         
         let i = navigationController?.viewControllers.firstIndex(of: self)
         if let previousViewController = navigationController?.viewControllers[i!-1] as? GroupTableViewController {
             self.navigationController?.popViewController(animated: true)
         }
-     }
+    }
 }

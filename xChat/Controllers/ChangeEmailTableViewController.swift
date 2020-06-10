@@ -18,7 +18,7 @@ class ChangeEmailTableViewController: UITableViewController {
     private let gradientLoadingBar = GradientLoadingBar()
     override func viewDidLoad() {
         super.viewDidLoad()
-         gradientLoadingBar.gradientColors =  [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
+        gradientLoadingBar.gradientColors =  [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
         emailTextField.text = FUser.currentUser()?.email
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -47,9 +47,9 @@ class ChangeEmailTableViewController: UITableViewController {
             if let user = Auth.auth().currentUser {
                 // re authenticate the user
                 user.reauthenticate(with: credential, completion: { (result, error) in
-                   
+                    
                     if let error = error {
-                         self.gradientLoadingBar.fadeOut()
+                        self.gradientLoadingBar.fadeOut()
                         if let errCode = AuthErrorCode(rawValue: error._code) {
                             switch errCode {
                             case .userNotFound:
@@ -67,9 +67,9 @@ class ChangeEmailTableViewController: UITableViewController {
                     } else {
                         // User re-authenticated.
                         user.updateEmail(to: self.emailTextField.text!, completion: { (error) in
-                          
+                            
                             if error != nil {
-                                  self.gradientLoadingBar.fadeOut()
+                                self.gradientLoadingBar.fadeOut()
                                 if let errCode = AuthErrorCode(rawValue: error!._code) {
                                     switch errCode {
                                     case .invalidEmail: self.showMessage(kEMAILNOTVALID, type: .error)
@@ -81,7 +81,7 @@ class ChangeEmailTableViewController: UITableViewController {
                                 }
                             }  else {
                                 updateCurrentUserInFirestore(withValues: [kEMAIL : self.emailTextField.text!]) { (error) in
-                                      self.gradientLoadingBar.fadeOut()
+                                    self.gradientLoadingBar.fadeOut()
                                     if error == nil {
                                         ProgressHUD.showSuccess("Successfully changed")
                                     } else {
@@ -95,10 +95,7 @@ class ChangeEmailTableViewController: UITableViewController {
                     
                 })
             }
-            
-            
         }
-        
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {

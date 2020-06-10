@@ -13,14 +13,6 @@ import Firebase
 import OneSignal
 
 class FUser: Equatable{
-    static func == (lhs: FUser, rhs: FUser) -> Bool {
-        return lhs.objectId == rhs.objectId
-    }
-    
-    
-    
-    
-    
     
     let objectId: String
     var pushId: String?
@@ -167,7 +159,7 @@ class FUser: Equatable{
     
     class func currentId() -> String {
         
-         return Auth.auth().currentUser!.uid
+        return Auth.auth().currentUser!.uid
     }
     
     class func currentUser () -> FUser? {
@@ -185,7 +177,9 @@ class FUser: Equatable{
         
     }
     
-    
+    static func == (lhs: FUser, rhs: FUser) -> Bool {
+        return lhs.objectId == rhs.objectId
+    }
     
     //MARK: Login function
     
@@ -235,44 +229,44 @@ class FUser: Equatable{
     //phoneNumberRegistration
     
     class func registerUserWith(phoneNumber: String, verificationCode: String, verificationId: String!, completion: @escaping (_ error: Error?, _ shouldLogin: Bool) -> Void) {
-
-
+        
+        
         let credential = PhoneAuthProvider.provider().credential(withVerificationID: verificationId, verificationCode: verificationCode)
-
+        
         Auth.auth().signInAndRetrieveData(with: credential) { (firuser, error) in
-
+            
             if error != nil {
-
+                
                 completion(error!, false)
                 return
             }
-
+            
             //check if user exist - login else register
             fetchCurrentUserFromFirestore(userId: firuser!.user.uid, completion: { (user) in
-
+                
                 if user != nil && user!.firstname != "" {
                     //we have user, login
-
+                    
                     saveUserLocally(fUser: user!)
                     saveUserToFirestore(fUser: user!)
-
+                    
                     completion(error, true)
-
+                    
                 } else {
-
+                    
                     //    we have no user, register
                     let fUser = FUser(_objectId: firuser!.user.uid, _pushId: "", _createdAt: Date(), _updatedAt: Date(), _email: "", _firstname: "", _lastname: "", _avatar: "", _loginMethod: kPHONE, _phoneNumber: firuser!.user.phoneNumber!, _city: "", _country: "", _countryCode: "")
-
+                    
                     saveUserLocally(fUser: fUser)
                     saveUserToFirestore(fUser: fUser)
                     completion(error, false)
-
+                    
                 }
-
+                
             })
-
+            
         }
-
+        
     }
     
     
@@ -350,7 +344,7 @@ func fetchCurrentUserFromFirestore(userId: String) {
             UserDefaults.standard.synchronize()
             OneSignal.sendTag("userId", value: FUser.currentId())
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: "UserSavedLocally"), object: nil, userInfo: nil)
-           // startActivityMonitoring()
+            // startActivityMonitoring()
             
         }
         
@@ -360,57 +354,57 @@ func fetchCurrentUserFromFirestore(userId: String) {
 
 func startActivityMonitoring() {
     let userId = Auth.auth().currentUser?.uid
-         
-         let userStatusDatabaseRef = Database.database().reference(withPath: "status/" + userId!)
-         
-         let isOfflineForDatabase = ["state" : "Offline", "last_changed" : ServerValue.timestamp(), "userId" : userId!] as [String : Any]
-         let isOnlineForDatabase = ["state" : "Online", "last_changed" : ServerValue.timestamp(), "userId" : userId!] as [String : Any]
-         
-         Database.database().reference(withPath: ".info/connected").observe(.value) { (snapshot) in
-                  if snapshot.value == nil {
-                      //userStatusDatabaseRef.setValue(isOfflineForDatabase)
-                   return
-                  }
-                  userStatusDatabaseRef.onDisconnectSetValue(isOfflineForDatabase) { (error, dbref) in
-                     // userStatusDatabaseRef.setValue(isOnlineForDatabase)
-                      userStatusDatabaseRef.setValue(isOnlineForDatabase)
-                  }
-              }
-         
-         
-         let userStatusFirestoreRef = Firestore.firestore().document("/status/" + userId!)
-         
-         let isOnlineForFirestore = ["state" : "Online", "last_changed" : FieldValue.serverTimestamp(), "userId" : userId!] as [String : Any]
-         let isOfflineForFirestore = ["state" : "Offline", "last_changed" : FieldValue.serverTimestamp(), "userId" : userId!] as [String : Any]
     
-//        userStatusFirestoreRef.addSnapshotListener(includeMetadataChanges: true) { (snapshot, error) in
-//            
-//            guard let snapshot = snapshot else { return }
-//            
-//            if snapshot.data() != nil {
-//                let isOnline = snapshot.data()!["state"] as! String == "Online"
-//                         if isOnline {
-//                             print("O     N     L     I      N     E")
-//                         }else {
-//                             print(" O O O O F  L I N  N E E E E")
-//                         }
-//                     }
-//            }
-     
-         
-         Database.database().reference(withPath: ".info/connected").observe(.value) { (snapshot) in
-             
-             if snapshot.value == nil {
-                 userStatusFirestoreRef.setData(isOfflineForFirestore)
-                 return
-             }
-             
-             userStatusDatabaseRef.onDisconnectSetValue(isOfflineForDatabase) { (error, dbred) in
-                 userStatusDatabaseRef.setValue(isOnlineForDatabase)
-                 userStatusFirestoreRef.setData(isOnlineForFirestore)
-             }
-         }
-         
+    let userStatusDatabaseRef = Database.database().reference(withPath: "status/" + userId!)
+    
+    let isOfflineForDatabase = ["state" : "Offline", "last_changed" : ServerValue.timestamp(), "userId" : userId!] as [String : Any]
+    let isOnlineForDatabase = ["state" : "Online", "last_changed" : ServerValue.timestamp(), "userId" : userId!] as [String : Any]
+    
+    Database.database().reference(withPath: ".info/connected").observe(.value) { (snapshot) in
+        if snapshot.value == nil {
+            //userStatusDatabaseRef.setValue(isOfflineForDatabase)
+            return
+        }
+        userStatusDatabaseRef.onDisconnectSetValue(isOfflineForDatabase) { (error, dbref) in
+            // userStatusDatabaseRef.setValue(isOnlineForDatabase)
+            userStatusDatabaseRef.setValue(isOnlineForDatabase)
+        }
+    }
+    
+    
+    let userStatusFirestoreRef = Firestore.firestore().document("/status/" + userId!)
+    
+    let isOnlineForFirestore = ["state" : "Online", "last_changed" : FieldValue.serverTimestamp(), "userId" : userId!] as [String : Any]
+    let isOfflineForFirestore = ["state" : "Offline", "last_changed" : FieldValue.serverTimestamp(), "userId" : userId!] as [String : Any]
+    
+    //        userStatusFirestoreRef.addSnapshotListener(includeMetadataChanges: true) { (snapshot, error) in
+    //
+    //            guard let snapshot = snapshot else { return }
+    //
+    //            if snapshot.data() != nil {
+    //                let isOnline = snapshot.data()!["state"] as! String == "Online"
+    //                         if isOnline {
+    //                             print("O     N     L     I      N     E")
+    //                         }else {
+    //                             print(" O O O O F  L I N  N E E E E")
+    //                         }
+    //                     }
+    //            }
+    
+    
+    Database.database().reference(withPath: ".info/connected").observe(.value) { (snapshot) in
+        
+        if snapshot.value == nil {
+            userStatusFirestoreRef.setData(isOfflineForFirestore)
+            return
+        }
+        
+        userStatusDatabaseRef.onDisconnectSetValue(isOfflineForDatabase) { (error, dbred) in
+            userStatusDatabaseRef.setValue(isOnlineForDatabase)
+            userStatusFirestoreRef.setData(isOnlineForFirestore)
+        }
+    }
+    
 }
 
 func fetchUser(withId userId: String, completion: @escaping (FUser) -> Void) {
@@ -422,8 +416,8 @@ func fetchUser(withId userId: String, completion: @escaping (FUser) -> Void) {
         guard let snapshot = snapshot else {  return }
         
         if snapshot.exists {
-                fUser = FUser(_dictionary: snapshot.data()! as NSDictionary)
-                completion(fUser!)
+            fUser = FUser(_dictionary: snapshot.data()! as NSDictionary)
+            completion(fUser!)
         }
         
     }
@@ -533,25 +527,25 @@ func updateCurrentUserInFirestore(withValues : [String : Any], completion: @esca
 
 func updateUserInFirestore(userId: String, withValues : [String : Any], completion: @escaping (_ error: Error?) -> Void) {
     
-        var tempWithValues = withValues
+    var tempWithValues = withValues
+    
+    let userId = userId
+    
+    let updatedAt = dateFormatter().string(from: Date())
+    
+    tempWithValues[kUPDATEDAT] = updatedAt
+    
+    
+    reference(.User).document(userId).updateData(withValues) { (error) in
         
-        let userId = userId
-        
-        let updatedAt = dateFormatter().string(from: Date())
-        
-        tempWithValues[kUPDATEDAT] = updatedAt
-        
-        
-       reference(.User).document(userId).updateData(withValues) { (error) in
-            
-            if error != nil {
-                
-                completion(error)
-                return
-            }
+        if error != nil {
             
             completion(error)
+            return
         }
+        
+        completion(error)
+    }
     
 }
 

@@ -33,7 +33,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     var activeUsersListeners: [ListenerRegistration] = []
     private let gradientLoadingBar = GradientLoadingBar()
     var quotaDidExceed = false
-      private var observer: NSObjectProtocol!
+    private var observer: NSObjectProtocol!
     
     
     
@@ -159,8 +159,8 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         for i in 0...contactsBy10.count - 1 {
             activeUsersListeners.append(Firestore.firestore().collection("status").whereField("userId", in: contactsBy10[i]).addSnapshotListener { (snapshot, error) in
-               
-               
+                
+                
                 guard let snapshot = snapshot else {
                     print("NO SNAPSHOT -----------------_!!!")
                     return
@@ -177,7 +177,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                             if doc["state"] as! String == "Online" && !self.usersOnline.contains(userId) {
                                 self.usersOnline.append(userId)
                             }
-                    
+                            
                         }
                         MyVariables.usersOnline = self.usersOnline
                         print(self.usersOnline)
@@ -186,22 +186,22 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                         
                     }
                 }
-                 
+                
                 if !snapshot.isEmpty {
                     
                     let documents = snapshot.documents
                     for doc in documents {
                         let userId = doc["userId"] as! String
                         
-                     
+                        
                         if doc["state"] as! String == "Online" {
                             tempUsersOnline.append(userId)
                         } else {
                             if let  indx = tempUsersOnline.firstIndex(of: userId) {
-                                 tempUsersOnline.remove(at: indx)
+                                tempUsersOnline.remove(at: indx)
                             }
                         }
-                           print("T E M P \(tempUsersOnline)")
+                        print("T E M P \(tempUsersOnline)")
                     }
                     if self.updateActivityTabBar {
                         if index == contactsBy10.count - 1 {
@@ -217,38 +217,38 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                         self.recentChatsTableView.reloadData()
                         self.contactsChanged = false
                     }
-             
+                    
                 } else {
                     print("SNAPSHOT EMPTY !!! -------")
                     if tempUsersOnline.count > 0 {
                         
                         self.recentChatsTableView.reloadData()
-                  
+                        
                     }
                     
                     if index == tempUsersOnline.count-1 {
                         MyVariables.usersOnline = tempUsersOnline
-                                               self.usersOnline = tempUsersOnline
-                         self.recentChatsTableView.reloadData()
+                        self.usersOnline = tempUsersOnline
+                        self.recentChatsTableView.reloadData()
                         
-                          self.contactsChanged = false
+                        self.contactsChanged = false
                     }
-                   
+                    
                 }
-                   index += 1
-        })
-        
+                index += 1
+            })
+            
         }
     }
     
-            
+    
     
     
     @objc func setupLeftBarButtons() {
         //        navigationItem.leftBarButtonItem = UIBarButtonItem.menuButton(self, action: #selector(presentSettings), image: UIImage(named: "avatarph")!)
         
         if let currentUser = FUser.currentUser() {
-                       NotificationCenter.default.post(name: NSNotification.Name(rawValue: USER_DID_LOGIN_NOTIFICATION), object: nil, userInfo:  [kUSERID : FUser.currentId()])
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: USER_DID_LOGIN_NOTIFICATION), object: nil, userInfo:  [kUSERID : FUser.currentId()])
             if currentUser.avatar != "" {
                 
                 imageFromData(pictureData: currentUser.avatar) { (avatarImage) in
@@ -599,7 +599,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                     
                     self.recentChatsTableView.setEmptyMessage("No chats to show")
                 } else {
-                   // self.getContacts()
+                    // self.getContacts()
                     self.recentChatsTableView.restore()
                     
                 }
@@ -636,10 +636,10 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         //NotificationCenter.default.removeObserver(self, name: .internetConnectionState, object: nil)
         self.removeAllNotifications()
         if recentChatsTableView.numberOfRows(inSection: 0) > 0 {
-              self.recentChatsTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+            self.recentChatsTableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
         }
-      
-        self.recentChatsTableView.showTableHeaderView(header: getTableViewHeader(title: "Transaction limt exceeded. Try again later.", backgroundColor: .systemPink, textColor: .white))
+        
+        self.recentChatsTableView.showTableHeaderView(header: getTableViewHeader(title: "Transaction limit exceeded. Try again later.", backgroundColor: .systemPink, textColor: .white))
         
     }
     
@@ -916,30 +916,6 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
     }
     
-}
-
-extension UITableView {
-    func hideTableHeaderView() -> Void {
-        self.beginUpdates()
-        UIView.animate(withDuration: 0.2, animations: {
-            self.tableHeaderView = nil
-        })
-        self.endUpdates()
-    }
-    func showTableHeaderView(header: UIView) -> Void {
-        let headerView = header
-        self.beginUpdates()
-        let headerFrame = headerView.frame
-        headerView.frame = CGRect()
-        self.tableHeaderView = headerView
-        UIView.animate(withDuration: 0.2, animations: {
-            self.tableHeaderView?.frame = headerFrame
-            self.tableHeaderView?.alpha = 0
-            self.endUpdates()
-        }, completion: { (ok) in
-            self.tableHeaderView?.alpha = 1
-        })
-    }
 }
 //
 //extension UIApplication {

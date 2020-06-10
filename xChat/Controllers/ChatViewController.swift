@@ -20,22 +20,7 @@ import OneSignal
 import GradientLoadingBar
 import Firebase
 
-
-
-
-class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, IQAudioRecorderViewControllerDelegate, GroupDelegate {
-    
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return .portrait
-    }
-    
-    override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
-        return .portrait
-    }
-    
-    override var shouldAutorotate: Bool {
-        return true
-    }
+class ChatViewController: JSQMessagesViewController, UINavigationControllerDelegate, IQAudioRecorderViewControllerDelegate, GroupDelegate {
     
     var chatRoomId: String!
     var memberIds: [String]!
@@ -84,7 +69,6 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     
     var firstLoadMessages = false
     
-    
     var outgoingBubble: JSQMessagesBubbleImage?
     var incomingBubble: JSQMessagesBubbleImage?
     var activityListener: ListenerRegistration!
@@ -125,120 +109,14 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     //    }
     
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-      
-        if !(MyVariables.globalContactsVariable.contains((memberIds.filter({ $0 != FUser.currentId() }))[0])) {
-            self.subTitleLabel.text = "Sllick Chat"
-        } else {
-            checkActivityStatus()
-        }
-        
-        setNavigationBarAppearance()
-        if MyVariables.wasShowingVariableInChat {
-                 self.inputToolbar.contentView.textView.becomeFirstResponder()
-            }
-    
-       
-        if let viewWithTag = self.view.viewWithTag(0) {
-            viewWithTag.isHidden = false
-        }
-        //        let item = self.collectionView(self.collectionView, numberOfItemsInSection: 0) - 1
-        //        let lastItemIndex = NSIndexPath(item: item, section: 0)
-        //        self.collectionView.scrollToItem(at: lastItemIndex as IndexPath, at: .top, animated: true)
-        //        AppDelegate.AppUtility.lockOrientation(UIInterfaceOrientationMask.portrait, andRotateTo: UIInterfaceOrientation.portrait)
-        
-        if !isGroup! {
-            recentListener = reference(.Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).addSnapshotListener({ (snapshot, error) in
-                guard let snapshot = snapshot else { return }
-                
-                if !snapshot.isEmpty {
-                
-                    let docs = snapshot.documents
-                    for doc in docs {
-                        self.membersToPush = doc[kMEMBERSTOPUSH] as! [String]
-                    }
-                }
-            })
-        }
-
-        
-        
-        avatarButton.imageView?.contentMode = .scaleAspectFill
-        avatarButton.layer.cornerRadius = 0.5 * avatarButton.bounds.size.width
-        avatarButton.clipsToBounds = true
-     
-    }
-    
-    func setNavigationBarAppearance() {
-
-
-    }
-    
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        if inputToolbar.contentView.textView.isFirstResponder {
-            MyVariables.wasShowingVariableInChat = true
-         
-        } else {
-            MyVariables.wasShowingVariableInChat = false
-        }
-           inputToolbar.contentView.textView.resignFirstResponder()
-        recentListener?.remove()
-        
-        gradientLoadingBar.fadeOut(duration: 0)
-        if let viewWithTag = self.view.viewWithTag(0) {
-            if  userDefaults.object(forKey: kBACKGROUBNDIMAGE) != nil {
-                self.view.subviews[0].backgroundColor = .systemBackground
-                self.view.window?.backgroundColor = .systemBackground
-                viewWithTag.isHidden = true
-            }
-            
-        }
-        //        AppDelegate.AppUtility.lockOrientation(UIInterfaceOrientationMask.all)
-        //        removeListeners()
-        //newChatListener.remove()
-        activityListener?.remove()
-        clearRecentCounter(chatRoomId: chatRoomId)
-    }
-    
-    @objc func internetConnectionChanged() {
-        if !MyVariables.internetConnectionState {
-            self.showMessage("No internet connection", type: .warning, options: [.autoHide(false), .hideOnTap(false)])
-            //self.loadViewIfNeeded()
-        }
-        else {
-            self.hideMessage()
-        }
-    }
-    
-    
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        
-        outgoingBubble = JSQMessagesBubbleImageFactory()?.outgoingMessagesBubbleImage(with: UIColor(named: "outgoingBubbleColor"))
-        incomingBubble = JSQMessagesBubbleImageFactory()?.incomingMessagesBubbleImage(with: UIColor(named: "incomingBubbleColor"))
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-          self.view.window?.backgroundColor = .black
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        //internetConnectionChanged()
- 
         checkForBackgroundImage()
-        MyVariables.wasShowingVariableInChat = false
         clearRecentCounter(chatRoomId: chatRoomId)
         self.inputToolbar.contentView.rightBarButtonItem.isEnabled = true
         NotificationCenter.default.addObserver(self,
-                                                             selector: #selector(internetConnectionChanged),
-                                                             name: .internetConnectionState, object: nil)
+                                               selector: #selector(internetConnectionChanged),
+                                               name: .internetConnectionState, object: nil)
         self.view.backgroundColor = .systemBackground
         self.showTypingIndicator = false
         gradientLoadingBar.gradientColors =  [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
@@ -277,10 +155,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
                 listenForBlockStatus()
             }
         }
-        
-        
         self.gradientLoadingBar.fadeIn()
-        
         getUsersFromFirestore(withIds: memberIds) { (withUsers) in
             
             self.withUsers = withUsers
@@ -292,7 +167,6 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
                 self.setUIForSingleChat()
             }
         }
-        
         createTypingObserver()
         loadUserDefaults()
         firstLoadMessages = true
@@ -304,14 +178,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         }
         imgl = imgl.imageWithColor(color1: UIColor(named: "outgoingBubbleColor")!)
         self.inputToolbar.contentView.leftBarButtonItem.setImage(imgl, for: .normal)
-        
         navigationItem.largeTitleDisplayMode = .never
-        //
-        //            let navBarAppearance = UINavigationBarAppearance()
-        //        navBarAppearance.backgroundColor = nil
-        //        navBarAppearance.backIndicatorImage = nil
-        //             UINavigationBar.appearance(whenContainedInInstancesOf: [UINavigationController.self]).standardAppearance = navBarAppearance
-        //             UINavigationBar.appearance(whenContainedInInstancesOf: [UINavigationController.self]).scrollEdgeAppearance = navBarAppearance
         self.navigationItem.leftBarButtonItems = [UIBarButtonItem(image: UIImage(named: "Back"), style: .plain, target: self, action: #selector(self.backAction))]
         self.senderId = FUser.currentId()
         self.senderDisplayName = FUser.currentUser()!.firstname
@@ -336,9 +203,6 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
             UIImage(systemName: "mic.fill")?.draw(in: CGRect(x: 0, y: 0, width: 22, height: 25))
         }
         img = img.imageWithColor(color1: UIColor(named: "outgoingBubbleColor")!)
-        
-        
-        
         self.inputToolbar.contentView.rightBarButtonItem.setImage(img, for: .normal)
         self.inputToolbar.contentView.rightBarButtonItem.setTitle("", for: .normal)
         self.inputToolbar.contentView.textView.backgroundColor = .clear
@@ -346,15 +210,91 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         self.inputToolbar.contentView.textView.textColor = .label
         self.inputToolbar.contentView.textView.placeHolder = "New message"
         self.inputToolbar.contentView.textView.layer.borderColor = UIColor.clear.cgColor
-        // self.inputToolbar?.backgroundColor = .clear
-        //        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        //          self.navigationController?.navigationBar.shadowImage = UIImage()
-        //          self.navigationController?.navigationBar.backgroundColor = UIColor(named: "bwBackground")?.withAlphaComponent(0.9)
-        //          self.navigationController?.navigationBar.isTranslucent = true
-        //        self.inputToolbar?.setBackgroundImage(UIImage(), forToolbarPosition: .any, barMetrics: .default)
-        //self.inputToolbar?.backgroundColor = UIColor(named: "bwBackground")?.withAlphaComponent(0.9)
-        //self.inputToolbar?.isTranslucent = true
+    }
+    
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         
+        if !(MyVariables.globalContactsVariable.contains((memberIds.filter({ $0 != FUser.currentId() }))[0])) {
+            self.subTitleLabel.text = "Sllick Chat"
+        } else {
+            checkActivityStatus()
+        }
+        
+        if let viewWithTag = self.view.viewWithTag(0) {
+            viewWithTag.isHidden = false
+        }
+        //        let item = self.collectionView(self.collectionView, numberOfItemsInSection: 0) - 1
+        //        let lastItemIndex = NSIndexPath(item: item, section: 0)
+        //        self.collectionView.scrollToItem(at: lastItemIndex as IndexPath, at: .top, animated: true)
+        //        AppDelegate.AppUtility.lockOrientation(UIInterfaceOrientationMask.portrait, andRotateTo: UIInterfaceOrientation.portrait)
+        
+        if !isGroup! {
+            recentListener = reference(.Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId as Any).addSnapshotListener({ (snapshot, error) in
+                guard let snapshot = snapshot else { return }
+                
+                if !snapshot.isEmpty {
+                    
+                    let docs = snapshot.documents
+                    for doc in docs {
+                        self.membersToPush = (doc[kMEMBERSTOPUSH] as! [String])
+                    }
+                }
+            })
+        }
+        
+        avatarButton.imageView?.contentMode = .scaleAspectFill
+        avatarButton.layer.cornerRadius = 0.5 * avatarButton.bounds.size.width
+        avatarButton.clipsToBounds = true
+        
+    }
+    
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        inputToolbar.contentView.textView.resignFirstResponder()
+        recentListener?.remove()
+        
+        gradientLoadingBar.fadeOut(duration: 0)
+        if let viewWithTag = self.view.viewWithTag(0) {
+            if  userDefaults.object(forKey: kBACKGROUBNDIMAGE) != nil {
+                self.view.subviews[0].backgroundColor = .systemBackground
+                self.view.window?.backgroundColor = .systemBackground
+                viewWithTag.isHidden = true
+            }
+            
+        }
+        //        AppDelegate.AppUtility.lockOrientation(UIInterfaceOrientationMask.all)
+        //        removeListeners()
+        //newChatListener.remove()
+        activityListener?.remove()
+        clearRecentCounter(chatRoomId: chatRoomId)
+    }
+    
+    
+    @objc func internetConnectionChanged() {
+        if !MyVariables.internetConnectionState {
+            self.showMessage("No internet connection", type: .warning, options: [.autoHide(false), .hideOnTap(false), .textColor(.label)])
+            //self.loadViewIfNeeded()
+        }
+        else {
+            self.hideMessage()
+        }
+    }
+    
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        outgoingBubble = JSQMessagesBubbleImageFactory()?.outgoingMessagesBubbleImage(with: UIColor(named: "outgoingBubbleColor"))
+        incomingBubble = JSQMessagesBubbleImageFactory()?.incomingMessagesBubbleImage(with: UIColor(named: "incomingBubbleColor"))
+    }
+    
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.view.window?.backgroundColor = .black
     }
     
     
@@ -364,8 +304,8 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         
     }
     
+    
     func  createTypingObserver() {
-        
         typingListener = reference(.Typing).document(chatRoomId).addSnapshotListener({ (snapshot, error) in
             
             guard let snapshot = snapshot else { return }
@@ -380,8 +320,6 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
                             self.scrollToBottom(animated: true)
                         }
                     }
-                    
-                    
                 }
             }
             else {
@@ -397,11 +335,13 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         
     }
     
+    
     func typingCounterStart() {
         typingCounter += 1
         saveTypingCounter(type: true)
         self.perform(#selector(typingCounterStop), with: nil, afterDelay: 2.0)
     }
+    
     
     @objc func typingCounterStop() {
         typingCounter -= 1
@@ -411,15 +351,11 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         }
     }
     
-    override func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        
-        typingCounterStart()
-        return true
-    }
     
     func saveTypingCounter(type: Bool) {
         reference(.Typing).document(chatRoomId).updateData([FUser.currentId() : type])
     }
+    
     
     func setCustomTitle() {
         
@@ -463,6 +399,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         }
     }
     
+    
     func avatarImageFrom(fUser: FUser) {
         
         if fUser.avatar != "" {
@@ -484,6 +421,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
             }
         }
     }
+    
     
     func createJSQAvatars(avatarDictionary: NSMutableDictionary?) {
         
@@ -509,20 +447,6 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         }
     }
     
-    
-    
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
-        
-        let message = messages[indexPath.row]
-        var avatar: JSQMessageAvatarImageDataSource
-        if let testAvatar = jsqAvatarDictionary!.object(forKey: message.senderId!) {
-            avatar = testAvatar as! JSQMessageAvatarImageDataSource
-        } else {
-            avatar = JSQMessagesAvatarImageFactory.avatarImage(with: UIImage(named: "avatarph"), diameter: 70)
-        }
-        
-        return avatar
-    }
     
     func setUIForSingleChat() {
         
@@ -553,6 +477,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         avatarButton.addTarget(self, action: #selector(self.showUserProfile), for: .touchUpInside)
     }
     
+    
     func checkActivityStatus() {
         
         if firstLoading {
@@ -564,7 +489,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
             return
         }
         
-       activityListener = Firestore.firestore().collection("status").whereField("userId", isEqualTo: withUsers.first!.objectId).addSnapshotListener { (snapshot, error) in
+        activityListener = Firestore.firestore().collection("status").whereField("userId", isEqualTo: withUsers.first!.objectId).addSnapshotListener { (snapshot, error) in
             
             guard let snapshot = snapshot else { return }
             
@@ -582,6 +507,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         }
     }
     
+    
     func setUIForGroupChat() {
         imageFromData(pictureData: group![kAVATAR] as! String) { (image) in
             if image != nil {
@@ -595,12 +521,14 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         titleLabel.text = (group![kNAME] as! String)
     }
     
+    
     @objc func infoButtonPressed() {
         let mediaVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "mediaView") as! PicturesCollectionViewController
         mediaVC.allImageLinks = allPictureMessages
         
         self.navigationController?.pushViewController(mediaVC, animated: true)
     }
+    
     
     @objc func showGroup() {
         if let group = group {
@@ -611,6 +539,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         }
         
     }
+    
     
     @objc func showUserProfile() {
         
@@ -623,251 +552,12 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         
         self.navigationController?.pushViewController(profileVC, animated: true)
     }
-    //MARK: JSQessages Data Source functions
-    
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
-        let cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! JSQMessagesCollectionViewCell
-        
-        let data = messages[indexPath.row]
-        
-        if data.senderId == FUser.currentId() {
-            cell.textView?.textColor = .white
-        }
-        else {
-            cell.textView?.textColor = .label
-        }
-        
-        return cell
-    }
-    
-    
-    
-    
-    
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageDataForItemAt indexPath: IndexPath!) -> JSQMessageData! {
-        return messages[indexPath.row]
-    }
-    
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return messages.count
-    }
-    
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
-        
-        let data = messages[indexPath.row]
-        
-        if data.senderId == FUser.currentId() {
-            return outgoingBubble
-        }
-        else {
-            return incomingBubble
-        }
-    }
-    
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForMessageBubbleTopLabelAt indexPath: IndexPath!) -> CGFloat {
-        if messages[indexPath.row].senderId != FUser.currentId() && isGroup! {
-             return 30
-        }
-        return 10
-       
-    }
-    
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
-        if messages[indexPath.row].senderId == FUser.currentId() || !isGroup!{
-             return NSAttributedString(string: "")
-        }
-        
-        
-        return NSAttributedString(string: messages[indexPath.row].senderDisplayName)
-    }
-    
-    
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForCellTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
-        if prevD == nil {
-            prevD = messages[indexPath.row].date()
-        }
-        if  indexPath.item % 5 == 0 || prevD!.stripTime() < messages[indexPath.row].date.stripTime() {
-            
-            let message = messages[indexPath.row]
-            prevD = message.date
-            
-            return JSQMessagesTimestampFormatter.shared()?.attributedTimestamp(for: message.date)
-        }
-        else {
-            return nil
-        }
-    }
-    
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForCellBottomLabelAt indexPath: IndexPath!) -> NSAttributedString! {
-        
-        let message = objectMessages[indexPath.row]
-        
-        let status: NSAttributedString
-        
-        let attributetStringColor = [NSAttributedString.Key.foregroundColor : UIColor.darkGray]
-        
-        switch message[kSTATUS] as! String {
-        case kDELIVERED:
-            status = NSAttributedString(string: kDELIVERED)
-        case kREAD:
-            let statusText = "Read" + " " + readTimeFrom(dateString: message[kREADDATE] as! String)
-            status = NSAttributedString(string: statusText, attributes: attributetStringColor)
-        default:
-            status = NSAttributedString(string: "✔️")
-        }
-        
-        if indexPath.row == (messages.count - 1) {
-            return status
-        } else {
-            return NSAttributedString(string: "")
-        }
-        
-    }
-    
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForCellBottomLabelAt indexPath: IndexPath!) -> CGFloat {
-        
-        let data = messages[indexPath.row]
-        
-        if data.senderId == FUser.currentId() && indexPath.row == objectMessages.count-1{
-            return kJSQMessagesCollectionViewCellLabelHeightDefault
-        }
-        else {
-            return 0.0
-        }
-    }
-    
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForCellTopLabelAt indexPath: IndexPath!) -> CGFloat {
-        
-        if previousDate == nil {
-            previousDate = messages[indexPath.row].date()
-        }
-        
-        if indexPath.item % 5 == 0 || previousDate!.stripTime() < messages[indexPath.row].date.stripTime() {
-            
-            previousDate = messages[indexPath.row].date
-            
-            return kJSQMessagesCollectionViewCellLabelHeightDefault
-        }
-        else {
-            return 0.0
-        }
-    }
-    
-    
-
-    
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, didTapMessageBubbleAt indexPath: IndexPath!) {
-        
-        let messageDictionary = objectMessages[indexPath.row]
-        let messageType = messageDictionary[kTYPE] as! String
-
-        switch messageType {
-        case kPICTURE:
-            let message = messages[indexPath.row]
-            var images = [SKPhoto]()
-            let mediaItem = message.media as! JSQPhotoMediaItem
-            if mediaItem.image == nil {
-                return
-            }
-            let photo = SKPhoto.photoWithImage(mediaItem.image!)
-            images.append(photo)
-            let browser = SKPhotoBrowser(photos: images)
-            self.present(browser, animated: true, completion: nil)
-        case kLOCATION: print("location message tapped")
-        case kVIDEO:
-            print("location message tapped")
-            let message = messages[indexPath.row]
-            let mediaItem = message.media as! VideoMessage
-            let player = AVPlayer(url: mediaItem.fileURL! as URL)
-            let moviePlayer = AVPlayerViewController()
-            let session = AVAudioSession.sharedInstance()
-            try! session.setCategory(.playAndRecord, mode: .default, options: .defaultToSpeaker)
-            
-            moviePlayer.player = player
-            self.present(moviePlayer, animated: true) {
-                moviePlayer.player!.play()
-            }
-        default: print("unknown message tapped")
-        }
-    }
-    
-    
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, didTapAvatarImageView avatarImageView: UIImageView!, at indexPath: IndexPath!) {
-        
-        if withUsers.first == nil && !isGroup! {
-            return
-        }
-        
-        
-        
-        let senderID = messages[indexPath.row].senderId
-        var selectedUser: FUser?
-        
-        if senderID == FUser.currentId() {
-            selectedUser = FUser.currentUser()
-        }
-        else {
-            for user in withUsers {
-                if user.objectId == senderID {
-                    selectedUser = user
-                }
-            }
-        }
-        
-        if selectedUser == nil || selectedUser == FUser.currentUser(){
-            return
-        }
-        let profileVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(identifier: "profileView") as! ProfileTableViewController
-        
-        profileVC.user = selectedUser
-        profileVC.fromGroup = isGroup! ? true : false
-        self.navigationController?.pushViewController(profileVC, animated: true)
-    }
-    
-    //for multimedia messages delete option
-    override func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
-        
-        super.collectionView(collectionView, shouldShowMenuForItemAt: indexPath)
-        return true
-    }
-    
-    override func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
-        
-        if messages[indexPath.row].isMediaMessage {
-            if action.description == "delete:" {
-                return true
-            } else {
-                return false
-            }
-        } else {
-            if action.description == "delete:" || action.description == "copy:" {
-                return true
-            } else {
-                return false
-            }
-        }
-    }
-    
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, didDeleteMessageAt indexPath: IndexPath!) {
-        let messageId = objectMessages[indexPath.row][kMESSAGEID] as! String
-        
-        objectMessages.remove(at: indexPath.row)
-        messages.remove(at: indexPath.row)
-        
-        //delete message from firebase
-        OutgoingMessage.deleteMessage(withId: messageId, chatRoomId: chatRoomId)
-        if (indexPath.row == messages.count) {
-            
-            updateExistingRecentWithNewValues(forMembers: [FUser.currentId()], chatRoomId: chatRoomId, withValues: [kLASTMESSAGETYPE : "removed_message", kDATE : dateFormatter().string(from: Date()) ])
-            
-        }
-    }
     
     
     func addNewPictureMessageLink(link: String) {
         allPictureMessages.append(link)
     }
+    
     
     func getPictureMessages() {
         allPictureMessages = []
@@ -878,114 +568,18 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         }
     }
     
-    //MARK: JSQMessages Delegate functions
-    //files image
-    override func didPressAccessoryButton(_ sender: UIButton!) {
-    
-        if !MyVariables.internetConnectionState {
-             self.showMessage("No internet connection", type: .warning, options: [.autoHide(false), .hideOnTap(false)])
-            return
-        }
-        let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        
-        let camera = Camera(delegate_: self)
-        
-        let takePhotoOrVideo = UIAlertAction(title: "Camera", style: .default) { (action) in
-            checkCameraAccess(viewController: self) {
-                accessStatus in
-                if accessStatus == .authorized {
-                    camera.PresentMultyCamera(target: self, canEdit: false)
-                }
-            }
-            
-        }
-        
-        let sharePhoto = UIAlertAction(title: "Photo Library", style: .default) { (action) in
-            checkCameraAccess(viewController: self) {
-                accessStatus in
-                if accessStatus == .authorized {
-                    camera.PresentPhotoLibrary(target: self, canEdit: false)
-                }
-            }
-            
-        }
-        
-        let shareVideo = UIAlertAction(title: "Video Library", style: .default) { (action) in
-            checkCameraAccess(viewController: self) {
-                accessStatus in
-                if accessStatus == .authorized {
-                    camera.PresentVideoLibrary(target: self, canEdit: false)
-                }
-            }
-            
-        }
-        
-        let shareLocation = UIAlertAction(title: "Share Location", style: .default) { (action) in
-            
-            print("share location")
-        }
-        
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (action) in
-            
-        }
-        
-        takePhotoOrVideo.setValue(UIImage(named: "camera"), forKey: "image")
-        sharePhoto.setValue(UIImage(named: "picture"), forKey: "image")
-        shareVideo.setValue(UIImage(named: "video"), forKey: "image")
-        shareLocation.setValue(UIImage(named: "location"), forKey: "image")
-        
-        optionMenu.addAction(takePhotoOrVideo)
-        optionMenu.addAction(sharePhoto)
-        optionMenu.addAction(shareVideo)
-        optionMenu.addAction(cancelAction)
-        
-        //for iPad compatibility mode
-        
-        
-        optionMenu.view.tintColor = UIColor.getAppColor(.light)
-        if ( UIDevice().userInterfaceIdiom == .pad ) {
-            if let currentPopoverpresentioncontroller = optionMenu.popoverPresentationController {
-                currentPopoverpresentioncontroller.sourceView = self.inputToolbar.contentView.leftBarButtonItem
-                currentPopoverpresentioncontroller.sourceRect = self.inputToolbar.contentView.leftBarButtonItem.bounds
-                
-                currentPopoverpresentioncontroller.permittedArrowDirections = .up
-                self.present(optionMenu, animated: true, completion: nil)
-            }
-        }
-        self.present(optionMenu, animated: true, completion: nil)
-    }
-    
-    
-    //send button
-    override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
-        if !text.trimmingCharacters(in: .whitespaces).isEmpty{
-            print(text!)
-            sendMessage(text: text, date: date, picture: nil, location: nil, video: nil, audio: nil)
-            updateSendButton(isSend: false)
-            self.collectionView.reloadData()
-        }
-        else {
-            if !MyVariables.internetConnectionState {
-                 self.showMessage("No internet connection", type: .warning, options: [.autoHide(false), .hideOnTap(false)])
-                  return
-              }
-             self.internetConnectionChanged()
-            let audioVC = AudioViewController(delegate_: self)
-            audioVC.presentAudioRecorder(target: self)
-        }
-    }
     
     //MARK: IQAudioDelegate
-    
-    
     func audioRecorderController(_ controller: IQAudioRecorderViewController, didFinishWithAudioAtPath filePath: String) {
         controller.dismiss(animated: true, completion: nil)
         self.sendMessage(text: nil, date: Date(), picture: nil, location: nil, video: nil, audio: filePath)
     }
     
+    
     func audioRecorderControllerDidCancel(_ controller: IQAudioRecorderViewController) {
         controller.dismiss(animated: true, completion: nil)
     }
+    
     
     @objc func backAction() {
         removeListeners()
@@ -998,6 +592,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         }
         
     }
+    
     
     func listenForBlockStatus() {
         if let  member = memberIds.filter({ $0 != FUser.currentId()}).first {
@@ -1018,9 +613,9 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         }
     }
     
+    
     //MARK: Custom send button
     func updateSendButton(isSend: Bool) {
-        
         if isSend {
             var img = UIImage(systemName: "paperplane.fill")
             img = img!.imageWithColor(color1: UIColor(named: "outgoingBubbleColor")!)
@@ -1034,36 +629,21 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
             img = img.imageWithColor(color1: UIColor(named: "outgoingBubbleColor")!)
             self.inputToolbar.contentView.rightBarButtonItem.setImage(img, for: .normal)
         }
-         self.inputToolbar.contentView.rightBarButtonItem.isEnabled = true
+        self.inputToolbar.contentView.rightBarButtonItem.isEnabled = true
     }
     
-    override func textViewDidChange(_ textView: UITextView) {
-        
-//        if textView.text.trimmingCharacters(in: .whitespaces).isEmpty  {
-//            return
-//        }
-        
-        if textView.text != "" {
-            updateSendButton(isSend: true)
-        }
-        else {
-            updateSendButton(isSend: false)
-        }
-        
-    }
     
     //MARK: Send messages
-    
     func sendMessage(text: String?, date: Date, picture: UIImage?, location: String?, video: NSURL?, audio: String?) {
-        print(membersToPush)
+        
         var outgoingMessage: OutgoingMessage?
         let currentUser = FUser.currentUser()
         if isGroup! {
             membersToPush = (group![kMEMBERSTOPUSH] as! [String])
             memberIds = (group![kMEMBERS] as! [String])
         }
+        
         if let text = text {
-            
             let encryptedText = Encryption.encryptText(chatRoomId: chatRoomId, message: text)
             outgoingMessage = OutgoingMessage(message: encryptedText, senderId: currentUser!.objectId, senderName: currentUser!.firstname, date: date, status: kDELIVERED, type: kTEXT)
             JSQSystemSoundPlayer.jsq_playMessageSentSound()
@@ -1072,7 +652,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         }
         
         if let pic = picture {
-    
+            
             uploadImage(image: pic, chatRoomId: chatRoomId, view: self.navigationController!.view) { (imageLink) in
                 
                 if imageLink != nil {
@@ -1121,24 +701,10 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
                 }
             }
         }
-        
-        
     }
     
-    //MARK: Image picker delegate
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        
-        let video = info[UIImagePickerController.InfoKey.mediaURL] as? NSURL
-        let picture = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
-        
-        sendMessage(text: nil, date: Date(), picture: picture, location: nil, video: video, audio: nil)
-        
-        picker.dismiss(animated: true, completion: nil)
-    }
     
     //MARK: Load messages
-    
     var groupChangedListener: ListenerRegistration!
     
     func loadMessages() {
@@ -1146,7 +712,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         //update message status
         updatedChatListener = reference(.Message).document(FUser.currentId()).collection(chatRoomId).addSnapshotListener({ (snapshot, error) in
             
-         
+            
             guard let snapshot = snapshot else { return }
             
             if !snapshot.isEmpty {
@@ -1159,24 +725,20 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
             }
         })
         
-        
-        
-        
-        //get last 11 messages
-        
+        //get last 21 messages
         reference(.Message).document(FUser.currentId()).collection(chatRoomId).order(by: kDATE, descending: true).limit(to: 21).getDocuments(completion: { (snapshot, error) in
             self.internetConnectionChanged()
             if let error = error {
                 self.gradientLoadingBar.fadeOut(duration: 0)
-                           if let errorCode = AuthErrorCode(rawValue: error._code) {
-                            switch errorCode.rawValue {
-                            case 8: self.showMessage("Transaction limit exceeded. Try again later.", type: .error, options: [.autoHide(false), .hideOnTap(false)])
-                            default: self.showMessage(kSOMETHINGWENTWRONG, type: .error, options: [.autoHide(false), .hideOnTap(false)]); print("LOCALIZED DESC: \(errorCode)")
-                             }
-                         }
+                if let errorCode = AuthErrorCode(rawValue: error._code) {
+                    switch errorCode.rawValue {
+                    case 8: self.showMessage("Transaction limit exceeded. Try again later.", type: .error, options: [.autoHide(false), .hideOnTap(false)])
+                    default: self.showMessage(kSOMETHINGWENTWRONG, type: .error, options: [.autoHide(false), .hideOnTap(false)]); print("LOCALIZED DESC: \(errorCode)")
+                    }
+                }
                 self.inputToolbar.isUserInteractionEnabled = false
-                         return
-                     }
+                return
+            }
             guard let snapshot = snapshot else {
                 self.initialLoadComplete = true
                 self.listenForNewChat()
@@ -1212,7 +774,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
             }
         }
     }
-
+    
     
     func listenForNewChat() {
         
@@ -1249,6 +811,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         }
     }
     
+    
     //insert messages
     func insertMessages() {
         maxMessageNumber = loadedMessages.count - loadedMessagesCount
@@ -1268,6 +831,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         
         self.showLoadEarlierMessagesHeader = loadedMessagesCount != loadedMessages.count
     }
+    
     
     func insertInitialLoadMessages(messageDictionary: NSDictionary) -> Bool {
         let incomingMessage = IncomingMessage(collectionVIew_: self.collectionView!)
@@ -1297,6 +861,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         }
     }
     
+    
     func readTimeFrom(dateString: String) -> String {
         let date = dateFormatter().date(from: dateString)
         
@@ -1304,6 +869,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         currentDateFormat.dateFormat = "HH:mm"
         return currentDateFormat.string(from: date!)
     }
+    
     
     func removeSuspiciousMessages(allMessages: [NSDictionary]) -> [NSDictionary] {
         var tempMessages = allMessages
@@ -1319,6 +885,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         }
         return tempMessages
     }
+    
     
     func getOldMessagesInBackground() {
         
@@ -1343,14 +910,6 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
     }
     
     
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, header headerView: JSQMessagesLoadEarlierHeaderView!, didTapLoadEarlierMessagesButton sender: UIButton!) {
-        self.collectionView.reloadData()
-        
-        loadMoreMessages(maxNumer: maxMessageNumber, minNumber: minMessageNumber)
-        
-        print("load more....")
-    }
-    
     func loadMoreMessages(maxNumer: Int, minNumber: Int) {
         
         if loadOld {
@@ -1372,6 +931,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         self.showLoadEarlierMessagesHeader = loadedMessagesCount != loadedMessages.count
     }
     
+    
     func insertNewMessage(messageDictionary: NSDictionary) {
         
         let incomingMessage = IncomingMessage(collectionVIew_: self.collectionView!)
@@ -1381,6 +941,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         objectMessages.insert(messageDictionary, at: 0)
         messages.insert(message!, at: 0)
     }
+    
     
     func removeListeners() {
         
@@ -1397,6 +958,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         }
     }
     
+    
     func loadUserDefaults() {
         firstLoad = userDefaults.bool(forKey: kFIRSTRUN)
         if !firstLoad! {
@@ -1409,12 +971,13 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         
     }
     
+    
     func checkForBackgroundImage() {
         // navigationController?.navigationBar.setBackgroundImage(imageVIew.image!, for: .compact)
-//        navigationController?.navigationBar.shadowImage = UIImage()
-//        navigationController?.navigationBar.isTranslucent = true
-//        navigationController?.view.backgroundColor = UIColor.clear
-//        navigationController?.navigationBar.backgroundColor = UIColor.clear
+        //        navigationController?.navigationBar.shadowImage = UIImage()
+        //        navigationController?.navigationBar.isTranslucent = true
+        //        navigationController?.view.backgroundColor = UIColor.clear
+        //        navigationController?.navigationBar.backgroundColor = UIColor.clear
         if userDefaults.object(forKey: kBACKGROUBNDIMAGE) != nil {
             self.collectionView.backgroundColor = .clear
             let width = UIScreen.main.bounds.width
@@ -1431,6 +994,7 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
         }
         
     }
+    
     
     func getCurrentGroup(withId: String) {
         reference(.Group).document(withId).getDocument { (snapshot, error) in
@@ -1486,6 +1050,23 @@ class ChatViewController: JSQMessagesViewController, UIImagePickerControllerDele
             self.setUIForGroupChat()
         }
     }
+    
+    
+    //MARK: Supporting  only portrait mode
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .portrait
+    }
+    
+    
+    override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
+        return .portrait
+    }
+    
+    
+    override var shouldAutorotate: Bool {
+        return true
+    }
+    
 }
 
 
@@ -1500,27 +1081,441 @@ extension JSQMessagesInputToolbar {
             bottomAnchor.constraint(lessThanOrEqualToSystemSpacingBelow: anchor, multiplier: 1.0).isActive = true
         }
     }
-}  // End fix iPhone x
+} 
 
-extension Date {
-    func stripTime() -> Date {
-        let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: self)
-        let date = Calendar.current.date(from: components)
-        return date!
+
+extension ChatViewController: UIImagePickerControllerDelegate {
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        
+        let video = info[UIImagePickerController.InfoKey.mediaURL] as? NSURL
+        let picture = info[UIImagePickerController.InfoKey.originalImage] as? UIImage
+        
+        sendMessage(text: nil, date: Date(), picture: picture, location: nil, video: video, audio: nil)
+        
+        picker.dismiss(animated: true, completion: nil)
     }
 }
 
-extension DispatchQueue {
+//CollectionView delegates/data source
+extension ChatViewController {
     
-    static func background(delay: Double = 0.0, background: (()->Void)? = nil, completion: (() -> Void)? = nil) {
-        DispatchQueue.global(qos: .background).async {
-            background?()
-            if let completion = completion {
-                DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: {
-                    completion()
-                })
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        let cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! JSQMessagesCollectionViewCell
+        
+        let data = messages[indexPath.row]
+        
+        if data.senderId == FUser.currentId() {
+            cell.textView?.textColor = .white
+        }
+        else {
+            cell.textView?.textColor = .label
+        }
+        
+        return cell
+    }
+    
+    
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, header headerView: JSQMessagesLoadEarlierHeaderView!, didTapLoadEarlierMessagesButton sender: UIButton!) {
+        self.collectionView.reloadData()
+        
+        loadMoreMessages(maxNumer: maxMessageNumber, minNumber: minMessageNumber)
+        
+        print("load more....")
+    }
+    
+    
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageDataForItemAt indexPath: IndexPath!) -> JSQMessageData! {
+        return messages[indexPath.row]
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return messages.count
+    }
+    
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
+        
+        let data = messages[indexPath.row]
+        
+        if data.senderId == FUser.currentId() {
+            return outgoingBubble
+        }
+        else {
+            return incomingBubble
+        }
+    }
+    
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForMessageBubbleTopLabelAt indexPath: IndexPath!) -> CGFloat {
+        if messages[indexPath.row].senderId != FUser.currentId() && isGroup! {
+            return 30
+        }
+        return 5
+        
+    }
+    
+    
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
+        if messages[indexPath.row].senderId == FUser.currentId() || !isGroup!{
+            return NSAttributedString(string: "")
+        }
+        return NSAttributedString(string: messages[indexPath.row].senderDisplayName)
+    }
+    
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForCellTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
+        if prevD == nil {
+            prevD = messages[indexPath.row].date()
+        }
+        
+        if  indexPath.item % 5 == 0 || prevD!.stripTime() < messages[indexPath.row].date.stripTime() {
+
+            let message = messages[indexPath.row]
+            prevD = message.date
+            
+            return  NSAttributedString(string: message.date.timeAgoInMessages())
+            //return JSQMessagesTimestampFormatter.shared()?.attributedTimestamp(for: message.date)
+        }
+        else {
+            return nil
+        }
+    }
+    
+//    override func collectionView(_ collectionView: JSQMessagesCollectionView?, attributedTextForCellTopLabelAt indexPath: IndexPath?) -> NSAttributedString? {
+//
+//        let message = self.messages[indexPath!.item]
+//        if indexPath!.item == 0 {
+//                            return JSQMessagesTimestampFormatter.shared().attributedTimestamp(for: message.date)
+//                        }
+//
+//        if indexPath!.item -  1 > 0{
+//            let previousMessage = self.messages[indexPath!.item - 1 ]
+//
+//                            if  ( ( message.date.timeIntervalSince(previousMessage.date) / 60 ) > 1){
+//                                return JSQMessagesTimestampFormatter.shared().attributedTimestamp(for: message.date)
+//                            }
+//                        }
+//
+//                        return nil
+//        }
+    
+    
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForCellBottomLabelAt indexPath: IndexPath!) -> NSAttributedString! {
+        
+        let message = objectMessages[indexPath.row]
+        
+        let status: NSAttributedString
+        
+        let attributetStringColor = [NSAttributedString.Key.foregroundColor : UIColor.darkGray]
+        
+        switch message[kSTATUS] as! String {
+        case kDELIVERED:
+            status = NSAttributedString(string: kDELIVERED)
+        case kREAD:
+            let statusText = "Read" + " " + readTimeFrom(dateString: message[kREADDATE] as! String)
+            status = NSAttributedString(string: statusText, attributes: attributetStringColor)
+        default:
+            status = NSAttributedString(string: "✔️")
+        }
+        
+        if indexPath.row == (messages.count - 1) {
+            return status
+        } else {
+            return NSAttributedString(string: "")
+        }
+        
+    }
+    
+    
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
+        
+        let message = messages[indexPath.row]
+        var avatar: JSQMessageAvatarImageDataSource
+        if let testAvatar = jsqAvatarDictionary!.object(forKey: message.senderId!) {
+            avatar = testAvatar as! JSQMessageAvatarImageDataSource
+        } else {
+            avatar = JSQMessagesAvatarImageFactory.avatarImage(with: UIImage(named: "avatarph"), diameter: 70)
+        }
+        
+        return avatar
+    }
+    
+    
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForCellBottomLabelAt indexPath: IndexPath!) -> CGFloat {
+        
+        let data = messages[indexPath.row]
+        
+        if data.senderId == FUser.currentId() && indexPath.row == objectMessages.count-1{
+            return kJSQMessagesCollectionViewCellLabelHeightDefault
+        }
+        else {
+            return 0.0
+        }
+    }
+    
+//    override func collectionView(
+//        _ collectionView: JSQMessagesCollectionView?,
+//        layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout?,
+//        heightForCellTopLabelAt indexPath: IndexPath?
+//    ) -> CGFloat {
+//
+//        if indexPath!.item == 0 {
+//            return kJSQMessagesCollectionViewCellLabelHeightDefault
+//        }
+//
+//        if indexPath!.item -  1 > 0{
+//            let message = self.messages[indexPath!.item]
+//            let previousMessage = self.messages[indexPath!.item - 1 ]
+//
+//            if  ( ( message.date.timeIntervalSince(previousMessage.date) / 60 ) > 1){
+//                return kJSQMessagesCollectionViewCellLabelHeightDefault
+//            }
+//        }
+//        return 0.0
+//    }
+        
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForCellTopLabelAt indexPath: IndexPath!) -> CGFloat {
+
+        if previousDate == nil {
+            previousDate = messages[indexPath.row].date()
+        }
+
+        if indexPath.item % 5 == 0 || previousDate!.stripTime() < messages[indexPath.row].date.stripTime() {
+
+            previousDate = messages[indexPath.row].date
+
+            return kJSQMessagesCollectionViewCellLabelHeightDefault
+        }
+        else {
+            return 0.0
+        }
+    }
+    
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, didTapMessageBubbleAt indexPath: IndexPath!) {
+        
+        let messageDictionary = objectMessages[indexPath.row]
+        let messageType = messageDictionary[kTYPE] as! String
+        
+        switch messageType {
+        case kPICTURE:
+            let message = messages[indexPath.row]
+            var images = [SKPhoto]()
+            let mediaItem = message.media as! JSQPhotoMediaItem
+            if mediaItem.image == nil {
+                return
+            }
+            let photo = SKPhoto.photoWithImage(mediaItem.image!)
+            images.append(photo)
+            let browser = SKPhotoBrowser(photos: images)
+            self.present(browser, animated: true, completion: nil)
+        case kLOCATION: print("location message tapped")
+        case kVIDEO:
+            print("location message tapped")
+            let message = messages[indexPath.row]
+            let mediaItem = message.media as! VideoMessage
+            let player = AVPlayer(url: mediaItem.fileURL! as URL)
+            let moviePlayer = AVPlayerViewController()
+            let session = AVAudioSession.sharedInstance()
+            try! session.setCategory(.playAndRecord, mode: .default, options: .defaultToSpeaker)
+            
+            moviePlayer.player = player
+            self.present(moviePlayer, animated: true) {
+                moviePlayer.player!.play()
+            }
+        default: print("unknown message tapped")
+        }
+    }
+    
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, didTapAvatarImageView avatarImageView: UIImageView!, at indexPath: IndexPath!) {
+        
+        if withUsers.first == nil && !isGroup! {
+            return
+        }
+        
+        let senderID = messages[indexPath.row].senderId
+        var selectedUser: FUser?
+        
+        if senderID == FUser.currentId() {
+            selectedUser = FUser.currentUser()
+        }
+        else {
+            for user in withUsers {
+                if user.objectId == senderID {
+                    selectedUser = user
+                }
+            }
+        }
+        
+        if selectedUser == nil || selectedUser == FUser.currentUser(){
+            return
+        }
+        let profileVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(identifier: "profileView") as! ProfileTableViewController
+        
+        profileVC.user = selectedUser
+        profileVC.fromGroup = isGroup! ? true : false
+        self.navigationController?.pushViewController(profileVC, animated: true)
+    }
+    
+    
+    //for multimedia messages delete option
+    override func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
+        //super.collectionView(collectionView, shouldShowMenuForItemAt: indexPath)
+        return true
+    }
+    
+    
+    override func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
+        
+        if messages[indexPath.row].isMediaMessage {
+            if action.description == "delete:" {
+                return true
+            } else {
+                return false
+            }
+        } else {
+            if action.description == "delete:" || action.description == "copy:" {
+                return true
+            } else {
+                return false
             }
         }
     }
     
+    
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, didDeleteMessageAt indexPath: IndexPath!) {
+        let messageId = objectMessages[indexPath.row][kMESSAGEID] as! String
+        
+        objectMessages.remove(at: indexPath.row)
+        messages.remove(at: indexPath.row)
+        
+        //delete message from firebase
+        OutgoingMessage.deleteMessage(withId: messageId, chatRoomId: chatRoomId)
+        if (indexPath.row == messages.count) {
+            
+            updateExistingRecentWithNewValues(forMembers: [FUser.currentId()], chatRoomId: chatRoomId, withValues: [kLASTMESSAGETYPE : "removed_message", kDATE : dateFormatter().string(from: Date()) ])
+            
+        }
+    }
+}
+
+
+//JSQMessage delegates
+extension ChatViewController {
+    
+    override func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        typingCounterStart()
+        return true
+    }
+    
+    
+    override func didPressAccessoryButton(_ sender: UIButton!) {
+        
+        if !MyVariables.internetConnectionState {
+            self.showMessage("No internet connection", type: .warning, options: [.autoHide(false), .hideOnTap(false), .textColor(.label)])
+            return
+        }
+        let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let camera = Camera(delegate_: self)
+        
+        let takePhotoOrVideo = UIAlertAction(title: "Camera", style: .default) { (action) in
+            checkCameraAccess(viewController: self) {
+                accessStatus in
+                if accessStatus == .authorized {
+                    DispatchQueue.main.async {
+                          camera.PresentMultyCamera(target: self, canEdit: false)
+                    }
+                  
+                }
+            }
+            
+        }
+        
+        let sharePhoto = UIAlertAction(title: "Photo Library", style: .default) { (action) in
+            checkCameraAccess(viewController: self) {
+                accessStatus in
+                if accessStatus == .authorized {
+                    DispatchQueue.main.async {
+                        camera.PresentPhotoLibrary(target: self, canEdit: false)
+                    }
+                }
+            }
+            
+        }
+        
+        let shareVideo = UIAlertAction(title: "Video Library", style: .default) { (action) in
+            checkCameraAccess(viewController: self) {
+                accessStatus in
+                if accessStatus == .authorized {
+                    DispatchQueue.main.async {
+                        camera.PresentVideoLibrary(target: self, canEdit: false)
+                    }
+                }
+            }
+        }
+        
+        let shareLocation = UIAlertAction(title: "Share Location", style: .default) { (action) in
+            
+            print("share location")
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (action) in
+            
+        }
+        
+        takePhotoOrVideo.setValue(UIImage(named: "camera"), forKey: "image")
+        sharePhoto.setValue(UIImage(named: "picture"), forKey: "image")
+        shareVideo.setValue(UIImage(named: "video"), forKey: "image")
+        shareLocation.setValue(UIImage(named: "location"), forKey: "image")
+        
+        optionMenu.addAction(takePhotoOrVideo)
+        optionMenu.addAction(sharePhoto)
+        optionMenu.addAction(shareVideo)
+        optionMenu.addAction(cancelAction)
+        
+        //for iPad compatibility mode
+        optionMenu.view.tintColor = UIColor.getAppColor(.light)
+        if ( UIDevice().userInterfaceIdiom == .pad ) {
+            if let currentPopoverpresentioncontroller = optionMenu.popoverPresentationController {
+                currentPopoverpresentioncontroller.sourceView = self.inputToolbar.contentView.leftBarButtonItem
+                currentPopoverpresentioncontroller.sourceRect = self.inputToolbar.contentView.leftBarButtonItem.bounds
+                
+                currentPopoverpresentioncontroller.permittedArrowDirections = .up
+                self.present(optionMenu, animated: true, completion: nil)
+            }
+        }
+        self.present(optionMenu, animated: true, completion: nil)
+    }
+    
+    
+    //send button
+    override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
+        if !text.trimmingCharacters(in: .whitespaces).isEmpty{
+            print(text!)
+            sendMessage(text: text, date: date, picture: nil, location: nil, video: nil, audio: nil)
+            updateSendButton(isSend: false)
+            self.collectionView.reloadData()
+        }
+        else {
+            if !MyVariables.internetConnectionState {
+                self.showMessage("No internet connection", type: .warning, options: [.autoHide(false), .hideOnTap(false), .textColor(.label)])
+                return
+            }
+            self.internetConnectionChanged()
+            let audioVC = AudioViewController(delegate_: self)
+            audioVC.presentAudioRecorder(target: self)
+        }
+    }
+    
+    
+    override func textViewDidChange(_ textView: UITextView) {
+        //        if textView.text.trimmingCharacters(in: .whitespaces).isEmpty  {
+        //            return
+        //        }
+        if textView.text != "" {
+            updateSendButton(isSend: true)
+        }
+        else {
+            updateSendButton(isSend: false)
+        }
+    }
 }

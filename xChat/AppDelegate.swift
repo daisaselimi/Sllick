@@ -167,8 +167,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         //        }
         
         let notificationReceivedBlock: OSHandleNotificationReceivedBlock = { notification in
-            
-            print("Received Notification: \(notification!.payload.notificationID)")
             NotificationCenter.default.post(name: NSNotification.Name(rawValue: "ReceivedNotification"), object: self, userInfo: ["notificationPayload" : notification!.payload!]) // post notification to view controller
         }
         
@@ -246,7 +244,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             reachability = try Reachability()
             reachability.whenReachable = { reachability in
                 if reachability.connection == .wifi {
-                    print("- - - - - - -- - - - - - - - - - - - - - - - -Reachable via WiFiiiiii")
+                    print("- - - - - - -- - - - - - - - - - - - - - - - -Reachable via WiFi")
                 } else {
                     print("- - - - - - - - - - - - - - - - - - - - - -- - Reachable via Cellular")
                 }
@@ -271,8 +269,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func setupUIForAlerts() {
         GSMessage.font = UIFont.boldSystemFont(ofSize: 14)
       //  GSMessage.successBackgroundColor = UIColor(red: 142.0/255, green: 183.0/255, blue: 64.0/255,  alpha: 0.95)
-       // GSMessage.warningBackgroundColor = UIColor(red: 230.0/255, green: 189.0/255, blue: 1.0/255,   alpha: 0.95)
-        GSMessage.errorBackgroundColor   = UIColor.systemPink.withAlphaComponent(0.7)
+        GSMessage.warningBackgroundColor = UIColor.systemGray6
+        
+    
+        GSMessage.errorBackgroundColor = UIColor.systemPink.withAlphaComponent(0.7)
         //GSMessage.infoBackgroundColor    = UIColor(red: 44.0/255,  green: 187.0/255, blue: 255.0/255, alpha: 0.90)
     }
     
@@ -399,23 +399,6 @@ func createKeywords(word: String) -> Set<String> {
     return allKeywords
 }
 
-extension String {
-    subscript (bounds: CountableClosedRange<Int>) -> String {
-        let start = index(startIndex, offsetBy: bounds.lowerBound)
-        let end = index(startIndex, offsetBy: bounds.upperBound)
-        return String(self[start...end])
-    }
-    
-    subscript (bounds: CountableRange<Int>) -> String {
-        let start = index(startIndex, offsetBy: bounds.lowerBound)
-        let end = index(startIndex, offsetBy: bounds.upperBound)
-        return String(self[start..<end])
-    }
-    
-    func removeExtraSpaces() -> String {
-        return self.replacingOccurrences(of: "[\\s\n]+", with: " ", options: .regularExpression, range: nil)
-    }
-    
-}
+
 
 

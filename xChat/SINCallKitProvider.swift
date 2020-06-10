@@ -118,10 +118,6 @@ class SINCallKitProvider: NSObject, CXProviderDelegate {
             return nil
         }
     }
-
-
-    
-    
     
     //MARK: CXProvider delegate
     func provider(_ provider: CXProvider, didActivate audioSession: AVAudioSession) {
@@ -198,8 +194,6 @@ class SINCallKitProvider: NSObject, CXProviderDelegate {
         
         return CXCallEndedReason.failed
     }
-
-    
 }
 
 

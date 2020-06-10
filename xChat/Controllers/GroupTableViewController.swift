@@ -64,6 +64,7 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
         cameraButtonOutlet.addGestureRecognizer(tapGestureRecognizer)
        //   ProgressHUD.show()
         
+        
         getGroupMembers(completion: { (users) in
             self.allMembers = users
             let showedGroupTips = userDefaults.bool(forKey: kSHOWEDGROUPTIPS)
@@ -71,18 +72,19 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
             if !users.isEmpty {
                 if !showedGroupTips {
                     let popTip = PopTip()
-                              
-                              popTip.show(text: "Long press members' pictures to remove them from group", direction: .none, maxWidth: 200, in: self.view, from: self.view.frame, duration: 10)
-                              
-                              popTip.entranceAnimation = .scale
-                              popTip.actionAnimation = .bounce(5)
-                              popTip.bubbleColor = .systemTeal
-                              popTip.textColor = .systemBackground
-                              popTip.cornerRadius = 10
-                              popTip.shouldDismissOnTap = true
-                     userDefaults.set(true, forKey: kSHOWEDGROUPTIPS)
+                    
+                    popTip.show(text: "Long press members' pictures to remove them from group", direction: .none, maxWidth: 200, in:  self.groupMembersCollectionView, from: self.groupMembersCollectionView.frame, duration: 10)
+                    
+                    popTip.entranceAnimation = .scale
+                    popTip.actionAnimation = .bounce(5)
+                    popTip.bubbleColor = .systemTeal
+                    popTip.textColor = .white
+                    popTip.cornerRadius = 10
+                    popTip.shouldDismissOnTap = true
+                    popTip.alpha = 0.9
+                    userDefaults.set(true, forKey: kSHOWEDGROUPTIPS)
                 }
-          
+                
             }else {
                 self.groupMembersCollectionView.setEmptyMessage("No members to show")
             }

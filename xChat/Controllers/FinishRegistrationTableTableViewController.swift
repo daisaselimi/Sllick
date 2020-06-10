@@ -7,8 +7,6 @@ import GradientLoadingBar
 
 class FinishRegistrationTableViewController: UITableViewController, ImagePickerDelegate, FPNTextFieldDelegate  {
     
-    
-    
     var email: String!
     var password: String!
     var avatarImage: UIImage?

@@ -11,12 +11,6 @@ import ProgressHUD
 import ImagePicker
 
 class NewGroupViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, GroupMemberCollectionViewCellDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    func didTapAvatarImage(indexPath: IndexPath) {
-    
-    }
-    
- 
-    
     
     @IBOutlet weak var editAvatarButtonOutlet: UIButton!
     @IBOutlet weak var groupIconImageView: UIImageView!
@@ -87,7 +81,7 @@ class NewGroupViewController: UIViewController, UICollectionViewDataSource, UICo
             let group = Group(groupId: groupId, subject: groupSubjectTextField.text!, ownerId: FUser.currentId(), members: memberIds, avatar: avatar)
             group.saveGroup()
             
-           
+            
             
             //create group recent
             startGroupChat(group: group)
@@ -115,11 +109,11 @@ class NewGroupViewController: UIViewController, UICollectionViewDataSource, UICo
     }
     
     @objc func avatarTapped() {
-       showIconOptions()
+        showIconOptions()
     }
     
     @IBAction func editButtonPressed(_ sender: Any) { 
-      showIconOptions()
+        showIconOptions()
     }
     
     //MARK: GroupMemberCollectionViewDelegate
@@ -134,23 +128,23 @@ class NewGroupViewController: UIViewController, UICollectionViewDataSource, UICo
     }
     
     func didLongPressAvatarImage(indexPath: IndexPath) {
-         
-     }
+        
+    }
     
- 
+    
     
     func cancelButtonDidPress(_ imagePicker: ImagePickerController) {
-         self.dismiss(animated: true, completion: nil)
+        self.dismiss(animated: true, completion: nil)
     }
-
+    
     
     //MARK: HelperFunctions
     
     func updateParticipantsLabel() {
         participantsLabel.text = "Participants: \(allMembers.count)"
-  
         
-            self.navigationItem.rightBarButtonItem?.isEnabled = allMembers.count > 0
+        
+        self.navigationItem.rightBarButtonItem?.isEnabled = allMembers.count > 0
     }
     
     //Mark UIPickerController delegates & code
@@ -158,14 +152,14 @@ class NewGroupViewController: UIViewController, UICollectionViewDataSource, UICo
     
     func showIconOptions() {
         
-          let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-             alert.addAction(UIAlertAction(title: "Camera", style: .default, handler: {(action: UIAlertAction) in
-                 self.getImage(fromSourceType: .camera)
-             }))
-             alert.addAction(UIAlertAction(title: "Photo Album", style: .default, handler: {(action: UIAlertAction) in
-                 self.getImage(fromSourceType: .photoLibrary)
-             }))
-            
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: "Camera", style: .default, handler: {(action: UIAlertAction) in
+            self.getImage(fromSourceType: .camera)
+        }))
+        alert.addAction(UIAlertAction(title: "Photo Album", style: .default, handler: {(action: UIAlertAction) in
+            self.getImage(fromSourceType: .photoLibrary)
+        }))
+        
         if groupIcon != nil || (groupIconImageView.image != nil && (groupIconImageView.image! != UIImage(systemName: "camera.circle.fill"))) {
             
             let resetAction = UIAlertAction(title: "Reset", style: .destructive) { (alert) in
@@ -180,31 +174,31 @@ class NewGroupViewController: UIViewController, UICollectionViewDataSource, UICo
         
         alert.view.tintColor = UIColor.getAppColor(.light)
         if ( UIDevice().userInterfaceIdiom == .pad ) {
-              if let currentPopoverpresentioncontroller = alert.popoverPresentationController {
-                  currentPopoverpresentioncontroller.sourceView = editAvatarButtonOutlet
-                  currentPopoverpresentioncontroller.sourceRect = editAvatarButtonOutlet.bounds
-                  
-                  currentPopoverpresentioncontroller.permittedArrowDirections = .up
-                  self.present(alert, animated: true, completion: nil)
-              }
-          } else {
-
-              self.present(alert, animated: true, completion: nil)
-          }
+            if let currentPopoverpresentioncontroller = alert.popoverPresentationController {
+                currentPopoverpresentioncontroller.sourceView = editAvatarButtonOutlet
+                currentPopoverpresentioncontroller.sourceRect = editAvatarButtonOutlet.bounds
+                
+                currentPopoverpresentioncontroller.permittedArrowDirections = .up
+                self.present(alert, animated: true, completion: nil)
+            }
+        } else {
+            
+            self.present(alert, animated: true, completion: nil)
+        }
     }
     
     func getImage(fromSourceType sourceType: UIImagePickerController.SourceType) {
-          
-          //Check is source type available
-          if UIImagePickerController.isSourceTypeAvailable(sourceType) {
-              
-              let imagePickerController = UIImagePickerController()
-              imagePickerController.delegate = self
-              imagePickerController.allowsEditing = false
-              imagePickerController.sourceType = sourceType
-              present(imagePickerController, animated: true, completion: nil)
-          }
-      }
+        
+        //Check is source type available
+        if UIImagePickerController.isSourceTypeAvailable(sourceType) {
+            
+            let imagePickerController = UIImagePickerController()
+            imagePickerController.delegate = self
+            imagePickerController.allowsEditing = false
+            imagePickerController.sourceType = sourceType
+            present(imagePickerController, animated: true, completion: nil)
+        }
+    }
     
     // UIImagePicker delegate
     
@@ -228,5 +222,9 @@ class NewGroupViewController: UIViewController, UICollectionViewDataSource, UICo
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true, completion: nil)
     }
-
+    
+    func didTapAvatarImage(indexPath: IndexPath) {
+        
+    }
+    
 }

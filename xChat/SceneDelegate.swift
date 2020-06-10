@@ -213,9 +213,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
     }
     
     func sceneWillEnterForeground(_ scene: UIScene) {
-        updateCurrentUserInFirestore(withValues: [kISONLINE : false]) { (error) in
-            
-        }
+   
         if callKitProvider != nil {
             let call = callKitProvider.currentEstablishedCall()
             
@@ -339,25 +337,37 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
             top = top?.presentedViewController
         }
         
-        let callVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "CallVC") as! CallViewController
-        let id =  call.remoteUserId
         
-        getUsersFromFirestore(withIds: [id!]) { (allUsers) in
-            if allUsers.count > 0 {
-                let user = allUsers.first!
-                callVC.callingName = user.fullname
-                imageFromData(pictureData: user.avatar) { (image) in
-                    if image != nil {
-                        callVC.callingImage = image!.circleMasked
-                    } else {
-                        callVC.callingImage = UIImage(named: "avatarph")
-                    }
-                    callVC._call = call
-                    top?.present(callVC, animated: true, completion: nil)
-                }
+//        if UserDefaults.standard.bool(forKey:  "Don't ask for mic permission") {
+//            return
+//        }
+        
+        checkMicPermission(viewController: top!, whenSomeoneIsCalling: true) { (authorizationStatus) in
+           
+            if authorizationStatus == .authorized {
+                
+                      let callVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "CallVC") as! CallViewController
+                      let id =  call.remoteUserId
+                      
+                      getUsersFromFirestore(withIds: [id!]) { (allUsers) in
+                          if allUsers.count > 0 {
+                              let user = allUsers.first!
+                              callVC.callingName = user.fullname
+                              imageFromData(pictureData: user.avatar) { (image) in
+                                  if image != nil {
+                                      callVC.callingImage = image!.circleMasked
+                                  } else {
+                                      callVC.callingImage = UIImage(named: "avatarph")
+                                  }
+                                  callVC._call = call
+                                  top?.present(callVC, animated: true, completion: nil)
+                              }
+                          }
+                      }
+                      
             }
         }
-        
+      
         
         
     }
@@ -433,7 +443,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
                // Report the call to CallKit, and let it display the call UI.
                 callKitProvider._provider.reportNewIncomingCall(with: callUUID,
                            update: callUpdate, completion: { (error) in
-                  if error == nil {
+                  if error != nil {
+                    
                      // If the system allows the call to proceed, make a data record for it.
                     // let newCall = VoipCall(callUUID, phoneNumber: phoneNumber)
                      return

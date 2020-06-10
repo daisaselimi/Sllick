@@ -152,6 +152,7 @@ class EditProfileTableViewController: UITableViewController,  UIImagePickerContr
                        // ProgressHUD.showError(error!.localizedDescription)
                         self.showMessage("Could not update profile", type: .error)
                         print("could not update user \(error!.localizedDescription)")
+                        ProgressHUD.dismiss()
                     }
                     return
                 }
@@ -324,24 +325,6 @@ class EditProfileTableViewController: UITableViewController,  UIImagePickerContr
     }
 }
 
-
-import UIKit
-
-extension UIImage {
-    
-    func isEqualToImage(image: UIImage) -> Bool {
-        let data1: NSData = self.pngData()! as NSData
-        let data2: NSData = image.pngData()! as NSData
-        return data1.isEqual(data2)
-    }
-    
-}
-
-extension String {
-    func removingWhitespaces() -> String {
-        return components(separatedBy: .whitespaces).joined()
-    }
-}
 
 
 

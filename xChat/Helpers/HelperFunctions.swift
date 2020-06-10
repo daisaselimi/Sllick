@@ -467,7 +467,7 @@ extension UITableView {
 
     func restore() {
         self.backgroundView = nil
-        self.separatorStyle = .singleLine
+       // self.separatorStyle = .singleLine
     }
 }
 
@@ -705,32 +705,54 @@ func checkCameraAccess(viewController: UIViewController, completion: @escaping(C
     }
 }
 
-func checkMicPermission(viewController: UIViewController) -> Bool {
-
-    var permissionCheck: Bool = false
+func checkMicPermission(viewController: UIViewController, whenSomeoneIsCalling receivedCall: Bool = false, completion: @escaping (CNAuthorizationStatus) -> Void) {
 
     switch AVAudioSession.sharedInstance().recordPermission {
     case AVAudioSessionRecordPermission.granted:
-        permissionCheck = true
+        UserDefaults.standard.set(false, forKey: "Don't ask for mic permission")
+        completion(.authorized)
     case AVAudioSessionRecordPermission.denied:
-        presentSettings(viewController: viewController, titleText: "Microphone access denied")
-        permissionCheck = false
+        !receivedCall ? presentSettings(viewController: viewController, titleText: "Microphone access denied") : !UserDefaults.standard.bool(forKey:  "Don't ask for mic permission") ? showReceivedCallDialog(viewController: viewController) : completion(.denied)
+       // completion(.denied)
     case AVAudioSessionRecordPermission.undetermined:
         AVAudioSession.sharedInstance().requestRecordPermission({ (granted) in
             if granted {
-                permissionCheck = true
+                UserDefaults.standard.set(false, forKey: "Don't ask for mic permission")
+                completion(.authorized)
             } else {
-                permissionCheck = false
+                completion(.denied)
             }
         })
     default:
         break
     }
-
-    return permissionCheck
 }
 
 
+func showReceivedCallDialog(viewController: UIViewController) {
+    let alertController = UIAlertController(title: "Someone is trying to call you",
+                                            message: "Microphone access is currently denied. Open settings to change permission",
+                                            preferredStyle: .alert)
+   
+    
+ 
+    
+    alertController.addAction(UIAlertAction(title: "Settings", style: .default) { _ in
+        if let url = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(url, options: [:], completionHandler: { _ in
+                // Handle
+            })
+        }
+    })
+    
+    alertController.addAction(UIAlertAction(title: "Don't ask again", style: .destructive, handler: { _ in
+            UserDefaults.standard.set(true, forKey: "Don't ask for mic permission")
+     }))
+    
+     alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+    
+    viewController.present(alertController, animated: true)
+}
 
 func presentSettings(viewController: UIViewController, titleText: String) {
     let alertController = UIAlertController(title: titleText,
@@ -796,6 +818,212 @@ struct MyVariables {
         }
     }
 }
+
+
+extension Date {
+    func stripTime() -> Date {
+        let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: self)
+        let date = Calendar.current.date(from: components)
+        return date!
+    }
+}
+
+extension DispatchQueue {
+    
+    static func background(delay: Double = 0.0, background: (()->Void)? = nil, completion: (() -> Void)? = nil) {
+        DispatchQueue.global(qos: .background).async {
+            background?()
+            if let completion = completion {
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: {
+                    completion()
+                })
+            }
+        }
+    }
+}
+
+extension UITableView {
+    func hideTableHeaderView() -> Void {
+        self.beginUpdates()
+        UIView.animate(withDuration: 0.2, animations: {
+            self.tableHeaderView = nil
+        })
+        self.endUpdates()
+    }
+    func showTableHeaderView(header: UIView) -> Void {
+        let headerView = header
+        self.beginUpdates()
+        let headerFrame = headerView.frame
+        headerView.frame = CGRect()
+        self.tableHeaderView = headerView
+        UIView.animate(withDuration: 0.2, animations: {
+            self.tableHeaderView?.frame = headerFrame
+            self.tableHeaderView?.alpha = 0
+            self.endUpdates()
+        }, completion: { (ok) in
+            self.tableHeaderView?.alpha = 1
+        })
+    }
+}
+
+extension String {
+    subscript (bounds: CountableClosedRange<Int>) -> String {
+        let start = index(startIndex, offsetBy: bounds.lowerBound)
+        let end = index(startIndex, offsetBy: bounds.upperBound)
+        return String(self[start...end])
+    }
+    
+    subscript (bounds: CountableRange<Int>) -> String {
+        let start = index(startIndex, offsetBy: bounds.lowerBound)
+        let end = index(startIndex, offsetBy: bounds.upperBound)
+        return String(self[start..<end])
+    }
+    
+    func removeExtraSpaces() -> String {
+        return self.replacingOccurrences(of: "[\\s\n]+", with: " ", options: .regularExpression, range: nil)
+    }
+    
+}
+
+extension UIViewController {
+    func showInputDialog(title:String? = nil,
+                         subtitle:String? = nil,
+                         actionTitle:String? = "Add",
+                         cancelTitle:String? = "Cancel",
+                         inputPlaceholder:String? = nil,
+                         inputKeyboardType:UIKeyboardType = UIKeyboardType.default,
+                         cancelHandler: ((UIAlertAction) -> Swift.Void)? = nil,
+                         actionHandler: ((_ text: String?) -> Void)? = nil) {
+
+        let alert = UIAlertController(title: title, message: subtitle, preferredStyle: .alert)
+        alert.addTextField { (textField:UITextField) in
+            textField.placeholder = inputPlaceholder
+            textField.keyboardType = inputKeyboardType
+            textField.isSecureTextEntry = true
+        }
+        alert.addAction(UIAlertAction(title: actionTitle, style: .destructive, handler: { (action:UIAlertAction) in
+            guard let textField =  alert.textFields?.first else {
+                actionHandler?(nil)
+                return
+            }
+            actionHandler?(textField.text)
+        }))
+        alert.addAction(UIAlertAction(title: cancelTitle, style: .cancel, handler: cancelHandler))
+
+        self.present(alert, animated: true, completion: nil)
+    }
+}
+
+
+extension Date {
+    
+    func timeAgoSinceDate() -> String {
+        
+        // From Time
+        let fromDate = self
+        
+        // To Time
+        let toDate = Date()
+        
+        // Estimation
+        // Year
+        if let interval = Calendar.current.dateComponents([.year], from: fromDate, to: toDate).year, interval > 0  {
+            
+            return interval == 1 ? "\(interval)" + " " + "year ago" : "\(interval)" + " " + "years ago"
+        }
+        
+        // Month
+        if let interval = Calendar.current.dateComponents([.month], from: fromDate, to: toDate).month, interval > 0  {
+            
+            return interval == 1 ? "\(interval)" + " " + "month ago" : "\(interval)" + " " + "months ago"
+        }
+        
+        // Day
+        if let interval = Calendar.current.dateComponents([.day], from: fromDate, to: toDate).day, interval > 0  {
+            
+            return interval == 1 ? "\(interval)" + " " + "day ago" : "\(interval)" + " " + "days ago"
+        }
+        
+        // Hours
+        if let interval = Calendar.current.dateComponents([.hour], from: fromDate, to: toDate).hour, interval > 0 {
+            
+            return interval == 1 ? "\(interval)" + " " + "hour ago" : "\(interval)" + " " + "hours ago"
+        }
+        
+        // Minute
+        if let interval = Calendar.current.dateComponents([.minute], from: fromDate, to: toDate).minute, interval > 0 {
+            
+            return interval == 1 ? "\(interval)" + " " + "minute ago" : "\(interval)" + " " + "minutes ago"
+        }
+        
+        return "just now"
+    }
+    
+    func timeAgoInMessages() -> String {
+          
+          // From Time
+          let fromDate = self
+          
+          // To Time
+          let toDate = Date()
+        
+        let dateFormatter = DateFormatter()
+          // Estimation
+          // Year
+          if let interval = Calendar.current.dateComponents([.year], from: fromDate, to: toDate).year, interval > 0  {
+            dateFormatter.dateFormat = "MMM d, yyy, HH:mm"
+            return dateFormatter.string(from: fromDate)
+          }
+          
+          // Month
+          if let interval = Calendar.current.dateComponents([.month], from: fromDate, to: toDate).month, interval > 0  {
+              
+               dateFormatter.dateFormat = "MMM d, HH:mm"
+                         return dateFormatter.string(from: fromDate)
+          }
+        
+          
+          // Day
+          if let interval = Calendar.current.dateComponents([.day], from: fromDate, to: toDate).day, interval > 0  {
+            if interval >= 7 {
+                dateFormatter.dateFormat = "MMM d, HH:mm"
+                                       return dateFormatter.string(from: fromDate)
+            }
+                      dateFormatter.dateFormat = "E, HH:mm"
+                              return dateFormatter.string(from: fromDate)
+          }
+          
+          // Hours
+             dateFormatter.dateFormat = "HH:mm"
+                                                 return dateFormatter.string(from: fromDate)
+      }
+}
+
+extension UIImage {
+    
+    func isEqualToImage(image: UIImage) -> Bool {
+        let data1: NSData = self.pngData()! as NSData
+        let data2: NSData = image.pngData()! as NSData
+        return data1.isEqual(data2)
+    }
+    
+}
+
+extension String {
+    func removingWhitespaces() -> String {
+        return components(separatedBy: .whitespaces).joined()
+    }
+}
+
+extension UICollectionView {
+    func reloadData(_ completion: @escaping () -> Void) {
+        reloadData()
+        DispatchQueue.main.async { completion() }
+    }
+}
+
+
+
 
 
 

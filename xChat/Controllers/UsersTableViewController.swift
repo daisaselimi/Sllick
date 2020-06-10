@@ -364,6 +364,12 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
                     }
                 }
                 
+                if self.allUsers.isEmpty {
+                    self.tableView.setEmptyMessage("No users to show")
+                } else {
+                    self.tableView.restore()
+                }
+                
                 self.lastDocumentSnapshot = snapshot.documents.last!
                 self.splitDataIntoSections()
                 //self.tableView.reloadData()

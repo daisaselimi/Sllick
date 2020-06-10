@@ -384,10 +384,5 @@ class GroupViewController: UIViewController, UIImagePickerControllerDelegate, UI
     }
 }
 
-extension UICollectionView {
-    func reloadData(_ completion: @escaping () -> Void) {
-        reloadData()
-        DispatchQueue.main.async { completion() }
-    }
-}
+
 
