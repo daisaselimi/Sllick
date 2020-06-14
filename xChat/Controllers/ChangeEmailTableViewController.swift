@@ -6,19 +6,19 @@
 //  Copyright © 2020 com.isaselimi. All rights reserved.
 //
 
-import UIKit
 import Firebase
 import GradientLoadingBar
 import ProgressHUD
+import UIKit
 
 class ChangeEmailTableViewController: UITableViewController {
     
-    @IBOutlet weak var emailTextField: UITextField!
-    @IBOutlet weak var passwordTextField: UITextField!
+    @IBOutlet var emailTextField: UITextField!
+    @IBOutlet var passwordTextField: UITextField!
     private let gradientLoadingBar = GradientLoadingBar()
     override func viewDidLoad() {
         super.viewDidLoad()
-        gradientLoadingBar.gradientColors =  [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
+        gradientLoadingBar.gradientColors = [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
         emailTextField.text = FUser.currentUser()?.email
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -30,14 +30,13 @@ class ChangeEmailTableViewController: UITableViewController {
     // MARK: - Table view data source
     
     @IBAction func saveButtonPressed(_ sender: Any) {
-        if emailTextField.text!.removeExtraSpaces().isEmpty || passwordTextField.text!.isEmpty{
-            self.showMessage(kEMPTYFIELDS, type: .error)
+        if emailTextField.text!.removeExtraSpaces().isEmpty || passwordTextField.text!.isEmpty {
+            showMessage(kEMPTYFIELDS, type: .error)
         } else if emailTextField.text!.removeExtraSpaces() == FUser.currentUser()?.email {
-            self.showMessage("Enter a different email", type: .error)
+            showMessage("Enter a different email", type: .error)
         } else {
-            
             if passwordTextField.text!.removeExtraSpaces().isEmpty {
-                self.showMessage("Enter your current password", type: .error)
+                showMessage("Enter your current password", type: .error)
                 return
             }
             //  let user = Auth.auth().currentUser
@@ -46,14 +45,14 @@ class ChangeEmailTableViewController: UITableViewController {
             let credential = EmailAuthProvider.credential(withEmail: FUser.currentUser()!.email, password: passwordTextField.text!)
             if let user = Auth.auth().currentUser {
                 // re authenticate the user
-                user.reauthenticate(with: credential, completion: { (result, error) in
+                user.reauthenticate(with: credential, completion: { _, error in
                     
                     if let error = error {
                         self.gradientLoadingBar.fadeOut()
                         if let errCode = AuthErrorCode(rawValue: error._code) {
                             switch errCode {
                             case .userNotFound:
-                                self.showMessage(kUSERNOTFOUND, type: .error )
+                                self.showMessage(kUSERNOTFOUND, type: .error)
                             case .wrongPassword:
                                 self.showMessage(kWRONGPASSWORD, type: .error)
                             case .tooManyRequests:
@@ -61,12 +60,11 @@ class ChangeEmailTableViewController: UITableViewController {
                                 
                             default:
                                 self.showMessage(kSOMETHINGWENTWRONG, type: .error)
-                                
                             }
                         }
                     } else {
                         // User re-authenticated.
-                        user.updateEmail(to: self.emailTextField.text!, completion: { (error) in
+                        user.updateEmail(to: self.emailTextField.text!, completion: { error in
                             
                             if error != nil {
                                 self.gradientLoadingBar.fadeOut()
@@ -77,10 +75,9 @@ class ChangeEmailTableViewController: UITableViewController {
                                     case .tooManyRequests: self.showMessage("Please wait before you try again", type: .error)
                                     default: self.showMessage(kSOMETHINGWENTWRONG, type: .error)
                                     }
-                                    
                                 }
-                            }  else {
-                                updateCurrentUserInFirestore(withValues: [kEMAIL : self.emailTextField.text!]) { (error) in
+                            } else {
+                                updateCurrentUserInFirestore(withValues: [kEMAIL: self.emailTextField.text!]) { error in
                                     self.gradientLoadingBar.fadeOut()
                                     if error == nil {
                                         ProgressHUD.showSuccess("Successfully changed")
@@ -88,7 +85,6 @@ class ChangeEmailTableViewController: UITableViewController {
                                         self.showMessage(kSOMETHINGWENTWRONG, type: .error)
                                     }
                                 }
-                                
                             }
                         })
                     }
@@ -162,5 +158,4 @@ class ChangeEmailTableViewController: UITableViewController {
      // Pass the selected object to the new view controller.
      }
      */
-    
 }

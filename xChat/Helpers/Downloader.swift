@@ -6,16 +6,15 @@
 //  Copyright © 2019 com.isaselimi. All rights reserved.
 //
 
-import Foundation
-import FirebaseStorage
-import Firebase
-import MBProgressHUD
 import AVFoundation
+import Firebase
+import FirebaseStorage
+import Foundation
+import MBProgressHUD
 
 let storage = Storage.storage()
 
 func uploadImage(image: UIImage, chatRoomId: String, view: UIView, completion: @escaping (_ imageLink: String?) -> Void) {
-    
     let progressHUD = MBProgressHUD.showAdded(to: view, animated: true)
     
     progressHUD.mode = .determinateHorizontalBar
@@ -28,9 +27,9 @@ func uploadImage(image: UIImage, chatRoomId: String, view: UIView, completion: @
     
     let imageData = image.jpegData(compressionQuality: 0.7)
     
-    var task : StorageUploadTask!
+    var task: StorageUploadTask!
     
-    task = storageRef.putData(imageData!, metadata: nil, completion: { (metadata, error) in
+    task = storageRef.putData(imageData!, metadata: nil, completion: { _, error in
         task.removeAllObservers()
         
         progressHUD.hide(animated: true)
@@ -39,44 +38,39 @@ func uploadImage(image: UIImage, chatRoomId: String, view: UIView, completion: @
             print("error uploading image \(error!.localizedDescription)")
         }
         
-        storageRef.downloadURL { (url, error) in
+        storageRef.downloadURL { url, _ in
             guard let downloadUrl = url else { completion(nil); return }
             
             completion(downloadUrl.absoluteString)
         }
     })
     
-    task.observe(StorageTaskStatus.progress) { (snapshot) in
+    task.observe(StorageTaskStatus.progress) { snapshot in
         
         progressHUD.progress = Float((snapshot.progress?.completedUnitCount)!) / Float((snapshot.progress?.totalUnitCount)!)
     }
 }
 
-func downloadImage(imageUrl: String, completion: @escaping(_ image: UIImage?) -> Void) {
-    
+func downloadImage(imageUrl: String, completion: @escaping (_ image: UIImage?) -> Void) {
     let imageURL = NSURL(string: imageUrl)
     
     let imageFileName = (imageUrl.components(separatedBy: "%").last!).components(separatedBy: "?").first!
     
     if fileExistsAtPath(path: imageFileName) {
-        
         if let contentsOfFile = UIImage(contentsOfFile: fileInDocumentsDirectory(fileName: imageFileName)) {
-                completion(contentsOfFile)
+            completion(contentsOfFile)
         } else {
             print("couldn't generate image")
             completion(nil)
         }
         
     } else {
-        
         let downloadQueue = DispatchQueue(label: "imageDownloadQueue")
         
         downloadQueue.async {
-            
             let data = NSData(contentsOf: imageURL! as URL)
             
             if data != nil {
-                
                 var docURL = getDocumentsURL()
                 
                 docURL = docURL.appendingPathComponent(imageFileName, isDirectory: false)
@@ -103,13 +97,11 @@ func fileInDocumentsDirectory(fileName: String) -> String {
 }
 
 func getDocumentsURL() -> URL {
-    
     let documentURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last
     return documentURL!
 }
 
 func fileExistsAtPath(path: String) -> Bool {
-    
     var doesExist = false
     
     let filePath = fileInDocumentsDirectory(fileName: path)
@@ -117,18 +109,15 @@ func fileExistsAtPath(path: String) -> Bool {
     
     if fileManager.fileExists(atPath: filePath) {
         doesExist = true
-    }
-    else {
+    } else {
         doesExist = false
     }
     return doesExist
 }
 
-
-//Video
+// Video
 
 func uploadVideo(video: NSData, chatRoomId: String, view: UIView, completion: @escaping (_ videoLink: String?) -> Void) {
-    
     let progressHUD = MBProgressHUD.showAdded(to: view, animated: true)
     
     progressHUD.mode = .determinateHorizontalBar
@@ -141,7 +130,7 @@ func uploadVideo(video: NSData, chatRoomId: String, view: UIView, completion: @e
     
     var task: StorageUploadTask!
     
-    task = storageRef.putData(video as Data, metadata: nil , completion: { (metadata, error) in
+    task = storageRef.putData(video as Data, metadata: nil, completion: { _, error in
         
         task.removeAllObservers()
         progressHUD.hide(animated: true)
@@ -150,7 +139,7 @@ func uploadVideo(video: NSData, chatRoomId: String, view: UIView, completion: @e
             print("error couldnt upload video \(error!.localizedDescription)")
         }
         
-        storageRef.downloadURL { (url, error) in
+        storageRef.downloadURL { url, _ in
             
             guard let downloadUrl = url else { completion(nil); return }
             
@@ -158,31 +147,26 @@ func uploadVideo(video: NSData, chatRoomId: String, view: UIView, completion: @e
         }
     })
     
-    task.observe(StorageTaskStatus.progress) { (snapshot) in
+    task.observe(StorageTaskStatus.progress) { snapshot in
         progressHUD.progress = Float((snapshot.progress?.completedUnitCount)!) / Float((snapshot.progress?.totalUnitCount)!)
     }
 }
 
-func downloadVideo(videoUrl: String, completion: @escaping(_ isReadyToPlay: Bool, _ videoFileName: String) -> Void) {
-    
+func downloadVideo(videoUrl: String, completion: @escaping (_ isReadyToPlay: Bool, _ videoFileName: String) -> Void) {
     let videoURL = NSURL(string: videoUrl)
     
     let videoFileName = (videoUrl.components(separatedBy: "%").last!).components(separatedBy: "?").first!
     
     if fileExistsAtPath(path: videoFileName) {
-        
-      completion(true, videoFileName)
+        completion(true, videoFileName)
         
     } else {
-        
         let downloadQueue = DispatchQueue(label: "videoDownloadQueue")
         
         downloadQueue.async {
-            
             let data = NSData(contentsOf: videoURL! as URL)
             
             if data != nil {
-                
                 var docURL = getDocumentsURL()
                 
                 docURL = docURL.appendingPathComponent(videoFileName, isDirectory: false)
@@ -200,9 +184,8 @@ func downloadVideo(videoUrl: String, completion: @escaping(_ isReadyToPlay: Bool
     }
 }
 
-//Audio messages
+// Audio messages
 func uploadAudio(audioPath: String, chatRoomId: String, view: UIView, completion: @escaping (_ audioLink: String?) -> Void) {
-    
     let progressHUD = MBProgressHUD.showAdded(to: view, animated: true)
     
     progressHUD.mode = .determinateHorizontalBar
@@ -216,7 +199,7 @@ func uploadAudio(audioPath: String, chatRoomId: String, view: UIView, completion
     let audio = NSData(contentsOfFile: audioPath)
     var task: StorageUploadTask!
     
-    task = storageRef.putData(audio! as Data, metadata: nil , completion: { (metadata, error) in
+    task = storageRef.putData(audio! as Data, metadata: nil, completion: { _, error in
         
         task.removeAllObservers()
         progressHUD.hide(animated: true)
@@ -225,7 +208,7 @@ func uploadAudio(audioPath: String, chatRoomId: String, view: UIView, completion
             print("error couldnt upload audio \(error!.localizedDescription)")
         }
         
-        storageRef.downloadURL { (url, error) in
+        storageRef.downloadURL { url, _ in
             
             guard let downloadUrl = url else { completion(nil); return }
             
@@ -233,31 +216,26 @@ func uploadAudio(audioPath: String, chatRoomId: String, view: UIView, completion
         }
     })
     
-    task.observe(StorageTaskStatus.progress) { (snapshot) in
+    task.observe(StorageTaskStatus.progress) { snapshot in
         progressHUD.progress = Float((snapshot.progress?.completedUnitCount)!) / Float((snapshot.progress?.totalUnitCount)!)
     }
 }
 
-func downloadAudio(audioUrl: String, completion: @escaping(_ audioFileName: String) -> Void) {
-    
+func downloadAudio(audioUrl: String, completion: @escaping (_ audioFileName: String) -> Void) {
     let audioURL = NSURL(string: audioUrl)
     
     let audioFileName = (audioUrl.components(separatedBy: "%").last!).components(separatedBy: "?").first!
     
     if fileExistsAtPath(path: audioFileName) {
-        
-      completion(audioFileName)
+        completion(audioFileName)
         
     } else {
-        
         let downloadQueue = DispatchQueue(label: "audioDownloadQueue")
         
         downloadQueue.async {
-            
             let data = NSData(contentsOf: audioURL! as URL)
             
             if data != nil {
-                
                 var docURL = getDocumentsURL()
                 
                 docURL = docURL.appendingPathComponent(audioFileName, isDirectory: false)
@@ -275,10 +253,9 @@ func downloadAudio(audioUrl: String, completion: @escaping(_ audioFileName: Stri
     }
 }
 
-//Helper
+// Helper
 
 func videoThumbnail(video: NSURL) -> UIImage {
-    
     let asset = AVURLAsset(url: video as URL, options: nil)
     let imageGenerator = AVAssetImageGenerator(asset: asset)
     imageGenerator.appliesPreferredTrackTransform = true

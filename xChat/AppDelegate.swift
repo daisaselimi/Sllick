@@ -6,16 +6,16 @@
 //  Copyright © 2019 com.isaselimi. All rights reserved.
 //
 
-import UIKit
 import Firebase
-import ProgressHUD
-import OneSignal
-import PushKit
 import FirebaseFirestore
-import GSMessages
 import GradientLoadingBar
+import GSMessages
+import OneSignal
+import ProgressHUD
+import PushKit
 import Reachability
 import SystemConfiguration
+import UIKit
 
 extension NSNotification.Name {
     static let globalContactsVariable = NSNotification.Name(Bundle.main.bundleIdentifier! + ".globalContactsVariable")
@@ -25,36 +25,25 @@ extension NSNotification.Name {
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
-    
     //
     //    var window: UIWindow?
     //    var authListener: AuthStateDidChangeListenerHandle?
     var orientationLock = UIInterfaceOrientationMask.all
     var reachability: Reachability!
-        
-
-   
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        FirebaseApp.configure() 
+        FirebaseApp.configure()
         
         UNUserNotificationCenter.current().delegate = self
         
-        
-
-       
         checkReachability()
-
+        
         setupUIForAlerts()
         GradientLoadingBar.shared.gradientColors = [UIColor.getAppColor(.light), .systemTeal, UIColor.getAppColor(.dark)]
         
-       //UIBarButtonItem.appearance().setBackButtonTitlePositionAdjustment(UIOffset(horizontal: -1000.0, vertical: 0.0), for: .default)
-       // print(FUser.currentUser()!.objectId)
-
-   
-
-     
+        // UIBarButtonItem.appearance().setBackButtonTitlePositionAdjustment(UIOffset(horizontal: -1000.0, vertical: 0.0), for: .default)
+        // print(FUser.currentUser()!.objectId)
         
 //        Database.database().reference(withPath: ".info/connected").observe(.value) { (snapshot) in
 //            if snapshot.value == nil {
@@ -67,8 +56,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 //            }
 //        }
         
-  
-        //reference(.User).document(FUser.currentUser()!.objectId).updateData([kCOUNTRYCODE : "KS"])
+        // reference(.User).document(FUser.currentUser()!.objectId).updateData([kCOUNTRYCODE : "KS"])
 //        reference(.User).getDocuments { (snapshot, error) in
 //            let docs = snapshot?.documents
 //                            for doc in docs! {
@@ -84,7 +72,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         //            })
         //          }
         //        })
-        
         
         //
         //
@@ -105,7 +92,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         //                reference(.UserKeywords).addDocument(data: ["userId" : doc["objectId"], "keywords" : keywords])
         //            }
         //        }
-        
         
         //        let settings = FirestoreSettings()
         //        settings.isPersistenceEnabled = false
@@ -131,13 +117,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         //            }
         //        })
         
-        
-        //let onesignalInitSettings = [kOSSettingsKeyAutoPrompt: false]
+        // let onesignalInitSettings = [kOSSettingsKeyAutoPrompt: false]
         
         // Replace 'YOUR_APP_ID' with your OneSignal App ID.
         
         if #available(iOS 10.0, *) {
-            UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound], completionHandler: { (granted, error) in
+            UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound], completionHandler: { _, _ in
             })
             application.registerForRemoteNotifications()
         } else {
@@ -167,26 +152,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         //        }
         
         let notificationReceivedBlock: OSHandleNotificationReceivedBlock = { notification in
-            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "ReceivedNotification"), object: self, userInfo: ["notificationPayload" : notification!.payload!]) // post notification to view controller
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "ReceivedNotification"), object: self, userInfo: ["notificationPayload": notification!.payload!]) // post notification to view controller
         }
-        
-        
         
         let notificationOpenedBlock: OSHandleNotificationActionBlock = { result in
             let payload: OSNotificationPayload = result!.notification.payload
             
-            
             if payload.additionalData != nil {
                 let additionalData = payload.additionalData
                 
-                getUsersFromFirestore(withIds: additionalData!["memberIds"] as! [String]) { (users) in
+                getUsersFromFirestore(withIds: additionalData!["memberIds"] as! [String]) { _ in
                     let chatVC = ChatViewController()
                     chatVC.membersToPush = (additionalData!["membersToPush"] as? [String])!
                     chatVC.memberIds = (additionalData!["memberIds"] as? [String])!
                     chatVC.chatRoomId = (additionalData!["chatRoomId"] as? String)!
                     chatVC.titleName = additionalData!["titleName"] as? String
                     chatVC.isGroup = additionalData!["isGroup"] as? Bool
-                    chatVC.initialWithUser = chatVC.isGroup! ? additionalData!["titleName"] as? String :  (additionalData!["withUser"] as! String)
+                    chatVC.initialWithUser = chatVC.isGroup! ? additionalData!["titleName"] as? String : (additionalData!["withUser"] as! String)
                     chatVC.initialImage = chatVC.isGroup! ? UIImage(named: "grouph") : UIImage(named: "avatarph")
                     chatVC.hidesBottomBarWhenPushed = true
                     
@@ -196,29 +178,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                     let viewController = navigationController.viewControllers.first as! ChatsViewController
                     
                     if (UIApplication.getTopViewController()?.isKind(of: ChatViewController.self))! {
-                        if ((UIApplication.getTopViewController() as? ChatViewController)?.chatRoomId !=  (additionalData!["chatRoomId"] as! String)) {
+                        if (UIApplication.getTopViewController() as? ChatViewController)?.chatRoomId != (additionalData!["chatRoomId"] as! String) {
                             //                            let idx = navigationController.viewControllers.firstIndex(of: navigationController.topViewController!)
                             //                            navigationController.viewControllers.remove(at: idx!)
                             navigationController.popToRootViewController(animated: false)
                             viewController.navigationController?.pushViewController(chatVC, animated: false)
                         }
-                    }
-                    else {
+                    } else {
                         let animated = (viewController.navigationController?.topViewController?.isKind(of: ChatsViewController.self))! ? true : false
                         if navigationController.viewControllers.count > 1 {
                             navigationController.popToRootViewController(animated: false)
                         }
                         
-                        
                         viewController.navigationController?.pushViewController(chatVC, animated: animated)
                     }
-                    
                 }
             }
         }
         
         let onesignalInitSettings = [kOSSettingsKeyAutoPrompt: false,
-                                     kOSSettingsKeyInAppLaunchURL: true, kOSSettingsKeyInAppAlerts : false]
+                                     kOSSettingsKeyInAppLaunchURL: true, kOSSettingsKeyInAppAlerts: false]
         
         OneSignal.initWithLaunchOptions(launchOptions, appId: kONESIGNALAPPID, handleNotificationReceived: notificationReceivedBlock, handleNotificationAction: notificationOpenedBlock, settings: onesignalInitSettings)
         
@@ -237,9 +216,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         OneSignal.inFocusDisplayType = OSNotificationDisplayType.none
         return true
     }
-
+    
     func checkReachability() {
-       
         do {
             reachability = try Reachability()
             reachability.whenReachable = { reachability in
@@ -268,12 +246,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     func setupUIForAlerts() {
         GSMessage.font = UIFont.boldSystemFont(ofSize: 14)
-      //  GSMessage.successBackgroundColor = UIColor(red: 142.0/255, green: 183.0/255, blue: 64.0/255,  alpha: 0.95)
+        //  GSMessage.successBackgroundColor = UIColor(red: 142.0/255, green: 183.0/255, blue: 64.0/255,  alpha: 0.95)
         GSMessage.warningBackgroundColor = UIColor.systemGray6
         
-    
         GSMessage.errorBackgroundColor = UIColor.systemPink.withAlphaComponent(0.7)
-        //GSMessage.infoBackgroundColor    = UIColor(red: 44.0/255,  green: 187.0/255, blue: 255.0/255, alpha: 0.90)
+        // GSMessage.infoBackgroundColor    = UIColor(red: 44.0/255,  green: 187.0/255, blue: 255.0/255, alpha: 0.90)
     }
     
     //    func goToApp() {
@@ -314,23 +291,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
-        let dictionaryItm = userInfo as? [String : [String : Any]]
+        let dictionaryItm = userInfo as? [String: [String: Any]]
         
         let dictionaryItem = dictionaryItm!["additionalData"]
         
         if (dictionaryItem?["inApp"]) == nil {
-            return 
+            return
         }
         
-        getUsersFromFirestore(withIds: dictionaryItem!["memberIds"] as! [String]) { (users) in
+        getUsersFromFirestore(withIds: dictionaryItem!["memberIds"] as! [String]) { _ in
             let chatVC = ChatViewController()
             chatVC.membersToPush = (dictionaryItem!["membersToPush"] as? [String])!
             chatVC.memberIds = (dictionaryItem!["memberIds"] as? [String])!
             chatVC.chatRoomId = (dictionaryItem!["chatRoomId"] as? String)!
             chatVC.titleName = dictionaryItem!["titleName"] as? String
             chatVC.isGroup = dictionaryItem!["isGroup"] as? Bool
-            chatVC.initialWithUser = chatVC.isGroup! ? dictionaryItem!["titleName"] as? String :  (dictionaryItem!["withUser"] as! String)
-            chatVC.initialImage =  chatVC.isGroup! ? UIImage(named: "grouph") : UIImage(named: "avatarph")
+            chatVC.initialWithUser = chatVC.isGroup! ? dictionaryItem!["titleName"] as? String : (dictionaryItem!["withUser"] as! String)
+            chatVC.initialImage = chatVC.isGroup! ? UIImage(named: "grouph") : UIImage(named: "avatarph")
             chatVC.hidesBottomBarWhenPushed = true
             
             let tabBarController = UIApplication.shared.windows.first!.rootViewController! as! UITabBarController
@@ -339,31 +316,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             let viewController = navigationController.viewControllers.first as! ChatsViewController
             
             if (UIApplication.getTopViewController()?.isKind(of: ChatViewController.self))! {
-                if ((UIApplication.getTopViewController() as? ChatViewController)?.chatRoomId !=  (dictionaryItem!["chatRoomId"] as! String)) {
+                if (UIApplication.getTopViewController() as? ChatViewController)?.chatRoomId != (dictionaryItem!["chatRoomId"] as! String) {
                     //                            let idx = navigationController.viewControllers.firstIndex(of: navigationController.topViewController!)
                     //                            navigationController.viewControllers.remove(at: idx!)
                     navigationController.popToRootViewController(animated: false)
                     viewController.navigationController?.pushViewController(chatVC, animated: false)
                 }
-            }
-            else {
+            } else {
                 let animated = (viewController.navigationController?.topViewController?.isKind(of: ChatsViewController.self))! ? true : false
                 if navigationController.viewControllers.count > 1 {
-
                     navigationController.popToRootViewController(animated: false)
                 }
-                          UIApplication.getTopViewController()?.dismiss(animated: true, completion: nil)
+                UIApplication.getTopViewController()?.dismiss(animated: true, completion: nil)
                 
                 viewController.navigationController?.pushViewController(chatVC, animated: animated)
             }
             completionHandler()
-            
         }
     }
     
-    
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
-        return self.orientationLock
+        return orientationLock
     }
     
     struct AppUtility {
@@ -373,8 +346,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             }
         }
         
-        static func lockOrientation(_ orientation: UIInterfaceOrientationMask, andRotateTo rotateOrientation:UIInterfaceOrientation) {
-            self.lockOrientation(orientation)
+        static func lockOrientation(_ orientation: UIInterfaceOrientationMask, andRotateTo rotateOrientation: UIInterfaceOrientation) {
+            lockOrientation(orientation)
             UIDevice.current.setValue(rotateOrientation.rawValue, forKey: "orientation")
         }
     }
@@ -389,7 +362,7 @@ func createKeywords(word: String) -> Set<String> {
                 continue
             }
             let substr = word[num..<num1]
-            if substr == " " || substr == ""{
+            if substr == " " || substr == "" {
                 continue
             }
             allKeywords.insert(substr)
@@ -398,7 +371,3 @@ func createKeywords(word: String) -> Set<String> {
     
     return allKeywords
 }
-
-
-
-

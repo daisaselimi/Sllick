@@ -10,10 +10,9 @@ import UIKit
 
 class CallViewController: UIViewController, SINCallDelegate {
     
-    
     var speaker = false
     var muted = false
-    var durationTimer: Timer! = nil
+    var durationTimer: Timer!
     var _call: SINCall!
     var callAnswered = false
     var callingName: String?
@@ -22,32 +21,31 @@ class CallViewController: UIViewController, SINCallDelegate {
     var justOpened = true
     
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-       return .portrait
-     }
+        return .portrait
+    }
     
-    @IBOutlet weak var fullNameLabel: UILabel!
-    @IBOutlet weak var timeLabel: UILabel!
-    @IBOutlet weak var avatarImageView: UIImageView!
-    @IBOutlet weak var muteButtonOutlet: UIButton!
-    @IBOutlet weak var speakerButtonOutlet: UIButton!
-    @IBOutlet weak var answerCallButtonOutlet: UIButton!
-    @IBOutlet weak var endCallButtonOutlet: UIButton!
-    @IBOutlet weak var declineCallButtonOutlet: UIButton!
+    @IBOutlet var fullNameLabel: UILabel!
+    @IBOutlet var timeLabel: UILabel!
+    @IBOutlet var avatarImageView: UIImageView!
+    @IBOutlet var muteButtonOutlet: UIButton!
+    @IBOutlet var speakerButtonOutlet: UIButton!
+    @IBOutlet var answerCallButtonOutlet: UIButton!
+    @IBOutlet var endCallButtonOutlet: UIButton!
+    @IBOutlet var declineCallButtonOutlet: UIButton!
     
     override func viewWillAppear(_ animated: Bool) {
-      
-        let id =  _call.remoteUserId
+        let id = _call.remoteUserId
         if let callingName = self.callingName {
             fullNameLabel.text = callingName
         }
         if let callingImage = self.callingImage {
-            self.avatarImageView.image = callingImage
+            avatarImageView.image = callingImage
         }
-        getUsersFromFirestore(withIds: [id!]) { (allUsers) in
+        getUsersFromFirestore(withIds: [id!]) { allUsers in
             if allUsers.count > 0 {
                 let user = allUsers.first!
                 self.fullNameLabel.text = user.fullname
-                imageFromData(pictureData: user.avatar) { (image) in
+                imageFromData(pictureData: user.avatar) { image in
                     if image != nil {
                         self.avatarImageView.image = image!.circleMasked
                     }
@@ -58,21 +56,20 @@ class CallViewController: UIViewController, SINCallDelegate {
     
     func setupBackground() {
         if !UIAccessibility.isReduceTransparencyEnabled {
-            self.view.backgroundColor = .clear
-
+            view.backgroundColor = .clear
+            
             let blurEffect = UIBlurEffect(style: .dark)
             let blurEffectView = UIVisualEffectView(effect: blurEffect)
-            //always fill the view
-            blurEffectView.frame = self.view.bounds
+            // always fill the view
+            blurEffectView.frame = view.bounds
             blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-
-            self.view.insertSubview(blurEffectView, at: 0)
-        //if you have more UIViews, use an insertSubview API to place it where needed
+            
+            view.insertSubview(blurEffectView, at: 0)
+            // if you have more UIViews, use an insertSubview API to place it where needed
         } else {
-            self.view.backgroundColor = .systemBackground
+            view.backgroundColor = .systemBackground
         }
     }
-
     
     override func viewDidLayoutSubviews() {
         let value = UIInterfaceOrientation.portrait.rawValue
@@ -82,52 +79,45 @@ class CallViewController: UIViewController, SINCallDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupBackground()
-          timeLabel.isHidden = false
-          self.avatarImageView.maskCircle()
+        timeLabel.isHidden = false
+        avatarImageView.maskCircle()
         _call.delegate = self
         if _call.direction == SINCallDirection.incoming {
-        
-            //show buttons
+            // show buttons
             showButtons()
             audioController()?.startPlayingSoundFile(pathForSOund(sound: "incoming"), loop: true)
             
         } else {
             callAnswered = true
-               showButtons()
-            //show buttons
+            showButtons()
+            // show buttons
             setCallTime(text: "Calling...", animation: true)
-         
-            
         }
     }
     
     func audioController() -> SINAudioController? {
-       let scene = UIApplication.shared.connectedScenes.first
-        if let sd : SceneDelegate = (scene?.delegate as? SceneDelegate) {
+        let scene = UIApplication.shared.connectedScenes.first
+        if let sd: SceneDelegate = (scene?.delegate as? SceneDelegate) {
             return sd._client.audioController()
         }
         return nil
     }
     
     func setCall(call: SINCall) {
-      _call = call
+        _call = call
         _call.delegate = self
     }
     
-    //MARK: Update UI
+    // MARK: Update UI
     
     func setCallTime(text: String, animation: Bool) {
-        
         if animation {
-            UIView.transition(with: self.timeLabel, duration: 0.3, options: .transitionFlipFromTop, animations: {
-                 self.timeLabel.text = text
+            UIView.transition(with: timeLabel, duration: 0.3, options: .transitionFlipFromTop, animations: {
+                self.timeLabel.text = text
                   }, completion: nil)
         } else {
-             self.timeLabel.text = text
+            timeLabel.text = text
         }
- 
-       
-    
     }
     
     func showButtons() {
@@ -146,7 +136,6 @@ class CallViewController: UIViewController, SINCallDelegate {
         }
     }
     
-    
     /*
      // MARK: - Navigation
      
@@ -157,13 +146,13 @@ class CallViewController: UIViewController, SINCallDelegate {
      }
      */
     
-    //MARK: IBActions
+    // MARK: IBActions
     
     @IBAction func muteButtonPressed(_ sender: Any) {
         if muted {
             muted = false
             audioController()!.unmute()
-            UIView.transition(with: self.muteButtonOutlet, duration: 0.3, options: .transitionCrossDissolve, animations: {
+            UIView.transition(with: muteButtonOutlet, duration: 0.3, options: .transitionCrossDissolve, animations: {
                 self.muteButtonOutlet.setImage(UIImage(named: "mute"), for: .normal)
             }, completion: nil)
             
@@ -171,28 +160,26 @@ class CallViewController: UIViewController, SINCallDelegate {
             muted = true
             audioController()!.mute()
             
-            UIView.transition(with: self.muteButtonOutlet, duration: 0.3, options: .transitionCrossDissolve, animations: {
+            UIView.transition(with: muteButtonOutlet, duration: 0.3, options: .transitionCrossDissolve, animations: {
                 self.muteButtonOutlet.setImage(UIImage(named: "muteSelected"), for: .normal)
             }, completion: nil)
         }
     }
     
     @IBAction func speakerButtonPressed(_ sender: Any) {
-        
         if !speaker {
             speaker = true
             audioController()!.enableSpeaker()
-            UIView.transition(with: self.speakerButtonOutlet, duration: 0.2, options: .transitionCrossDissolve, animations: {
-                 self.speakerButtonOutlet.setImage(UIImage(named: "speakerSelected"), for: .normal)
+            UIView.transition(with: speakerButtonOutlet, duration: 0.2, options: .transitionCrossDissolve, animations: {
+                self.speakerButtonOutlet.setImage(UIImage(named: "speakerSelected"), for: .normal)
             }, completion: nil)
             
         } else {
             speaker = false
             audioController()!.disableSpeaker()
-            UIView.transition(with: self.speakerButtonOutlet, duration: 0.2, options: .transitionCrossDissolve, animations: {
-                           self.speakerButtonOutlet.setImage(UIImage(named: "speaker"), for: .normal)
+            UIView.transition(with: speakerButtonOutlet, duration: 0.2, options: .transitionCrossDissolve, animations: {
+                self.speakerButtonOutlet.setImage(UIImage(named: "speaker"), for: .normal)
                        }, completion: nil)
-          
         }
     }
     
@@ -205,18 +192,17 @@ class CallViewController: UIViewController, SINCallDelegate {
     
     @IBAction func endCallButtonPressed(_ sender: Any) {
         _call.hangup()
-        self.dismiss(animated: true, completion: nil)
+        dismiss(animated: true, completion: nil)
     }
     
     @IBAction func declineButtonPressed(_ sender: Any) {
         _call.hangup()
-         self.dismiss(animated: true, completion: nil)
+        dismiss(animated: true, completion: nil)
     }
     
-    //MARK: SINCallDelegates
+    // MARK: SINCallDelegates
     
     func callDidProgress(_ call: SINCall!) {
-        
         setCallTime(text: "Ringing...", animation: true)
         audioController()!.startPlayingSoundFile(pathForSOund(sound: "ringback"), loop: true)
     }
@@ -233,25 +219,23 @@ class CallViewController: UIViewController, SINCallDelegate {
         dismiss(animated: true, completion: nil)
     }
     
-    //MARK: Timer
+    // MARK: Timer
     
     @objc func onDuration() {
         let duration = Date().timeIntervalSince(_call.details.establishedTime)
-        //update timer label
+        // update timer label
         updateTimerLabel(seconds: Int(duration))
     }
     
     func updateTimerLabel(seconds: Int) {
-        
-        let min = String(format: "%02d", (seconds/60))
-        let sec = String(format: "%02d", (seconds % 60))
+        let min = String(format: "%02d", seconds / 60)
+        let sec = String(format: "%02d", seconds % 60)
         setCallTime(text: "\(min) : \(sec)", animation: justOpened ? true : false)
         justOpened = false
-        
     }
     
     func startCallDurationTimer() {
-        self.durationTimer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.onDuration), userInfo: nil, repeats: true)
+        durationTimer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(onDuration), userInfo: nil, repeats: true)
     }
     
     func stopCallDurationTimer() {
@@ -261,11 +245,9 @@ class CallViewController: UIViewController, SINCallDelegate {
         }
     }
     
-    //MARK: Helpers
+    // MARK: Helpers
     
     func pathForSOund(sound: String) -> String {
         return Bundle.main.path(forResource: sound, ofType: "wav")!
     }
-    
-    
 }

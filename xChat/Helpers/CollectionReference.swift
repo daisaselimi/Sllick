@@ -6,9 +6,8 @@
 //  Copyright © 2019 com.isaselimi. All rights reserved.
 //
 
-import Foundation
 import FirebaseFirestore
-
+import Foundation
 
 public enum FCollectionReference: String {
     case User
@@ -19,9 +18,8 @@ public enum FCollectionReference: String {
     case Call
     case Contact
     case UserKeywords
-} 
+}
 
-
-public func reference(_ collectionReference: FCollectionReference) -> CollectionReference{
+public func reference(_ collectionReference: FCollectionReference) -> CollectionReference {
     return Firestore.firestore().collection(collectionReference.rawValue)
 }

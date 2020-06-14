@@ -6,32 +6,30 @@
 //  Copyright © 2019 com.isaselimi. All rights reserved.
 //
 
-import UIKit
-import ProgressHUD
-import ImagePicker
-import FlagPhoneNumber
 import Firebase
+import FlagPhoneNumber
 import GradientLoadingBar
+import ImagePicker
 import OneSignal
+import ProgressHUD
+import UIKit
 
-class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, FPNTextFieldDelegate  {
+class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, FPNTextFieldDelegate {
     
-    
-
     var email: String!
     var password: String!
     var avatarImage: UIImage?
     var viewTapGestureRecognizer = UITapGestureRecognizer()
     private let gradientLoadingBar = GradientLoadingBar()
     
-    @IBOutlet weak var avatarImageView: UIImageView!
-    @IBOutlet weak var nameTextField: UITextField!
-    @IBOutlet weak var surnameTextField: UITextField!
-    @IBOutlet weak var countryTextField: UITextField!
-    @IBOutlet weak var cityTextField: UITextField!
-    @IBOutlet weak var phoneTextField: FPNTextField!
+    @IBOutlet var avatarImageView: UIImageView!
+    @IBOutlet var nameTextField: UITextField!
+    @IBOutlet var surnameTextField: UITextField!
+    @IBOutlet var countryTextField: UITextField!
+    @IBOutlet var cityTextField: UITextField!
+    @IBOutlet var phoneTextField: FPNTextField!
     
-    @IBOutlet weak var topView: UIView!
+    @IBOutlet var topView: UIView!
     
     var phoneNumber: String = ""
     var countryCode: String = ""
@@ -40,46 +38,44 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
         super.viewDidLoad()
         viewTapGestureRecognizer.addTarget(self, action: #selector(viewTap))
         overrideUserInterfaceStyle = .light
-        let textAttributes = [NSAttributedString.Key.foregroundColor:UIColor.white]
+        let textAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
         navigationController?.navigationBar.titleTextAttributes = textAttributes
-          gradientLoadingBar.gradientColors =  [UIColor.getAppColor(.light), UIColor.getAppColor(.dark), UIColor.getAppColor(.light), UIColor.getAppColor(.dark)]
+        gradientLoadingBar.gradientColors = [UIColor.getAppColor(.light), UIColor.getAppColor(.dark), UIColor.getAppColor(.light), UIColor.getAppColor(.dark)]
         view.isUserInteractionEnabled = true
 //      topView.addBottomBorderWithColor(color: .opaqueSeparator, width: 0.5)
-        self.view.addGestureRecognizer(viewTapGestureRecognizer)
+        view.addGestureRecognizer(viewTapGestureRecognizer)
         avatarImageView.maskCircle()
         avatarImageView.isUserInteractionEnabled = true
         phoneTextField.displayMode = .list
         phoneTextField.delegate = self
         countryCode = (phoneTextField.selectedCountry?.code)!.rawValue
-       // phoneTextField.setCountries(including: [.KS])
+        // phoneTextField.setCountries(including: [.KS])
         print(email!, password!)
     }
     
-    
-    
     func fpnDisplayCountryList() {
         let listController: FPNCountryListViewController = FPNCountryListViewController(style: .insetGrouped)
-       let navigationViewController = UINavigationController(rootViewController: listController)
-
-       listController.title = "Countries"
+        let navigationViewController = UINavigationController(rootViewController: listController)
+        
+        listController.title = "Countries"
         listController.setup(repository: phoneTextField.countryRepository)
         listController.didSelect = { [weak self] country in
             self?.phoneTextField.setFlag(countryCode: country.code)
             self?.countryCode = country.code.rawValue
         }
-            self.present(navigationViewController, animated: true, completion: nil)
+        present(navigationViewController, animated: true, completion: nil)
     }
     
     override func viewDidLayoutSubviews() {
-        
         topView.addBottomBorderWithColor(color: .opaqueSeparator, width: 0.5)
     }
     
-    //MARK: IBActions
+    // MARK: IBActions
+    
     @IBAction func cancelButtonPressed(_ sender: Any) {
         clearTextFields()
         dismissKeyboard()
-        self.dismiss(animated: true, completion: nil)
+        dismiss(animated: true, completion: nil)
     }
     
     @objc func viewTap() {
@@ -88,20 +84,19 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
     
     @IBAction func doneButtonPressed(_ sender: Any) {
         dismissKeyboard()
-        self.gradientLoadingBar.fadeIn()
+        gradientLoadingBar.fadeIn()
         
         if allFieldsAreFilled() {
-            
             if phoneNumber == "Not Valid" {
-                self.gradientLoadingBar.fadeOut()
-                self.showMessage("Phone number is not valid", type: .error)
+                gradientLoadingBar.fadeOut()
+                showMessage("Phone number is not valid", type: .error)
                 return
             }
-            FUser.registerUserWith(email: email, password: password, firstName: nameTextField.text!, lastName: surnameTextField.text!) { (error) in
+            FUser.registerUserWith(email: email, password: password, firstName: nameTextField.text!, lastName: surnameTextField.text!) { error in
                 
                 if error != nil {
                     self.gradientLoadingBar.fadeOut()
-                       ProgressHUD.dismiss()
+                    ProgressHUD.dismiss()
                     if let errCode = AuthErrorCode(rawValue: error!._code) {
                         switch errCode {
                         case .emailAlreadyInUse: self.showMessage("Email already in use", type: .error)
@@ -117,24 +112,22 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
             }
         }
         else {
-            self.gradientLoadingBar.fadeOut()
-            self.showMessage("All fields are required", type: .error)
+            gradientLoadingBar.fadeOut()
+            showMessage("All fields are required", type: .error)
         }
-        
     }
     
     func registerUser() {
-        
         let fullName = nameTextField.text! + " " + surnameTextField.text!
         
         var tempDictionary: Dictionary = [
-            kFIRSTNAME : nameTextField.text!, kLASTNAME : surnameTextField.text!,
-            kFULLNAME : fullName, kCOUNTRY : countryTextField.text!, kCITY : cityTextField.text!,
-            kPHONE : phoneNumber, kCOUNTRYCODE : countryCode] as [String : Any]
+            kFIRSTNAME: nameTextField.text!, kLASTNAME: surnameTextField.text!,
+            kFULLNAME: fullName, kCOUNTRY: countryTextField.text!, kCITY: cityTextField.text!,
+            kPHONE: phoneNumber, kCOUNTRYCODE: countryCode,
+        ] as [String: Any]
         
         if avatarImage == nil {
-                
-                tempDictionary[kAVATAR] = ""
+            tempDictionary[kAVATAR] = ""
         }
         else {
             let avatarIMG = avatarImage?.jpegData(compressionQuality: 0.7)
@@ -142,13 +135,12 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
             tempDictionary[kAVATAR] = avatar
         }
         
-        //finishRegistration
-        self.finishRegistration(withValues: tempDictionary)
+        // finishRegistration
+        finishRegistration(withValues: tempDictionary)
     }
     
-    func finishRegistration(withValues: [String : Any]) {
-        
-        updateCurrentUserInFirestore(withValues: withValues) { (error) in
+    func finishRegistration(withValues: [String: Any]) {
+        updateCurrentUserInFirestore(withValues: withValues) { error in
             
             if error != nil {
                 self.showMessage(kSOMETHINGWENTWRONG, type: .error)
@@ -158,25 +150,24 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
             self.goToApp()
             print(FUser.currentUser()!.fullname.lowercased())
             let keywords = Array(createKeywords(word: FUser.currentUser()!.fullname.lowercased()))
-            reference(.UserKeywords).addDocument(data: ["userId" : FUser.currentUser()!.objectId, "keywords" : keywords])
-               ProgressHUD.dismiss()
+            reference(.UserKeywords).addDocument(data: ["userId": FUser.currentUser()!.objectId, "keywords": keywords])
+            ProgressHUD.dismiss()
         }
     }
     
     func goToApp() {
-        
         clearTextFields()
         dismissKeyboard()
         
-        NotificationCenter.default.post(name: NSNotification.Name(rawValue: USER_DID_LOGIN_NOTIFICATION), object: nil, userInfo:  [kUSERID : FUser.currentId()])
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: USER_DID_LOGIN_NOTIFICATION), object: nil, userInfo: [kUSERID: FUser.currentId()])
         customizeNavigationBar(colorName: "bwBackground")
-            let mainView = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(identifier: "mainApplication") as! UITabBarController
-              let scene = UIApplication.shared.connectedScenes.first
-                   if let sd : SceneDelegate = (scene?.delegate as? SceneDelegate) {
-                       OneSignal.sendTag("userId", value: FUser.currentId())
-                              sd.setRootViewController(mainView)
-                      sd.window!.makeKeyAndVisible()
-                   }
+        let mainView = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(identifier: "mainApplication") as! UITabBarController
+        let scene = UIApplication.shared.connectedScenes.first
+        if let sd: SceneDelegate = (scene?.delegate as? SceneDelegate) {
+            OneSignal.sendTag("userId", value: FUser.currentId())
+            sd.setRootViewController(mainView)
+            sd.window!.makeKeyAndVisible()
+        }
     }
     
     func allFieldsAreFilled() -> Bool {
@@ -186,10 +177,9 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
             cityTextField.text != "" &&
             phoneTextField.text != ""
     }
-   
     
     func dismissKeyboard() {
-        self.view.endEditing(false)
+        view.endEditing(false)
     }
     
     func clearTextFields() {
@@ -200,23 +190,23 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
         phoneTextField.text = ""
     }
     
-    //MARK: ImagePickerDelegate
+    // MARK: ImagePickerDelegate
     
     func wrapperDidPress(_ imagePicker: ImagePickerController, images: [UIImage]) {
-        self.dismiss(animated: true, completion: nil)
+        dismiss(animated: true, completion: nil)
     }
     
     func doneButtonDidPress(_ imagePicker: ImagePickerController, images: [UIImage]) {
         if images.count > 0 {
-            self.avatarImage = images.first!
-            self.avatarImageView.image = self.avatarImage
-            self.avatarImageView.maskCircle()
+            avatarImage = images.first!
+            avatarImageView.image = avatarImage
+            avatarImageView.maskCircle()
         }
-        self.dismiss(animated: true, completion: nil)
+        dismiss(animated: true, completion: nil)
     }
     
     func cancelButtonDidPress(_ imagePicker: ImagePickerController) {
-         self.dismiss(animated: true, completion: nil)
+        dismiss(animated: true, completion: nil)
     }
     
     @IBAction func avatarTapp(_ sender: Any) {
@@ -228,20 +218,18 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
         dismissKeyboard()
     }
     
-    //MARK: FlagPhoneNumber delegate
+    // MARK: FlagPhoneNumber delegate
     
-    func fpnDidSelectCountry(name: String, dialCode: String, code: String) {
-    }
+    func fpnDidSelectCountry(name: String, dialCode: String, code: String) {}
     
     func fpnDidValidatePhoneNumber(textField: FPNTextField, isValid: Bool) {
         if isValid {
             phoneNumber = textField.getFormattedPhoneNumber(format: .International)!
             phoneTextField.tintColor = .green
-            
-        } else {
+        }
+        else {
             phoneNumber = "Not Valid"
             phoneTextField.tintColor = .red
         }
     }
-    
 }

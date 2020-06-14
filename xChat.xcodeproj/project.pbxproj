@@ -161,6 +161,7 @@
 		7F8C893023945D7C00432EAE /* GroupTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupTableViewController.swift; sourceTree = "<group>"; };
 		7F8CFCE72379A8A1003E0A12 /* Encryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encryption.swift; sourceTree = "<group>"; };
 		7FBDCCBD23776DA400CE92EA /* NewGroupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGroupViewController.swift; sourceTree = "<group>"; };
+		7FCDF1B5249287120065B75D /* absl.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = absl.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7FD5B92C2371962B008343C3 /* BlockedUsersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockedUsersViewController.swift; sourceTree = "<group>"; };
 		7FD5B92E2371A6D3008343C3 /* BackgroundsCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundsCollectionViewController.swift; sourceTree = "<group>"; };
 		7FD5B9302371A6E9008343C3 /* BackgroundsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundsCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -360,6 +361,7 @@
 		EC78F393DC29F83D3CADFA85 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7FCDF1B5249287120065B75D /* absl.framework */,
 				7F50AE9D24265D0E00CE11A7 /* PushKit.framework */,
 				7F5DBD7A237AFB3F00D4D1CC /* ImagePicker.framework */,
 				5A7D190803A5E92949C307E1 /* Pods_xChat.framework */,

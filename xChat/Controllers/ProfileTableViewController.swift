@@ -6,9 +6,9 @@
 //  Copyright © 2019 com.isaselimi. All rights reserved.
 //
 
-import UIKit
-import ProgressHUD
 import Firebase
+import ProgressHUD
+import UIKit
 
 enum ImageType {
     case systemImage
@@ -17,13 +17,13 @@ enum ImageType {
 
 class ProfileTableViewController: UITableViewController {
     
-    @IBOutlet weak var avatarImageView: UIImageView!
-    @IBOutlet weak var fullNameLabel: UILabel!
-    @IBOutlet weak var activityLabel: UILabel!
-    @IBOutlet weak var messageButton: UIButton!
-    @IBOutlet weak var blockUserButton: UIButton!
-    @IBOutlet weak var callButton: UIButton!
-    var userDictionary: [String : Any] = [:]
+    @IBOutlet var avatarImageView: UIImageView!
+    @IBOutlet var fullNameLabel: UILabel!
+    @IBOutlet var activityLabel: UILabel!
+    @IBOutlet var messageButton: UIButton!
+    @IBOutlet var blockUserButton: UIButton!
+    @IBOutlet var callButton: UIButton!
+    var userDictionary: [String: Any] = [:]
     var user: FUser?
     var fromGroup = false
     var profilePicture: UIImage!
@@ -43,7 +43,6 @@ class ProfileTableViewController: UITableViewController {
         //        self.navigationController?.navigationBar.backgroundColor = .systemBackground
         //        self.navigationController?.navigationBar.alpha = 0.9
         
-        
         navigationItem.largeTitleDisplayMode = .never
         tableView.separatorColor = .separator
         
@@ -56,7 +55,7 @@ class ProfileTableViewController: UITableViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        observer = NotificationCenter.default.addObserver(forName: .globalContactsVariable, object: nil, queue: .main) { [weak self] notification in
+        observer = NotificationCenter.default.addObserver(forName: .globalContactsVariable, object: nil, queue: .main) { [weak self] _ in
             if MyVariables.globalContactsVariable.contains(self!.user!.objectId) {
                 self!.setBarButton(imageName: "person.badge.minus.fill", imageType: .systemImage, withTintColor: .systemPink)
                 self!.activityLabel.isHidden = false
@@ -79,16 +78,15 @@ class ProfileTableViewController: UITableViewController {
         //                      self.checkActivityStatus()
         //               }
         if MyVariables.globalContactsVariable.contains(user!.objectId) {
-            self.setBarButton(imageName: "person.badge.minus.fill", imageType: .systemImage, withTintColor: .systemPink)
-            self.activityLabel.isHidden = false
-            self.isInContacts = true
+            setBarButton(imageName: "person.badge.minus.fill", imageType: .systemImage, withTintColor: .systemPink)
+            activityLabel.isHidden = false
+            isInContacts = true
         } else {
-            
-            self.setBarButton(imageName: "person.badge.plus.fill", imageType: .systemImage, withTintColor: .systemGreen)
-            self.activityLabel.isHidden = true
-            self.isInContacts = false
+            setBarButton(imageName: "person.badge.plus.fill", imageType: .systemImage, withTintColor: .systemGreen)
+            activityLabel.isHidden = true
+            isInContacts = false
         }
-        self.checkActivityStatus()
+        checkActivityStatus()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -111,11 +109,10 @@ class ProfileTableViewController: UITableViewController {
         return 1
     }
     
-    //MARK: IBactions
+    // MARK: IBactions
     
     @IBAction func callButtonPressed(_ sender: Any) {
-        
-        checkMicPermission(viewController: self) { (authorizationStatus) in
+        checkMicPermission(viewController: self) { authorizationStatus in
             if authorizationStatus == .authorized {
                 DispatchQueue.main.async {
                     self.callUser()
@@ -129,14 +126,12 @@ class ProfileTableViewController: UITableViewController {
     }
     
     @IBAction func messageButtonPressed(_ sender: Any) {
-        
         let i = navigationController?.viewControllers.firstIndex(of: self)
-        if (navigationController?.viewControllers[i!-1] as? ChatViewController) != nil && !fromGroup {
-            self.navigationController?.popViewController(animated: true)
+        if (navigationController?.viewControllers[i! - 1] as? ChatViewController) != nil, !fromGroup {
+            navigationController?.popViewController(animated: true)
             return
         }
-        if !checkBlockedStatus(withUser: user!){
-            
+        if !checkBlockedStatus(withUser: user!) {
             let chatVC = ChatViewController()
             chatVC.titleName = user!.firstname
             chatVC.membersToPush = [FUser.currentId(), user!.objectId]
@@ -146,14 +141,11 @@ class ProfileTableViewController: UITableViewController {
             chatVC.initialWithUser = user!.fullname
             chatVC.initialImage = avatarImageView.image!
             chatVC.hidesBottomBarWhenPushed = true
-            self.navigationController?.pushViewController(chatVC, animated: true)
-            
-        }
-        else {
+            navigationController?.pushViewController(chatVC, animated: true)
+        } else {
             ProgressHUD.showError("This user is not available for chat")
         }
     }
-    
     
     func setBarButton(imageName: String, imageType: ImageType, withTintColor: UIColor?) {
         var image = imageType == .systemImage ? UIImage(systemName: imageName) : UIImage(named: imageName)
@@ -161,7 +153,7 @@ class ProfileTableViewController: UITableViewController {
         if let tintColor = withTintColor {
             image = image?.withTintColor(tintColor)
         }
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(togglePresenceInContacts))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: #selector(togglePresenceInContacts))
     }
     
     @objc func togglePresenceInContacts() {
@@ -170,12 +162,11 @@ class ProfileTableViewController: UITableViewController {
             
         } else {
             addToContacts(ofUser: FUser.currentId(), user: user!.objectId)
-            
         }
     }
     
-    func isParOfContacts(user: String, completion: @escaping(Bool) -> ()) {
-        reference(.Contact).document(FUser.currentId()).getDocument { (document, error) in
+    func isParOfContacts(user: String, completion: @escaping (Bool) -> ()) {
+        reference(.Contact).document(FUser.currentId()).getDocument { document, _ in
             
             let data = document?.data()
             let contacts = data?["contacts"] as! [String]
@@ -190,7 +181,7 @@ class ProfileTableViewController: UITableViewController {
     }
     
     func checkActivityStatus() {
-       activityListener = Firestore.firestore().collection("status").whereField("userId", isEqualTo: user?.objectId).addSnapshotListener { (snapshot, error) in
+        activityListener = Firestore.firestore().collection("status").whereField("userId", isEqualTo: user?.objectId).addSnapshotListener { snapshot, _ in
             
             guard let snapshot = snapshot else { return }
             
@@ -221,11 +212,10 @@ class ProfileTableViewController: UITableViewController {
             if currentBlockedIds.contains(self.user!.objectId) {
                 let index = currentBlockedIds.firstIndex(of: self.user!.objectId)
                 currentBlockedIds.remove(at: index!)
-            }
-            else {
+            } else {
                 currentBlockedIds.append(self.user!.objectId)
             }
-            updateCurrentUserInFirestore(withValues: [kBLOCKEDUSERID : currentBlockedIds]) { (error) in
+            updateCurrentUserInFirestore(withValues: [kBLOCKEDUSERID: currentBlockedIds]) { error in
                 
                 if error != nil {
                     print("error updating user \(error)")
@@ -240,27 +230,24 @@ class ProfileTableViewController: UITableViewController {
             }
         })
         alertController.view.tintColor = UIColor(named: "outgoingBubbleColor")
-        self.present(alertController, animated: true)
-        
+        present(alertController, animated: true)
     }
     
-    
-    
     func removeFromContacts(ofUser: String, user: String) {
-        //navigationItem.rightBarButtonItems?.first?.isEnabled = false
-        reference(.Contact).document(ofUser).getDocument { (document, error) in
+        // navigationItem.rightBarButtonItems?.first?.isEnabled = false
+        reference(.Contact).document(ofUser).getDocument { document, error in
             
             if error != nil {
-                //self.navigationItem.rightBarButtonItems?.first?.isEnabled = true
+                // self.navigationItem.rightBarButtonItems?.first?.isEnabled = true
                 return
             }
-            //self.navigationItem.rightBarButtonItems?.first?.isEnabled = true
+            // self.navigationItem.rightBarButtonItems?.first?.isEnabled = true
             let data = document?.data()
             var contacts = data?["contacts"] as! [String]
             if contacts.contains(user) {
                 let idx = contacts.firstIndex(of: user)
                 contacts.remove(at: idx!)
-                reference(.Contact).document(ofUser).updateData(["contacts" : contacts])
+                reference(.Contact).document(ofUser).updateData(["contacts": contacts])
                 //                self.setBarButton(imageName: "person.badge.plus.fill", imageType: .systemImage, withTintColor: .systemGreen)
                 //                self.isInContacts = false
                 //                self.activityLabel.isHidden = true
@@ -269,8 +256,8 @@ class ProfileTableViewController: UITableViewController {
     }
     
     func addToContacts(ofUser: String, user: String) {
-        //navigationItem.rightBarButtonItems?.first?.isEnabled = false
-        reference(.Contact).document(ofUser).getDocument { (document, error) in
+        // navigationItem.rightBarButtonItems?.first?.isEnabled = false
+        reference(.Contact).document(ofUser).getDocument { document, error in
             if error != nil {
                 // self.navigationItem.rightBarButtonItems?.first?.isEnabled = true
                 return
@@ -281,13 +268,13 @@ class ProfileTableViewController: UITableViewController {
             let data = document.data()
             if let data = data {
                 var contacts = data["contacts"] as! [String]
-                        contacts.append(user)
-                        reference(.Contact).document(ofUser).updateData(["contacts" : contacts])
+                contacts.append(user)
+                reference(.Contact).document(ofUser).updateData(["contacts": contacts])
             } else {
                 // reference(.Contact).document(ofUser).updateData(["contacts" : [user]])
-                reference(.Contact).document(ofUser).setData(["userID" : ofUser, "contacts" : [user]])
+                reference(.Contact).document(ofUser).setData(["userID": ofUser, "contacts": [user]])
             }
-        
+            
             //            self.setBarButton(imageName: "person.badge.minus.fill", imageType: .systemImage, withTintColor: .systemPink)
             //            self.isInContacts = true
             //                     self.activityLabel.isHidden = false
@@ -313,20 +300,18 @@ class ProfileTableViewController: UITableViewController {
         return 10
     }
     
-    
-    //MARK: Setup UI
+    // MARK: Setup UI
     
     func setupUI() {
-        
         if user != nil {
-            self.title = "Profile"
+            title = "Profile"
             
             fullNameLabel.text = user!.fullname
             activityLabel.text = ""
             updateBlockStatus()
             
             if userDictionary.isEmpty {
-                imageFromData(pictureData: user!.avatar) { (avatarImage) in
+                imageFromData(pictureData: user!.avatar) { avatarImage in
                     
                     if user!.avatar == "" {
                         self.avatarImageView.image = UIImage(named: "avatarph")
@@ -338,13 +323,10 @@ class ProfileTableViewController: UITableViewController {
                     }
                 }
             }
-            
-            
         }
     }
     
     func updateBlockStatus() {
-        
         if user!.objectId != FUser.currentId() {
             blockUserButton.isHidden = false
             messageButton.isHidden = false
@@ -357,18 +339,17 @@ class ProfileTableViewController: UITableViewController {
         
         if FUser.currentUser()!.blockedUsers.contains(user!.objectId) {
             blockUserButton.setTitle("Ublock user", for: .normal)
-        }
-        else {
+        } else {
             blockUserButton.setTitle("Block user", for: .normal)
         }
     }
     
-    //MARK: Call User
+    // MARK: Call User
     
-    func callClient() -> SINCallClient?{
+    func callClient() -> SINCallClient? {
         let scene = UIApplication.shared.connectedScenes.first
-        if let sd : SceneDelegate = (scene?.delegate as? SceneDelegate) {
-            return  sd._client.call()
+        if let sd: SceneDelegate = (scene?.delegate as? SceneDelegate) {
+            return sd._client.call()
         }
         return nil
     }
@@ -380,8 +361,6 @@ class ProfileTableViewController: UITableViewController {
         callVC._call = call
         callVC.callingImage = avatarImageView.image
         callVC.callingName = user!.fullname
-        self.present(callVC, animated: true, completion: nil)
+        present(callVC, animated: true, completion: nil)
     }
 }
-
-

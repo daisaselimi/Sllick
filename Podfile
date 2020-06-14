@@ -7,12 +7,12 @@ target 'xChat' do
 
   # Pods for xChat
   
-  pod 'Firebase/Database'
+   pod 'Firebase/Database'
   #pod 'Firebase/Core'
-  pod 'FirebaseCore'
-  pod 'Firebase/Auth'
-  pod 'Firebase/Storage'
-  pod 'Firebase/Firestore'
+   pod 'FirebaseCore'
+   pod 'Firebase/Auth'
+   pod 'Firebase/Storage'
+   pod 'Firebase/Firestore'
   
   pod 'ProgressHUD'
   pod 'MBProgressHUD'

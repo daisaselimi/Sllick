@@ -15,10 +15,9 @@ protocol UserTableViewCellDelegate {
 class UserTableViewCell: UITableViewCell {
     
     var delegate: UserTableViewCellDelegate?
-    @IBOutlet weak var avatarImage: UIImageView!
+    @IBOutlet var avatarImage: UIImageView!
     
-    
-    @IBOutlet weak var fullNameLabel: UITextField!
+    @IBOutlet var fullNameLabel: UITextField!
     
     var indexPath: IndexPath!
     let tapGestureRecognizer = UITapGestureRecognizer()
@@ -27,7 +26,7 @@ class UserTableViewCell: UITableViewCell {
         super.awakeFromNib()
         tapGestureRecognizer.addTarget(self, action: #selector(avatarTapped))
         avatarImage.maskCircle()
-         avatarImage.isUserInteractionEnabled = true
+        avatarImage.isUserInteractionEnabled = true
         avatarImage.addGestureRecognizer(tapGestureRecognizer)
     }
     
@@ -37,20 +36,19 @@ class UserTableViewCell: UITableViewCell {
     
     func generateCellWith(fUser: FUser, indexPath: IndexPath, isOnline: Bool = false) {
         self.indexPath = indexPath
-        self.fullNameLabel.text = fUser.fullname
-        if(fUser.avatar != "") {
-            imageFromData(pictureData: fUser.avatar) { (image) in
+        fullNameLabel.text = fUser.fullname
+        if fUser.avatar != "" {
+            imageFromData(pictureData: fUser.avatar) { image in
                 if avatarImage != nil {
                     self.avatarImage.image = image
                 }
             }
         } else {
-            self.avatarImage.image = UIImage(named: "avatarph")
+            avatarImage.image = UIImage(named: "avatarph")
         }
     }
     
     @objc func avatarTapped() {
         delegate!.didTapAvatarImage(indexPath: indexPath)
     }
-    
 }

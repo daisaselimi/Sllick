@@ -6,14 +6,14 @@
 //  Copyright © 2019 com.isaselimi. All rights reserved.
 //
 
-import UIKit
 import ProgressHUD
+import UIKit
 
 class BlockedUsersViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UserTableViewCellDelegate {
-
-    @IBOutlet weak var tableView: UITableView!
+    
+    @IBOutlet var tableView: UITableView!
     var blockedUsers: [FUser] = []
-    @IBOutlet weak var notificationLabel: UILabel!
+    @IBOutlet var notificationLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,7 +23,8 @@ class BlockedUsersViewController: UIViewController, UITableViewDataSource, UITab
         loadBlockedUsers()
     }
     
-    //MARK: TableView data source
+    // MARK: TableView data source
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         notificationLabel.isHidden = blockedUsers.count != 0
         return blockedUsers.count
@@ -38,8 +39,8 @@ class BlockedUsersViewController: UIViewController, UITableViewDataSource, UITab
         return cell
     }
     
+    // MARK: TableView delegate
     
-    //MARK: TableView delegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
     }
@@ -53,13 +54,12 @@ class BlockedUsersViewController: UIViewController, UITableViewDataSource, UITab
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        
         var tempBLockedUsers = FUser.currentUser()!.blockedUsers
         let userIdToBlock = blockedUsers[indexPath.row].objectId
         
         tempBLockedUsers.remove(at: tempBLockedUsers.firstIndex(of: userIdToBlock)!)
         blockedUsers.remove(at: indexPath.row)
-        updateCurrentUserInFirestore(withValues: [kBLOCKEDUSERID : tempBLockedUsers]) { (error) in
+        updateCurrentUserInFirestore(withValues: [kBLOCKEDUSERID: tempBLockedUsers]) { error in
             if error != nil {
                 ProgressHUD.showError(error!.localizedDescription)
                 return
@@ -69,26 +69,23 @@ class BlockedUsersViewController: UIViewController, UITableViewDataSource, UITab
         }
     }
     
-    //MARK: Load blocked users
+    // MARK: Load blocked users
+    
     func loadBlockedUsers() {
         if FUser.currentUser()!.blockedUsers.count > 0 {
-              ProgressHUD.show()
+            ProgressHUD.show()
             
-            getUsersFromFirestore(withIds: FUser.currentUser()!.blockedUsers) { (allBlockedUsers) in
+            getUsersFromFirestore(withIds: FUser.currentUser()!.blockedUsers) { allBlockedUsers in
                 
-                   ProgressHUD.dismiss()
+                ProgressHUD.dismiss()
                 self.blockedUsers = allBlockedUsers
                 self.tableView.reloadData()
             }
         }
     }
     
-    
-    
-    //UserTableViewCell delegate
+    // UserTableViewCell delegate
     func didTapAvatarImage(indexPath: IndexPath) {
-       return
-        
-     }
-    
+        return
+    }
 }

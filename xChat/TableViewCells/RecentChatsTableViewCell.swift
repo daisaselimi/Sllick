@@ -14,14 +14,14 @@ protocol RecentChatsTableViewCellDelegate {
 
 class RecentChatsTableViewCell: UITableViewCell {
     
-    @IBOutlet weak var avatarImageView: UIImageView!
-    @IBOutlet weak var nameLabel: UILabel!
-    @IBOutlet weak var lastMessageLabel: UILabel!
-    @IBOutlet weak var dateLabel: UILabel!
-    @IBOutlet weak var messageCounterLabel: UILabel!
-    @IBOutlet weak var messageCounterBackgroundView: UIView!
-    @IBOutlet weak var onlineIndicatorView: UIView!
-    @IBOutlet weak var activeView: UIView!
+    @IBOutlet var avatarImageView: UIImageView!
+    @IBOutlet var nameLabel: UILabel!
+    @IBOutlet var lastMessageLabel: UILabel!
+    @IBOutlet var dateLabel: UILabel!
+    @IBOutlet var messageCounterLabel: UILabel!
+    @IBOutlet var messageCounterBackgroundView: UIView!
+    @IBOutlet var onlineIndicatorView: UIView!
+    @IBOutlet var activeView: UIView!
     var profileIsEmpty: Bool = false
     
     override func prepareForReuse() {
@@ -43,22 +43,19 @@ class RecentChatsTableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-
+        
         messageCounterBackgroundView.layer.cornerRadius = messageCounterBackgroundView.frame.width / 2
         onlineIndicatorView.layer.cornerRadius = onlineIndicatorView.frame.width / 2
         activeView.layer.cornerRadius = activeView.frame.width / 2
-        self.selectionStyle = .none
-        tapGesture.addTarget(self, action: #selector(self.avatarTapped))
+        selectionStyle = .none
+        tapGesture.addTarget(self, action: #selector(avatarTapped))
         avatarImageView.addGestureRecognizer(tapGesture)
         avatarImageView.isUserInteractionEnabled = true
         lastMessageLabel.textColor = .secondaryLabel
         dateLabel.textColor = .tertiaryLabel
         messageCounterBackgroundView.backgroundColor = #colorLiteral(red: 0.0001922522367, green: 1, blue: 0.1971572093, alpha: 1)
-        
     }
     
-
-
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
     }
@@ -67,20 +64,16 @@ class RecentChatsTableViewCell: UITableViewCell {
         delegate?.didTapAvatarImage(indexPath: indexPath)
     }
     
-    
-    //MARL: Generate cell
+    // MARL: Generate cell
     
     func generateCell(isGroup: Bool, recentChat: NSDictionary, indexPath: IndexPath, isOnline: Bool, tabBarController: UITabBarController) {
-        
         self.indexPath = indexPath
         
-        self.nameLabel.text = recentChat[kWITHUSERFULLNAME] as? String
+        nameLabel.text = recentChat[kWITHUSERFULLNAME] as? String
         onlineIndicatorView.isHidden = !isOnline
         
         var decryptedText = ""
         DispatchQueue.global().async {
-            
-            
             Encryption.decryptText(chatRoomId: recentChat[kCHATROOMID] as! String, encryptedMessage: recentChat[kLASTMESSAGE] as! String) { decryptedTxt in
                 
                 decryptedText = decryptedTxt
@@ -109,30 +102,25 @@ class RecentChatsTableViewCell: UITableViewCell {
                 } else if recentChat[kLASTMESSAGETYPE] as! String == kAUDIO {
                     messageContent += " sent an audio message"
                 } else {
-                    messageContent += (isGroup || self.currentUserRecent(recent: recentChat[kSENDERID] as! String) ? ": " : "")  + decryptedText
+                    messageContent += (isGroup || self.currentUserRecent(recent: recentChat[kSENDERID] as! String) ? ": " : "") + decryptedText
                 }
                 DispatchQueue.main.async {
-                    
                     self.lastMessageLabel.text = messageContent
-   
-                    
                 }
             }
-          
         }
         
- 
-        self.messageCounterLabel.text = recentChat[kCOUNTER] as? String
-      
+        messageCounterLabel.text = recentChat[kCOUNTER] as? String
+        
         if let avatarString = recentChat[kAVATAR] {
-            imageFromData(pictureData: avatarString as! String) { (image) in
+            imageFromData(pictureData: avatarString as! String) { image in
                 
                 if image != nil {
                     self.avatarImageView.image = image
-                }else if !isGroup {
+                } else if !isGroup {
                     self.avatarImageView.image = UIImage(named: "avatarph")
-                  
-                } else{
+                    
+                } else {
                     self.avatarImageView.image = UIImage(named: "groupph")
                     profileIsEmpty = true
                 }
@@ -142,25 +130,23 @@ class RecentChatsTableViewCell: UITableViewCell {
         }
         
         if recentChat[kCOUNTER] as! Int != 0 {
-            self.messageCounterBackgroundView.isHidden = false
-            self.lastMessageLabel.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.semibold)
-            self.lastMessageLabel.textColor = .label
-            self.dateLabel.textColor = .secondaryLabel
-        }
-        else {
-            self.messageCounterBackgroundView.isHidden = true
-            self.messageCounterLabel.isHidden = true
-            self.lastMessageLabel.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.regular)
-            self.lastMessageLabel.textColor = .secondaryLabel
-            self.dateLabel.textColor = .tertiaryLabel
+            messageCounterBackgroundView.isHidden = false
+            lastMessageLabel.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.semibold)
+            lastMessageLabel.textColor = .label
+            dateLabel.textColor = .secondaryLabel
+        } else {
+            messageCounterBackgroundView.isHidden = true
+            messageCounterLabel.isHidden = true
+            lastMessageLabel.font = UIFont.systemFont(ofSize: 15, weight: UIFont.Weight.regular)
+            lastMessageLabel.textColor = .secondaryLabel
+            dateLabel.textColor = .tertiaryLabel
         }
         
         var date: Date!
         if let created = recentChat[kDATE] {
             if (created as! String).count != 14 {
                 date = Date()
-            }
-            else {
+            } else {
                 date = dateFormatter().date(from: created as! String)
             }
 //            let dateFormatter = DateFormatter()
@@ -173,16 +159,14 @@ class RecentChatsTableViewCell: UITableViewCell {
             date = Date()
         }
         
-    
-        self.dateLabel.text = "・" + timeElapsed(date: date)
+        dateLabel.text = "・" + timeElapsed(date: date)
     }
     
     func containsMedia(message: String) -> Bool {
         return message == kPICTURE || message == kVIDEO || message == kAUDIO || message == kLOCATION
     }
     
-    func currentUserRecent(recent: String) -> Bool{
+    func currentUserRecent(recent: String) -> Bool {
         return recent == FUser.currentId()
     }
 }
-

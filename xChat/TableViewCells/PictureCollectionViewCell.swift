@@ -11,13 +11,9 @@ import UIKit
 
 class PictureCollectionViewCell: UICollectionViewCell {
     
-    
-    @IBOutlet weak var imageView: UIImageView!
-    
+    @IBOutlet var imageView: UIImageView!
+
     func generateCell(image: UIImage) {
         self.imageView.image = image
     }
 }
-
-
-

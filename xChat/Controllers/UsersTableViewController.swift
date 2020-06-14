@@ -6,10 +6,10 @@
 //  Copyright © 2019 com.isaselimi. All rights reserved.
 //
 
-import UIKit
 import FirebaseFirestore
-import ProgressHUD
 import GradientLoadingBar
+import ProgressHUD
+import UIKit
 
 protocol UsersDelegate {
     func didAddNewContacts()
@@ -17,15 +17,15 @@ protocol UsersDelegate {
 
 class UsersTableViewController: UITableViewController, UISearchResultsUpdating, UserTableViewCellDelegate {
     
-    @IBOutlet weak var headerView: UIView!
-    @IBOutlet weak var filterSegmentedControl: UISegmentedControl!
+    @IBOutlet var headerView: UIView!
+    @IBOutlet var filterSegmentedControl: UISegmentedControl!
     
     var delegate: UsersDelegate?
     
     var allUsers: [FUser] = []
     var filteredUsers: [FUser] = []
-    var allUsersGrouped = NSDictionary() as! [String : [FUser]]
-    var sectionTitleList : [String] = []
+    var allUsersGrouped = NSDictionary() as! [String: [FUser]]
+    var sectionTitleList: [String] = []
     var contacts: [String] = []
     var firstLoad = false
     let searchController = UISearchController(searchResultsController: nil)
@@ -35,12 +35,11 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
     var fetchingMore = false
     private let gradientLoadingBar = GradientLoadingBar()
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = "Users"
+        title = "Users"
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
-        gradientLoadingBar.gradientColors =  [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
+        gradientLoadingBar.gradientColors = [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
         navigationItem.largeTitleDisplayMode = .never
         tableView.tableFooterView = UIView()
         navigationItem.searchController = searchController
@@ -59,20 +58,20 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-        self.gradientLoadingBar.fadeOut(duration: 0)
+        gradientLoadingBar.fadeOut(duration: 0)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         if !firstLoad {
             getContacts()
-        } else {
+        }
+        else {
             firstLoad = false
         }
     }
     
-    
-    func getContacts()  {
-        reference(.Contact).whereField("userID", isEqualTo: FUser.currentId()).getDocuments { (snapshot, error) in
+    func getContacts() {
+        reference(.Contact).whereField("userID", isEqualTo: FUser.currentId()).getDocuments { snapshot, error in
             if error != nil {
                 self.showMessage("Could not fetch users", type: .error)
                 return
@@ -89,7 +88,6 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
             }
         }
     }
-    
     
     // MARK: - Table view data source
     
@@ -119,7 +117,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         
-        if searchController.isActive && searchController.searchBar.text != "" {
+        if searchController.isActive, searchController.searchBar.text != "" {
             return 1
         }
         else {
@@ -129,22 +127,21 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        if searchController.isActive && searchController.searchBar.text != "" {
+        if searchController.isActive, searchController.searchBar.text != "" {
             return filteredUsers.count
         }
         else {
-            let sectionTitle = self.sectionTitleList[section]
+            let sectionTitle = sectionTitleList[section]
             let users = allUsersGrouped[sectionTitle]
             return users!.count
         }
     }
     
-    
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let cell = tableView.cellForRow(at: indexPath)
         var tempUser: FUser
         
-        if searchController.isActive && searchController.searchBar.text != "" {
+        if searchController.isActive, searchController.searchBar.text != "" {
             tempUser = filteredUsers[indexPath.row]
         }
         else {
@@ -152,23 +149,23 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
             tempUser = allUsersGrouped[sectionTitle]![indexPath.row]
         }
         
-        
         var isInContacts = false
         
         if contacts.contains(tempUser.objectId) {
             isInContacts = true
         }
         
-        let contactAction = UIContextualAction(style: .normal, title: nil) { (action, view, success) in
+        let contactAction = UIContextualAction(style: .normal, title: nil) { _, _, _ in
             if isInContacts {
                 self.removeContact(id: tempUser.objectId)
                 
                 isInContacts = false
-                UIView.transition(with: tableView, duration: 0.1, options: .transitionCrossDissolve, animations: {self.tableView.reloadData()}, completion: nil)
-            } else {
+                UIView.transition(with: tableView, duration: 0.1, options: .transitionCrossDissolve, animations: { self.tableView.reloadData() }, completion: nil)
+            }
+            else {
                 self.addContact(id: tempUser.objectId)
                 isInContacts = true
-                UIView.transition(with: tableView, duration: 0.1, options: .transitionCrossDissolve, animations: {self.tableView.reloadData()}, completion: nil)
+                UIView.transition(with: tableView, duration: 0.1, options: .transitionCrossDissolve, animations: { self.tableView.reloadData() }, completion: nil)
             }
             self.delegate?.didAddNewContacts()
         }
@@ -180,15 +177,15 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
             
             if isInContacts {
                 UIImage(systemName: "person.badge.minus")?.draw(in: CGRect(x: 0, y: 0, width: 25, height: 25))
-            } else {
+            }
+            else {
                 UIImage(systemName: "person.badge.plus")?.draw(in: CGRect(x: 0, y: 0, width: 25, height: 25))
             }
         }
         contactImg = isInContacts ? contactImg.imageWithColor(color1: UIColor.systemRed) : contactImg.imageWithColor(color1: UIColor.getAppColor(.light))
         contactAction.image = contactImg
         
-        return  UISwipeActionsConfiguration(actions: [contactAction])
-        
+        return UISwipeActionsConfiguration(actions: [contactAction])
     }
     
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -200,41 +197,43 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
         contacts.remove(at: index!)
         
         let arr = contacts.filter { $0 != id }
-        let dict = ["contacts" : arr] as [String : Any]
-        reference(.Contact).document(FUser.currentId()).updateData(dict) { (error) in
+        let dict = ["contacts": arr] as [String: Any]
+        reference(.Contact).document(FUser.currentId()).updateData(dict) { error in
             if error != nil {
                 self.showMessage("Could not delete", type: .error)
-            } else {
+            }
+            else {
                 ProgressHUD.showSuccess()
             }
         }
     }
     
     func addContact(id: String) {
-        
         contacts.append(id)
-        let dict = ["contacts" : contacts as Any, "userID" : FUser.currentId()] as [String : Any]
+        let dict = ["contacts": contacts as Any, "userID": FUser.currentId()] as [String: Any]
         
         if contacts.count == 1 {
-            reference(.Contact).document(FUser.currentId()).setData(dict) { (error) in
+            reference(.Contact).document(FUser.currentId()).setData(dict) { error in
                 if error != nil {
                     print(error?.localizedDescription)
                     self.showMessage("Could not add contact", type: .error)
-                } else {
-                    ProgressHUD.showSuccess()
                 }
-            }
-        } else {
-            reference(.Contact).document(FUser.currentId()).updateData(dict) { (error) in
-                if error != nil {
-                    print(error?.localizedDescription)
-                    self.showMessage("Could not add contact", type: .error)
-                } else {
+                else {
                     ProgressHUD.showSuccess()
                 }
             }
         }
-        
+        else {
+            reference(.Contact).document(FUser.currentId()).updateData(dict) { error in
+                if error != nil {
+                    print(error?.localizedDescription)
+                    self.showMessage("Could not add contact", type: .error)
+                }
+                else {
+                    ProgressHUD.showSuccess()
+                }
+            }
+        }
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -242,12 +241,12 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
         
         var user: FUser
         
-        if searchController.isActive && searchController.searchBar.text != "" {
+        if searchController.isActive, searchController.searchBar.text != "" {
             user = filteredUsers[indexPath.row]
         }
         else {
-            let sectionTitle = self.sectionTitleList[indexPath.section]
-            let users = self.allUsersGrouped[sectionTitle]
+            let sectionTitle = sectionTitleList[indexPath.section]
+            let users = allUsersGrouped[sectionTitle]
             user = users![indexPath.row]
         }
         cell.generateCellWith(fUser: user, indexPath: indexPath)
@@ -256,10 +255,10 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
         return cell
     }
     
-    //MARK: TableView Delegate
+    // MARK: TableView Delegate
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if searchController.isActive && searchController.searchBar.text != "" {
+        if searchController.isActive, searchController.searchBar.text != "" {
             return ""
         }
         else {
@@ -268,11 +267,11 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
     }
     
     override func sectionIndexTitles(for tableView: UITableView) -> [String]? {
-        if searchController.isActive && searchController.searchBar.text != "" {
+        if searchController.isActive, searchController.searchBar.text != "" {
             return nil
         }
         else {
-            return nil//sectionTitleList
+            return nil // sectionTitleList
         }
     }
     
@@ -281,13 +280,11 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
     }
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        
         view.tintColor = .systemBackground
         
-        let header : UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
+        let header: UITableViewHeaderFooterView = view as! UITableViewHeaderFooterView
         
         header.textLabel?.textColor = .label
-        
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -295,18 +292,16 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
         
         var user: FUser
         
-        if searchController.isActive && searchController.searchBar.text != "" {
+        if searchController.isActive, searchController.searchBar.text != "" {
             user = filteredUsers[indexPath.row]
         }
         else {
-            let sectionTitle = self.sectionTitleList[indexPath.section]
-            let users = self.allUsersGrouped[sectionTitle]
+            let sectionTitle = sectionTitleList[indexPath.section]
+            let users = allUsersGrouped[sectionTitle]
             user = users![indexPath.row]
         }
         
-        
-        if !checkBlockedStatus(withUser: user){
-            
+        if !checkBlockedStatus(withUser: user) {
             let chatVC = ChatViewController()
             chatVC.titleName = user.firstname
             chatVC.membersToPush = [FUser.currentId(), user.objectId]
@@ -317,17 +312,15 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
             let cell = tableView.cellForRow(at: indexPath) as! UserTableViewCell
             chatVC.initialImage = cell.avatarImage!.image
             chatVC.hidesBottomBarWhenPushed = true
-            self.navigationController?.pushViewController(chatVC, animated: true)
+            navigationController?.pushViewController(chatVC, animated: true)
         }
         else {
-            self.showMessage("This user is not available for chat", type: .error)
+            showMessage("This user is not available for chat", type: .error)
         }
     }
     
-    
-    
     func loadUsers(filter: String) {
-        self.gradientLoadingBar.fadeIn()
+        gradientLoadingBar.fadeIn()
         
         var query: Query!
         
@@ -340,7 +333,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
             query = reference(.User).order(by: kFIRSTNAME, descending: false)
         }
         
-        query.limit(to: 10).getDocuments { (snapshot, error) in
+        query.limit(to: 10).getDocuments { snapshot, error in
             self.allUsers = []
             self.sectionTitleList = []
             self.allUsersGrouped = [:]
@@ -351,28 +344,28 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
                 return
             }
             
-            guard let snapshot = snapshot else {     self.gradientLoadingBar.fadeOut(); return }
+            guard let snapshot = snapshot else { self.gradientLoadingBar.fadeOut(); return }
             
             if !snapshot.isEmpty {
-                
                 for userDictionary in snapshot.documents {
                     let userDictionary = userDictionary.data() as NSDictionary
                     let fUser = FUser(_dictionary: userDictionary)
                     
-                    if(fUser.objectId != FUser.currentId() && !fUser.blockedUsers.contains(FUser.currentUser()!.objectId)) {
+                    if fUser.objectId != FUser.currentId(), !fUser.blockedUsers.contains(FUser.currentUser()!.objectId) {
                         self.allUsers.append(fUser)
                     }
                 }
                 
                 if self.allUsers.isEmpty {
                     self.tableView.setEmptyMessage("No users to show")
-                } else {
+                }
+                else {
                     self.tableView.restore()
                 }
                 
                 self.lastDocumentSnapshot = snapshot.documents.last!
                 self.splitDataIntoSections()
-                //self.tableView.reloadData()
+                // self.tableView.reloadData()
             }
             
             self.tableView.reloadData()
@@ -383,7 +376,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
-        //print("offsetY: \(offsetY) | contHeight-scrollViewHeight: \(contentHeight-scrollView.frame.height)")
+        // print("offsetY: \(offsetY) | contHeight-scrollViewHeight: \(contentHeight-scrollView.frame.height)")
         if offsetY > contentHeight - scrollView.frame.height - 50 {
             // Bottom of the screen is reached
             if !fetchingMore {
@@ -409,8 +402,8 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
             query = reference(.User).order(by: kFIRSTNAME, descending: false)
         }
         
-        query.limit(to: 6).start(afterDocument: lastDocumentSnapshot).getDocuments { (snapshot, error) in
-            //self.allUsers = []
+        query.limit(to: 6).start(afterDocument: lastDocumentSnapshot).getDocuments { snapshot, error in
+            // self.allUsers = []
             
             if error != nil {
                 print(error!.localizedDescription)
@@ -420,7 +413,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
                 return
             }
             
-            guard let snapshot = snapshot else {     self.gradientLoadingBar.fadeOut(); return }
+            guard let snapshot = snapshot else { self.gradientLoadingBar.fadeOut(); return }
             
             if !snapshot.isEmpty {
                 self.sectionTitleList = []
@@ -429,7 +422,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
                     let userDictionary = userDictionary.data() as NSDictionary
                     let fUser = FUser(_dictionary: userDictionary)
                     
-                    if(fUser.objectId != FUser.currentId() && !fUser.blockedUsers.contains(FUser.currentUser()!.objectId)) {
+                    if fUser.objectId != FUser.currentId(), !fUser.blockedUsers.contains(FUser.currentUser()!.objectId) {
                         self.allUsers.append(fUser)
                     }
                 }
@@ -443,33 +436,23 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
         }
     }
     
-    
-    //MARK: Search controller functions
-    
-    
+    // MARK: Search controller functions
     
     func updateSearchResults(for searchController: UISearchController) {
-        
-        
         NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(filterContentForSearchText), object: nil)
         searchTxt = searchController.searchBar.text!.lowercased().removeExtraSpaces()
-        self.perform(#selector(filterContentForSearchText), with: nil, afterDelay: 0.5)
-        
-        
+        perform(#selector(filterContentForSearchText), with: nil, afterDelay: 0.5)
     }
-    
     
     @objc func filterContentForSearchText() {
         //        filteredUsers = allUsers.filter({ (user) -> Bool in
         //            return user.fullname.lowercased().contains(searchText.lowercased())
         //        })        self.filteredUsers = []
         
-        
         filteredUsers = []
         tableView.reloadData()
         
-        
-        reference(.UserKeywords).whereField("keywords", arrayContains: searchTxt).getDocuments { (snapshot, error) in
+        reference(.UserKeywords).whereField("keywords", arrayContains: searchTxt).getDocuments { snapshot, error in
             print("hereeeeeeeeeeee")
             if error != nil {
                 self.showMessage("Could not fetch users", type: .error)
@@ -484,10 +467,10 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
                     users.append(doc["userId"] as! String)
                 }
                 
-                getUsersFromFirestore(withIds: users) { (foundUsers) in
+                getUsersFromFirestore(withIds: users) { foundUsers in
                     print("********\(foundUsers.count)")
                     self.filteredUsers = []
-                    self.filteredUsers = foundUsers.sorted(by: { $0.fullname < $1.fullname }).filter({ (user) -> Bool in
+                    self.filteredUsers = foundUsers.sorted(by: { $0.fullname < $1.fullname }).filter { (user) -> Bool in
                         switch self.scope {
                         case kCITY:
                             return user.city == FUser.currentUser()!.city
@@ -496,20 +479,14 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
                         default:
                             return true
                         }
-                    })
+                    }
                     self.tableView.reloadData()
                 }
             }
         }
-        
-        
-        
-        
-        
     }
     
     func splitDataIntoSections() {
-        
         var sectionTitle: String = ""
         
         for i in 0..<allUsers.count {
@@ -518,32 +495,33 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
             
             if firstCharacter != sectionTitle {
                 sectionTitle = firstCharacter
-                self.allUsersGrouped[sectionTitle] = []
-                self.sectionTitleList.append(sectionTitle)
+                allUsersGrouped[sectionTitle] = []
+                sectionTitleList.append(sectionTitle)
             }
             
-            self.allUsersGrouped[sectionTitle]?.append(currentUser)
+            allUsersGrouped[sectionTitle]?.append(currentUser)
         }
     }
     
-    //MARK: UserTableViewCellDelegate
+    // MARK: UserTableViewCellDelegate
+    
     func didTapAvatarImage(indexPath: IndexPath) {
-        
         print("user avatar tapped at: \(indexPath)")
-        let viewController = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "profileView") as! ProfileTableViewController
+        let viewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "profileView") as! ProfileTableViewController
         
         var user: FUser
         
-        if searchController.isActive && searchController.searchBar.text != "" {
+        if searchController.isActive, searchController.searchBar.text != "" {
             user = filteredUsers[indexPath.row]
         }
         else {
-            let sectionTitle = self.sectionTitleList[indexPath.section]
+            let sectionTitle = sectionTitleList[indexPath.section]
             
-            let users = self.allUsersGrouped[sectionTitle]
-            user = users![indexPath.row]        }
+            let users = allUsersGrouped[sectionTitle]
+            user = users![indexPath.row]
+        }
         
         viewController.user = user
-        self.navigationController?.pushViewController(viewController, animated: true)
+        navigationController?.pushViewController(viewController, animated: true)
     }
 }

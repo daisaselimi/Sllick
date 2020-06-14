@@ -22,7 +22,6 @@ class CallClass {
     var callDate: Date
     
     init(_callerId: String, _withUserId: String, _callerFullName: String, _withUserFullName: String) {
-        
         objectId = UUID().uuidString
         callerId = _callerId
         callerFullName = _callerFullName
@@ -34,7 +33,6 @@ class CallClass {
     }
     
     init(_dictionary: NSDictionary) {
-        
         objectId = _dictionary[kOBJECTID] as! String
         
         if let callId = _dictionary[kCALLERID] {
@@ -80,29 +78,22 @@ class CallClass {
     }
     
     func dictionaryFromCall() -> NSDictionary {
-        
         let dateStirg = dateFormatter().string(from: callDate)
         
         return NSDictionary(objects: [objectId, callerId, callerFullName, withUserId, withUserFullName, status, isIncoming, dateStirg], forKeys: [kOBJECTID as NSCopying, kCALLERID as NSCopying, kCALLERFULLNAME as NSCopying, kWITHUSERUSERID as NSCopying, kWITHUSERFULLNAME as NSCopying, kSTATUS as NSCopying, kISINCOMING as NSCopying, kDATE as NSCopying])
     }
     
-    //MARK: Save
+    // MARK: Save
+    
     func saveCallInBackground() {
-        reference(.Call).document(callerId).collection(callerId).document(objectId).setData(dictionaryFromCall() as! [String : Any])
+        reference(.Call).document(callerId).collection(callerId).document(objectId).setData(dictionaryFromCall() as! [String: Any])
         
-        reference(.Call).document(withUserId).collection(withUserId).document(objectId).setData(dictionaryFromCall() as! [String : Any])
-
+        reference(.Call).document(withUserId).collection(withUserId).document(objectId).setData(dictionaryFromCall() as! [String: Any])
     }
     
-    
-    //MARK: Delete
+    // MARK: Delete
     
     func deleteCall() {
         reference(.Call).document(FUser.currentId()).collection(FUser.currentId()).document(objectId).delete()
     }
-
-
-    
-    
-    
 }

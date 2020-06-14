@@ -6,12 +6,12 @@
 //  Copyright © 2020 com.isaselimi. All rights reserved.
 //
 
-import Foundation
 import FirebaseFirestore
+import Foundation
 
-func recentBadgeCount(withBlock: @escaping(_ badgeNumber: Int) -> Void) {
+func recentBadgeCount(withBlock: @escaping (_ badgeNumber: Int) -> Void) {
     
-    recentBadgeHandler = reference(.Recent).whereField(kUSERID, isEqualTo: FUser.currentId()).addSnapshotListener({ (snapshot, error) in
+    recentBadgeHandler = reference(.Recent).whereField(kUSERID, isEqualTo: FUser.currentId()).addSnapshotListener { snapshot, _ in
         
         var badge = 0
         var counter = 0
@@ -19,11 +19,9 @@ func recentBadgeCount(withBlock: @escaping(_ badgeNumber: Int) -> Void) {
         guard let snapshot = snapshot else { return }
         
         if !snapshot.isEmpty {
-            
             let recents = snapshot.documents
             
             for recent in recents {
-                
                 let currentRecent = recent.data() as NSDictionary
                 
                 badge += currentRecent[kCOUNTER] as! Int
@@ -36,12 +34,11 @@ func recentBadgeCount(withBlock: @escaping(_ badgeNumber: Int) -> Void) {
         } else {
             withBlock(badge)
         }
-    })
+    }
 }
 
 func setBadges(controller: UITabBarController) {
-    
-    recentBadgeCount { (badge) in
+    recentBadgeCount { badge in
         
         if badge != 0 {
             controller.tabBar.items![0].badgeValue = "\(badge)"

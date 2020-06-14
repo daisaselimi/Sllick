@@ -6,34 +6,26 @@
 //  Copyright © 2019 com.isaselimi. All rights reserved.
 //
 
-import UIKit
-import ProgressHUD
 import FlagPhoneNumber
+import ProgressHUD
+import UIKit
 
-class EditProfileTableViewController: UITableViewController,  UIImagePickerControllerDelegate, UINavigationControllerDelegate, FPNTextFieldDelegate {
-    
+class EditProfileTableViewController: UITableViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, FPNTextFieldDelegate {
     
     var phoneNumber: String = ""
     var countryCode: String = ""
     
-    
-    
-    @IBOutlet weak var saveButtonOutlet: UIBarButtonItem!
-    @IBOutlet weak var avatarImageView: UIImageView!
-    @IBOutlet weak var firstNameTextField: UITextField!
-    @IBOutlet weak var lastNameTextField: UITextField!
+    @IBOutlet var saveButtonOutlet: UIBarButtonItem!
+    @IBOutlet var avatarImageView: UIImageView!
+    @IBOutlet var firstNameTextField: UITextField!
+    @IBOutlet var lastNameTextField: UITextField!
     @IBOutlet var avagtarTapGestureRecognizer: UITapGestureRecognizer!
-    @IBOutlet weak var phoneNumberTextFld: FPNTextField!
-     var viewTapGestureRecognizer = UITapGestureRecognizer()
+    @IBOutlet var phoneNumberTextFld: FPNTextField!
+    var viewTapGestureRecognizer = UITapGestureRecognizer()
     
-    func fpnDidSelectCountry(name: String, dialCode: String, code: String) {
-        
-    }
-    
-
+    func fpnDidSelectCountry(name: String, dialCode: String, code: String) {}
     
     func fpnDidValidatePhoneNumber(textField: FPNTextField, isValid: Bool) {
-    
         if isValid {
             phoneNumber = textField.getFormattedPhoneNumber(format: .International)!
             phoneNumberTextFld.tintColor = .green
@@ -43,8 +35,6 @@ class EditProfileTableViewController: UITableViewController,  UIImagePickerContr
             phoneNumberTextFld.tintColor = .red
         }
     }
-    
-    
     
     func fpnDisplayCountryList() {
         let listController: FPNCountryListViewController = FPNCountryListViewController(style: .insetGrouped)
@@ -56,7 +46,7 @@ class EditProfileTableViewController: UITableViewController,  UIImagePickerContr
             self?.phoneNumberTextFld.setFlag(countryCode: country.code)
             self?.countryCode = country.code.rawValue
         }
-        self.present(navigationViewController, animated: true, completion: nil)
+        present(navigationViewController, animated: true, completion: nil)
     }
     
     var avatarImage: UIImage?
@@ -64,10 +54,10 @@ class EditProfileTableViewController: UITableViewController,  UIImagePickerContr
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 124, bottom: 0, right: 0)
-        self.tableView.backgroundColor = UIColor(named: "bwBackground")
+        tableView.backgroundColor = UIColor(named: "bwBackground")
         viewTapGestureRecognizer.addTarget(self, action: #selector(viewTap))
-             view.isUserInteractionEnabled = true
-             self.view.addGestureRecognizer(viewTapGestureRecognizer)
+        view.isUserInteractionEnabled = true
+        view.addGestureRecognizer(viewTapGestureRecognizer)
         phoneNumberTextFld.displayMode = .list
         
         phoneNumberTextFld.delegate = self
@@ -78,10 +68,10 @@ class EditProfileTableViewController: UITableViewController,  UIImagePickerContr
         setupUI()
     }
     
-    
     @objc func viewTap() {
-        self.view.endEditing(false)
+        view.endEditing(false)
     }
+    
     //    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
     //        return ""
     //    }
@@ -116,21 +106,20 @@ class EditProfileTableViewController: UITableViewController,  UIImagePickerContr
     }
     
     @IBAction func saveButtonPressed(_ sender: Any) {
-        if firstNameTextField.text != "" && lastNameTextField.text != "" && phoneNumberTextFld.text != "" {
-            
+        if firstNameTextField.text != "", lastNameTextField.text != "", phoneNumberTextFld.text != "" {
             if phoneNumber == "Not Valid" {
-                self.showMessage("Phone number is not valid", type: .error)
+                showMessage("Phone number is not valid", type: .error)
                 return
             }
             ProgressHUD.show("Saving...")
             
-            //block save button
+            // block save button
             saveButtonOutlet.isEnabled = false
             
             var fullName = firstNameTextField.text! + " " + lastNameTextField.text!
             fullName = fullName.removeExtraSpaces()
             
-            var withValues = [kFIRSTNAME : firstNameTextField.text!, kLASTNAME : lastNameTextField.text!, kFULLNAME : fullName, kPHONE : phoneNumber, kCOUNTRYCODE : countryCode]
+            var withValues = [kFIRSTNAME: firstNameTextField.text!, kLASTNAME: lastNameTextField.text!, kFULLNAME: fullName, kPHONE: phoneNumber, kCOUNTRYCODE: countryCode]
             
             var avatarData: Data?
             if avatarImage == nil {
@@ -144,12 +133,11 @@ class EditProfileTableViewController: UITableViewController,  UIImagePickerContr
             
             withValues[kAVATAR] = avatarString
             
-            
-            updateCurrentUserInFirestore(withValues: withValues) { (error) in
+            updateCurrentUserInFirestore(withValues: withValues) { error in
                 
                 if error != nil {
                     DispatchQueue.main.async {
-                       // ProgressHUD.showError(error!.localizedDescription)
+                        // ProgressHUD.showError(error!.localizedDescription)
                         self.showMessage("Could not update profile", type: .error)
                         print("could not update user \(error!.localizedDescription)")
                         ProgressHUD.dismiss()
@@ -159,38 +147,33 @@ class EditProfileTableViewController: UITableViewController,  UIImagePickerContr
                 
                 ProgressHUD.showSuccess("Saved")
                 self.saveButtonOutlet.isEnabled = true
-                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "UpdatedProfilePicture"), object: self, userInfo: ["picture" : self.avatarImage ?? UIImage(named: "avatarph")!]) // post notification to view controller
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: "UpdatedProfilePicture"), object: self, userInfo: ["picture": self.avatarImage ?? UIImage(named: "avatarph")!]) // post notification to view controller
                 self.navigationController?.popViewController(animated: true)
                 
                 let withUserFullName = self.firstNameTextField.text! + " " + self.lastNameTextField.text!
-                let withValuesForRecent = [kAVATAR : avatarString, kWITHUSERFULLNAME : withUserFullName]
+                let withValuesForRecent = [kAVATAR: avatarString, kWITHUSERFULLNAME: withUserFullName]
                 updateRecent(thatContainsID: FUser.currentId(), withValues: withValuesForRecent)
                 
                 let keywords = Array(createKeywords(word: fullName.lowercased().removeExtraSpaces()))
                 
-                reference(.UserKeywords).whereField("userId", isEqualTo: FUser.currentUser()!.objectId).getDocuments { (snapshot, error) in
+                reference(.UserKeywords).whereField("userId", isEqualTo: FUser.currentUser()!.objectId).getDocuments { snapshot, _ in
                     
                     guard let snapshot = snapshot else { return }
                     
                     if !snapshot.isEmpty {
-                        snapshot.documents.first!.reference.updateData(["keywords" : keywords])
+                        snapshot.documents.first!.reference.updateData(["keywords": keywords])
                     }
-                    
                 }
             }
             
-            
-            
-            
         } else {
-            self.showMessage(kEMPTYFIELDS, type: .error)
+            showMessage(kEMPTYFIELDS, type: .error)
         }
     }
     
-    //MARK: SetupUI
+    // MARK: SetupUI
     
     func setupUI() {
-        
         let currentUser = FUser.currentUser()!
         
         avatarImageView.isUserInteractionEnabled = true
@@ -203,29 +186,25 @@ class EditProfileTableViewController: UITableViewController,  UIImagePickerContr
         let countryCode = currentUser.phoneNumber.components(separatedBy: " ").first!
         self.phoneNumber = currentUser.phoneNumber
         self.countryCode = currentUser.countryCode
-         phoneNumberTextFld.tintColor = .green
-        let phoneNumber = currentUser.phoneNumber.components(separatedBy: " ").filter( { $0 != countryCode })
+        phoneNumberTextFld.tintColor = .green
+        let phoneNumber = currentUser.phoneNumber.components(separatedBy: " ").filter { $0 != countryCode }
         phoneNumberTextFld.text = phoneNumber.joined(separator: " ")
-    
-        //phoneNumberTextFld.set(phoneNumber: phoneNumber.joined())
+        
+        // phoneNumberTextFld.set(phoneNumber: phoneNumber.joined())
         
         if currentUser.avatar != "" {
-            imageFromData(pictureData: currentUser.avatar) { (avatarImage) in
+            imageFromData(pictureData: currentUser.avatar) { avatarImage in
                 
                 if avatarImage != nil {
-                    
                     self.avatarImage = avatarImage
                     self.avatarImageView.image = avatarImage
-                 
                 }
             }
         } else {
             avatarImageView.image = UIImage(named: "avatarph")
         }
-        self.avatarImageView.maskCircle()
+        avatarImageView.maskCircle()
     }
-    
-    
     
     //    //MARK: ImagePickerDelegate
     //
@@ -247,22 +226,22 @@ class EditProfileTableViewController: UITableViewController,  UIImagePickerContr
     //
     //
     
-    //MARK: UIImagePickerDelegate
+    // MARK: UIImagePickerDelegate
+    
     func imagePickerController(_ picker: UIImagePickerController,
-                               didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any])
-    {
+                               didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         guard let selectedImage = info[.originalImage] as? UIImage else {
             fatalError("Expected a dictionary containing an image, but was provided the following: \(info)")
         }
-        let chosenImage = selectedImage.resizeTo(MB: 1) //2
-        avatarImage = chosenImage //4
+        let chosenImage = selectedImage.resizeTo(MB: 1) // 2
+        avatarImage = chosenImage // 4
         //        let screenWidth = UIScreen.main.bounds
         //        print("*** * * * * * * * * *                  * **** ** **---------- * * * * ** * *:::::::::: \(screenWidth.size.width)")
         //        avatarImage = resizeImage(image: avatarImage!, targetSize: CGSize(width: screenWidth.size.width, height: screenWidth.size.width))
-        self.avatarImageView.image = self.avatarImage!
-        self.avatarImageView.maskCircle()
+        avatarImageView.image = avatarImage!
+        avatarImageView.maskCircle()
         
-        dismiss(animated:true, completion: nil) //5
+        dismiss(animated: true, completion: nil) // 5
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
@@ -270,11 +249,9 @@ class EditProfileTableViewController: UITableViewController,  UIImagePickerContr
     }
     
     func showAlert() {
-        
         let alert = UIAlertController(title: nil, message: "Change profile photo", preferredStyle: .actionSheet)
         if !(avatarImage == nil) {
-            
-            let resetAction = UIAlertAction(title: "Remove Current Photo", style: .destructive) { (alert) in
+            let resetAction = UIAlertAction(title: "Remove Current Photo", style: .destructive) { _ in
                 
                 self.avatarImage = nil
                 self.avatarImageView.image = UIImage(named: "avatarph")
@@ -282,40 +259,35 @@ class EditProfileTableViewController: UITableViewController,  UIImagePickerContr
             alert.addAction(resetAction)
         }
         
-        alert.addAction(UIAlertAction(title: "Take Photo", style: .default, handler: {(action: UIAlertAction) in
+        alert.addAction(UIAlertAction(title: "Take Photo", style: .default, handler: { (_: UIAlertAction) in
             self.getImage(fromSourceType: .camera)
         }))
-        alert.addAction(UIAlertAction(title: "Choose From Library", style: .default, handler: {(action: UIAlertAction) in
+        alert.addAction(UIAlertAction(title: "Choose From Library", style: .default, handler: { (_: UIAlertAction) in
             self.getImage(fromSourceType: .photoLibrary)
         }))
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: {
-            action in
+            _ in
             
         })
         alert.addAction(cancelAction)
         
         alert.preferredAction = cancelAction
         
-        
-        
         alert.view.tintColor = UIColor.getAppColor(.light)
-        self.present(alert, animated: true, completion:{
+        present(alert, animated: true, completion: {
             alert.view.superview?.isUserInteractionEnabled = true
             alert.view.superview?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.dismissOnTapOutside)))
         })
     }
     
-    @objc func dismissOnTapOutside(){
-        self.dismiss(animated: true, completion: nil)
+    @objc func dismissOnTapOutside() {
+        dismiss(animated: true, completion: nil)
     }
     
-    
     func getImage(fromSourceType sourceType: UIImagePickerController.SourceType) {
-        
-        //Check is source type available
+        // Check is source type available
         if UIImagePickerController.isSourceTypeAvailable(sourceType) {
-            
             let imagePickerController = UIImagePickerController()
             imagePickerController.delegate = self
             imagePickerController.allowsEditing = false
@@ -324,7 +296,3 @@ class EditProfileTableViewController: UITableViewController,  UIImagePickerContr
         }
     }
 }
-
-
-
-

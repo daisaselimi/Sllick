@@ -6,18 +6,17 @@
 //  Copyright © 2019 com.isaselimi. All rights reserved.
 //
 
-import UIKit
-import ProgressHUD
 import Firebase
+import ProgressHUD
+import UIKit
 
 class InviteUsersTableViewController: UITableViewController, UserTableViewCellDelegate {
     
-    
-    @IBOutlet weak var headerView: UIView!
+    @IBOutlet var headerView: UIView!
     
     var allUsers: [FUser] = []
-    var allUsersGrouped = NSDictionary() as! [String : [FUser]]
-    var sectionTitleList : [String] = []
+    var allUsersGrouped = NSDictionary() as! [String: [FUser]]
+    var sectionTitleList: [String] = []
     
     var newMemberIds: [String] = []
     var currentMembersIds: [String] = []
@@ -28,26 +27,26 @@ class InviteUsersTableViewController: UITableViewController, UserTableViewCellDe
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-           ProgressHUD.dismiss()
+        ProgressHUD.dismiss()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = "Users"
+        title = "Users"
         tableView.tableFooterView = UIView()
         
-        self.navigationItem.rightBarButtonItems = [UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(self.doneButtonPressed))]
-        self.navigationItem.rightBarButtonItem?.isEnabled = false
+        navigationItem.rightBarButtonItems = [UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(doneButtonPressed))]
+        navigationItem.rightBarButtonItem?.isEnabled = false
         currentMembersIds = group[kMEMBERS] as! [String]
     }
-
+    
     // MARK: - Table view data source
-
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return allUsersGrouped.count
     }
-
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         let sectionTitle = sectionTitleList[section]
@@ -58,8 +57,8 @@ class InviteUsersTableViewController: UITableViewController, UserTableViewCellDe
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! UserTableViewCell
         
-        let sectionTitle = self.sectionTitleList[indexPath.section]
-        let users = self.allUsersGrouped[sectionTitle]
+        let sectionTitle = sectionTitleList[indexPath.section]
+        let users = allUsersGrouped[sectionTitle]
         cell.generateCellWith(fUser: users![indexPath.row], indexPath: indexPath)
         cell.delegate = self
         return cell
@@ -80,8 +79,8 @@ class InviteUsersTableViewController: UITableViewController, UserTableViewCellDe
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        let sectionTitle = self.sectionTitleList[indexPath.section]
-        let users = self.allUsersGrouped[sectionTitle]
+        let sectionTitle = sectionTitleList[indexPath.section]
+        let users = allUsersGrouped[sectionTitle]
         
         let selectedUser = users![indexPath.row]
         
@@ -98,7 +97,7 @@ class InviteUsersTableViewController: UITableViewController, UserTableViewCellDe
             }
         }
         
-        //add/remove users
+        // add/remove users
         let selected = newMemberIds.contains(selectedUser.objectId)
         
         if selected {
@@ -108,12 +107,10 @@ class InviteUsersTableViewController: UITableViewController, UserTableViewCellDe
             newMemberIds.append(selectedUser.objectId)
         }
         
-        self.navigationItem.rightBarButtonItem?.isEnabled = newMemberIds.count > 0
+        navigationItem.rightBarButtonItem?.isEnabled = newMemberIds.count > 0
     }
     
-    
-   
-    //MARK: IBActions
+    // MARK: IBActions
     
     @IBAction func filterSengmentValueChanged(_ sender: UISegmentedControl) {
         switch sender.selectedSegmentIndex {
@@ -132,26 +129,24 @@ class InviteUsersTableViewController: UITableViewController, UserTableViewCellDe
         updateGroup(group: group)
     }
     
-    //MARK: UserTableViewCellDelegate
+    // MARK: UserTableViewCellDelegate
     
     func didTapAvatarImage(indexPath: IndexPath) {
-        
         print("user avatar tapped at: \(indexPath)")
-        let viewController = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "profileView") as! ProfileTableViewController
+        let viewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "profileView") as! ProfileTableViewController
         
-        let sectionTitle = self.sectionTitleList[indexPath.section]
+        let sectionTitle = sectionTitleList[indexPath.section]
         
-        let users = self.allUsersGrouped[sectionTitle]
+        let users = allUsersGrouped[sectionTitle]
         
         viewController.user = users![indexPath.row]
-        self.navigationController?.pushViewController(viewController, animated: true)
+        navigationController?.pushViewController(viewController, animated: true)
     }
     
-    
-    //MARK: Helper
+    // MARK: Helper
     
     func loadUsers(filter: String) {
-          ProgressHUD.show()
+        ProgressHUD.show()
         
         var query: Query!
         
@@ -164,27 +159,26 @@ class InviteUsersTableViewController: UITableViewController, UserTableViewCellDe
             query = reference(.User).order(by: kFIRSTNAME, descending: false)
         }
         
-        query.getDocuments { (snapshot, error) in
+        query.getDocuments { snapshot, error in
             self.allUsers = []
             self.sectionTitleList = []
             self.allUsersGrouped = [:]
             
             if error != nil {
                 print(error!.localizedDescription)
-                   ProgressHUD.dismiss()
+                ProgressHUD.dismiss()
                 self.tableView.reloadData()
                 return
             }
             
-            guard let snapshot = snapshot else {    ProgressHUD.dismiss(); return }
+            guard let snapshot = snapshot else { ProgressHUD.dismiss(); return }
             
             if !snapshot.isEmpty {
-                
                 for userDictionary in snapshot.documents {
                     let userDictionary = userDictionary.data() as NSDictionary
                     let fUser = FUser(_dictionary: userDictionary)
                     
-                    if(fUser.objectId != FUser.currentId() && !fUser.blockedUsers.contains(FUser.currentUser()!.objectId)) {
+                    if fUser.objectId != FUser.currentId(), !fUser.blockedUsers.contains(FUser.currentUser()!.objectId) {
                         self.allUsers.append(fUser)
                     }
                 }
@@ -194,12 +188,11 @@ class InviteUsersTableViewController: UITableViewController, UserTableViewCellDe
             }
             
             self.tableView.reloadData()
-               ProgressHUD.dismiss()
+            ProgressHUD.dismiss()
         }
     }
     
     func splitDataIntoSections() {
-        
         var sectionTitle: String = ""
         
         for i in 0..<allUsers.count {
@@ -208,11 +201,11 @@ class InviteUsersTableViewController: UITableViewController, UserTableViewCellDe
             
             if firstCharacter != sectionTitle {
                 sectionTitle = firstCharacter
-                self.allUsersGrouped[sectionTitle] = []
-                self.sectionTitleList.append(sectionTitle)
+                allUsersGrouped[sectionTitle] = []
+                sectionTitleList.append(sectionTitle)
             }
             
-            self.allUsersGrouped[sectionTitle]?.append(currentUser)
+            allUsersGrouped[sectionTitle]?.append(currentUser)
         }
     }
     
@@ -220,20 +213,18 @@ class InviteUsersTableViewController: UITableViewController, UserTableViewCellDe
         let tempMembers = currentMembersIds + newMemberIds
         let tempMembersToPush = group[kMEMBERSTOPUSH] as! [String] + newMemberIds
         
-        let withValues = [kMEMBERS : tempMembers, kMEMBERSTOPUSH : tempMembersToPush]
+        let withValues = [kMEMBERS: tempMembers, kMEMBERSTOPUSH: tempMembersToPush]
         
         Group.updateGroup(groupId: group[kGROUPID] as! String, withValues: withValues)
         
         createRecentsForNewMembers(groupId: group[kGROUPID] as! String, groupName: group[kNAME] as! String, membersToPush: tempMembersToPush, avatar: group[kAVATAR] as! String)
         
-    
         updateExistingRecentWithNewValues(forMembers: group[kMEMBERS] as! [String], chatRoomId: group[kGROUPID] as! String, withValues: withValues)
         
         goToGroupChat(membersToPush: tempMembersToPush, members: tempMembers)
     }
     
-    func  goToGroupChat(membersToPush: [String], members: [String]) {
-        
+    func goToGroupChat(membersToPush: [String], members: [String]) {
         let chatVC = ChatViewController()
         chatVC.titleName = (group[kNAME] as! String)
         chatVC.memberIds = members
@@ -242,6 +233,6 @@ class InviteUsersTableViewController: UITableViewController, UserTableViewCellDe
         chatVC.chatRoomId = (group[kGROUPID] as! String)
         chatVC.isGroup = true
         chatVC.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(chatVC, animated: true)
+        navigationController?.pushViewController(chatVC, animated: true)
     }
 }

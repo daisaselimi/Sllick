@@ -6,21 +6,21 @@
 //  Copyright © 2019 com.isaselimi. All rights reserved.
 //
 
-import UIKit
-import ProgressHUD
 import AMPopTip
 import FirebaseFirestore
+import ProgressHUD
+import UIKit
 
 class GroupTableViewController: UITableViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UICollectionViewDelegate, UICollectionViewDataSource, GroupMemberCollectionViewCellDelegate, UICollectionViewDelegateFlowLayout {
     
-    @IBOutlet weak var cameraButtonOutlet: UIImageView!
-    @IBOutlet weak var groupNameTextField: UITextField!
-    @IBOutlet weak var editButtonOutlet: UIButton!
-    @IBOutlet weak var groupMembersCollectionView: UICollectionView!
-    @IBOutlet weak var saveButtonOutlet: MyButton!
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet var cameraButtonOutlet: UIImageView!
+    @IBOutlet var groupNameTextField: UITextField!
+    @IBOutlet var editButtonOutlet: UIButton!
+    @IBOutlet var groupMembersCollectionView: UICollectionView!
+    @IBOutlet var saveButtonOutlet: MyButton!
+    @IBOutlet var activityIndicator: UIActivityIndicatorView!
     
-    @IBOutlet weak var muteGroupButton: UIButton!
+    @IBOutlet var muteGroupButton: UIButton!
     
     var tapGestureRecognizer = UITapGestureRecognizer()
     
@@ -40,14 +40,14 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
     
     override func viewDidLoad() {
         firstLoad = true
-   
+        
         super.viewDidLoad()
         
-     activityIndicator.isHidden = false
-         tableView.separatorInset = UIEdgeInsets(top: 0, left: 50, bottom: 0, right: 0)
-          activityIndicator.hidesWhenStopped = true
-      //  groupNameTextField.addBottomBorder()
-          activityIndicator.startAnimating()
+        activityIndicator.isHidden = false
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 50, bottom: 0, right: 0)
+        activityIndicator.hidesWhenStopped = true
+        //  groupNameTextField.addBottomBorder()
+        activityIndicator.startAnimating()
         setupUI()
         allMembersToPush = group[kMEMBERSTOPUSH] as! [String]
         muted = !(group[kMEMBERSTOPUSH] as! [String]).contains(FUser.currentId())
@@ -57,15 +57,14 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
 //        saveButtonOutlet.layer.borderColor = UIColor.secondaryLabel.cgColor
         groupMembersCollectionView.delegate = self
         groupMembersCollectionView.dataSource = self
-  
+        
         tapGestureRecognizer.addTarget(self, action: #selector(avatarImageTap))
         removeKeyboardGestureRecognizer.addTarget(self, action: #selector(viewTapped))
-        self.view.addGestureRecognizer(removeKeyboardGestureRecognizer)
+        view.addGestureRecognizer(removeKeyboardGestureRecognizer)
         cameraButtonOutlet.addGestureRecognizer(tapGestureRecognizer)
-       //   ProgressHUD.show()
+        //   ProgressHUD.show()
         
-        
-        getGroupMembers(completion: { (users) in
+        getGroupMembers(completion: { users in
             self.allMembers = users
             let showedGroupTips = userDefaults.bool(forKey: kSHOWEDGROUPTIPS)
             print(showedGroupTips)
@@ -73,7 +72,7 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
                 if !showedGroupTips {
                     let popTip = PopTip()
                     
-                    popTip.show(text: "Long press members' pictures to remove them from group", direction: .none, maxWidth: 200, in:  self.groupMembersCollectionView, from: self.groupMembersCollectionView.frame, duration: 10)
+                    popTip.show(text: "Long press members' pictures to remove them from group", direction: .none, maxWidth: 200, in: self.groupMembersCollectionView, from: self.groupMembersCollectionView.frame, duration: 10)
                     
                     popTip.entranceAnimation = .scale
                     popTip.actionAnimation = .bounce(5)
@@ -85,48 +84,45 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
                     userDefaults.set(true, forKey: kSHOWEDGROUPTIPS)
                 }
                 
-            }else {
+            } else {
                 self.groupMembersCollectionView.setEmptyMessage("No members to show")
             }
-            self.groupMembersCollectionView.reloadData() {
-                   ProgressHUD.dismiss()
+            self.groupMembersCollectionView.reloadData {
+                ProgressHUD.dismiss()
                 if let activityIndic = self.activityIndicator {
                     activityIndic.stopAnimating()
                 }
-           
+                
                 print("xxxxxx")
             }
         })
         cameraButtonOutlet.isUserInteractionEnabled = true
         var inviteImage = UIImage(systemName: "plus.circle.fill")
-        let inviteButton = UIBarButtonItem(image: inviteImage, style: .plain, target: self, action: #selector(self.inviteUsers))
+        let inviteButton = UIBarButtonItem(image: inviteImage, style: .plain, target: self, action: #selector(inviteUsers))
         inviteButton.tintColor = UIColor.systemIndigo
-        self.navigationItem.rightBarButtonItems = [inviteButton]
-        self.navigationItem.largeTitleDisplayMode = .never
-     
+        navigationItem.rightBarButtonItems = [inviteButton]
+        navigationItem.largeTitleDisplayMode = .never
+        
         // Do any additional setup after loading the view.
     }
+    
     override func viewDidAppear(_ animated: Bool) {
-        
-
         registerGroupListener()
     }
     
     func registerGroupListener() {
-        
-              self.groupChangedListener = reference(.Group).whereField(kGROUPID, isEqualTo : self.group![kGROUPID] as! String).addSnapshotListener({ (snapshot, error) in
-                  
-                  guard let snapshot = snapshot else { return }
-                  
-                  if !snapshot.isEmpty {
-                      snapshot.documentChanges.forEach { (diff) in
-                        if diff.type == .modified {
-                            
-                            self.group = diff.document.data() as NSDictionary
-                            self.getGroupMembers { (users) in
-                                self.allMembers = users
-                                self.groupMembersCollectionView.reloadData()
-                            }
+        groupChangedListener = reference(.Group).whereField(kGROUPID, isEqualTo: group![kGROUPID] as! String).addSnapshotListener { snapshot, _ in
+            
+            guard let snapshot = snapshot else { return }
+            
+            if !snapshot.isEmpty {
+                snapshot.documentChanges.forEach { diff in
+                    if diff.type == .modified {
+                        self.group = diff.document.data() as NSDictionary
+                        self.getGroupMembers { users in
+                            self.allMembers = users
+                            self.groupMembersCollectionView.reloadData()
+                        }
 //                            self.groupNameTextField.text = (self.group[kNAME] as! String)
 //                            if self.group[kAVATAR] as! String == "" {
 //                                self.cameraButtonOutlet.image =  UIImage(named: "groupph")
@@ -135,17 +131,16 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
 //                                imageFromData(pictureData: self.group[kAVATAR] as! String) { (image) in
 //                                    self.cameraButtonOutlet.image = image!
 //                                    self.groupIcon = image!f   }
-//                                
+//
 //                            }
-                         
-                            if !(self.group![kMEMBERS] as! [String]).contains(FUser.currentId()) {
-                                self.navigationController?.popViewController(animated: true)
-                            }
-                            
+                        
+                        if !(self.group![kMEMBERS] as! [String]).contains(FUser.currentId()) {
+                            self.navigationController?.popViewController(animated: true)
                         }
-                      }
-                  }
-              })
+                    }
+                }
+            }
+        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -167,32 +162,28 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
         return 1
     }
     
-
-
-    
     override func viewWillDisappear(_ animated: Bool) {
-         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
-  
         pendingToDelete.removeAll()
         if !firstLoad {
             groupMembersCollectionView.reloadData()
-            self.navigationItem.rightBarButtonItems?.first?.isEnabled = false
-           //   ProgressHUD.show()
+            navigationItem.rightBarButtonItems?.first?.isEnabled = false
+            //   ProgressHUD.show()
             Group.getGroup(groupId: group[kGROUPID]! as! String, completion: { updatedGroup in
                 self.group = updatedGroup
                 self.navigationItem.rightBarButtonItems?.first?.isEnabled = true
                 
-                self.getGroupMembers(completion: { (users) in
-                    if !users.isEmpty{
+                self.getGroupMembers(completion: { users in
+                    if !users.isEmpty {
                         self.groupMembersCollectionView.restore()
                         self.allMembers = []
                         self.allMembersToPush = self.group[kMEMBERSTOPUSH] as! [String]
                         self.allMembers = users
-                        self.groupMembersCollectionView.reloadData() {
-                           //    ProgressHUD.dismiss()
+                        self.groupMembersCollectionView.reloadData {
+                            //    ProgressHUD.dismiss()
                         }
                     } else {
                         self.groupMembersCollectionView.setEmptyMessage("No members to show")
@@ -206,12 +197,9 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
         }
     }
     
-    
-    
-    //MARK: Collection view DataSource, delegate
+    // MARK: Collection view DataSource, delegate
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-     
         return allMembers.count
     }
     
@@ -231,20 +219,18 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        
         let totalCellWidth = 87 * collectionView.numberOfItems(inSection: section)
         let totalSpacingWidth = 10 * (collectionView.numberOfItems(inSection: section) - 1)
         
-        let leftInset = max(0.0, (self.groupMembersCollectionView.frame.width - CGFloat(totalCellWidth + totalSpacingWidth)) / 2)
+        let leftInset = max(0.0, (groupMembersCollectionView.frame.width - CGFloat(totalCellWidth + totalSpacingWidth)) / 2)
         let rightInset = leftInset
         
         return UIEdgeInsets(top: 0, left: leftInset, bottom: 0, right: rightInset)
     }
     
+    // MARK: GroupCell delegate
     
-    //MARK: GroupCell delegate
     func didClickDeleteButton(indexPath: IndexPath) {
-        
         allMembersToPush = group[kMEMBERSTOPUSH] as! [String]
         if allMembersToPush.contains(allMembers[indexPath.row].objectId) {
             print(allMembers[indexPath.row].fullname)
@@ -256,25 +242,25 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
         let removedId = allMembers[indexPath.row].objectId
         allMembers.remove(at: indexPath.row)
         if allMembers.count == 0 {
-               self.groupMembersCollectionView.setEmptyMessage("No members to show")
+            groupMembersCollectionView.setEmptyMessage("No members to show")
         } else {
-            self.groupMembersCollectionView.restore()
+            groupMembersCollectionView.restore()
         }
         
         var members = allMembers.map { $0.objectId }
         members.append(FUser.currentId())
-          self.navigationItem.rightBarButtonItems?.first?.isEnabled = false
-        Group.updateGroup(groupId: group![kGROUPID] as! String, withValues: [kMEMBERS : members, kMEMBERSTOPUSH : allMembersToPush])
-        Group.getGroup(groupId: group![kGROUPID] as! String) { (updatedGroup) in
+        navigationItem.rightBarButtonItems?.first?.isEnabled = false
+        Group.updateGroup(groupId: group![kGROUPID] as! String, withValues: [kMEMBERS: members, kMEMBERSTOPUSH: allMembersToPush])
+        Group.getGroup(groupId: group![kGROUPID] as! String) { updatedGroup in
             self.group = updatedGroup
-              self.navigationItem.rightBarButtonItems?.first?.isEnabled = true
+            self.navigationItem.rightBarButtonItems?.first?.isEnabled = true
             self.delegate?.updatedGroupMembers(group: updatedGroup)
         }
-       
+        
         var updateForMembers = members
         updateForMembers.append(removedId)
-        self.groupMembersCollectionView.reloadData()
-          updateExistingRecentWithNewValues(forMembers: updateForMembers, chatRoomId: group![kGROUPID] as! String, withValues: [kMEMBERS : members, kMEMBERSTOPUSH : allMembersToPush])
+        groupMembersCollectionView.reloadData()
+        updateExistingRecentWithNewValues(forMembers: updateForMembers, chatRoomId: group![kGROUPID] as! String, withValues: [kMEMBERS: members, kMEMBERSTOPUSH: allMembersToPush])
     }
     
     var pendingToDelete: Set<String> = []
@@ -288,7 +274,7 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
     
     func didTapAvatarImage(indexPath: IndexPath) {
         print(pendingToDelete)
-        if pendingToDelete.contains(allMembers[indexPath.row].objectId){
+        if pendingToDelete.contains(allMembers[indexPath.row].objectId) {
             pendingToDelete.remove(allMembers[indexPath.row].objectId)
             print(pendingToDelete)
         }
@@ -297,24 +283,22 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
         cell.deleteButtonOutlet.isHidden = true
     }
     
-    
     func getGroupMembers(completion: @escaping ([FUser]) -> Void) {
-        
-        getUsersFromFirestore(withIds: group[kMEMBERS] as! [String]){ (users) in
+        getUsersFromFirestore(withIds: group[kMEMBERS] as! [String]) { users in
             completion(users.sorted(by: { $0.firstname < $1.firstname }))
             self.delegate?.updatedGroupMembers(group: self.group!)
         }
     }
     
-    //MARK: IBOutlets
+    // MARK: IBOutlets
     
     @objc func avatarImageTap() {
         showIconOptions()
     }
     
     @objc func viewTapped() {
-        self.view.endEditing(false)
-        if(!pendingToDelete.isEmpty){
+        view.endEditing(false)
+        if !pendingToDelete.isEmpty {
             pendingToDelete.removeAll()
             groupMembersCollectionView.reloadData()
         }
@@ -326,20 +310,19 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
         //            contactsVC.isGroup = false
         //            self.navigationController?.pushViewController(contactsVC, animated: true)
         
-        
         //        let userVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "inviteUsersView") as! InviteUsersTableViewController
         //        userVC.group = group
         ////
         ////        let i = navigationController?.viewControllers.firstIndex(of: self)
         ////        let previousViewController = navigationController?.viewControllers[i!-1] as! ChatViewController
         //        self.navigationController?.pushViewController(userVC, animated: true)
-  
-        let contactsVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(identifier: "contactsView") as! ContactsTableViewController
+        
+        let contactsVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(identifier: "contactsView") as! ContactsTableViewController
         contactsVC.isGroup = true
         contactsVC.title = "Invite from contacts"
         contactsVC.isInviting = true
-        contactsVC.group = self.group
-            self.navigationController?.pushViewController(contactsVC, animated: true)
+        contactsVC.group = group
+        navigationController?.pushViewController(contactsVC, animated: true)
     }
     
     @IBAction func editButtonPressed(_ sender: Any) {
@@ -347,15 +330,13 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
     }
     
     @IBAction func saveButtonPressed(_ sender: Any) {
-        var withValues: [String : Any]!
+        var withValues: [String: Any]!
         
         if groupNameTextField.text != "" {
-            withValues = [kNAME : groupNameTextField.text!]
+            withValues = [kNAME: groupNameTextField.text!]
         } else {
             ProgressHUD.showError("Subject is required")
         }
-        
-        
         
         let avatarData = cameraButtonOutlet.image!.jpegData(compressionQuality: 0.5)
         
@@ -365,39 +346,35 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
             avatarString = ""
         }
         
-        withValues = [kNAME : groupNameTextField.text!, kAVATAR : avatarString!]
+        withValues = [kNAME: groupNameTextField.text!, kAVATAR: avatarString!]
         
         Group.updateGroup(groupId: group![kGROUPID] as! String, withValues: withValues)
         
-        withValues = [kWITHUSERFULLNAME : groupNameTextField.text!, kAVATAR : avatarString!]
+        withValues = [kWITHUSERFULLNAME: groupNameTextField.text!, kAVATAR: avatarString!]
         
         updateExistingRecentWithNewValues(forMembers: group[kMEMBERS] as! [String], chatRoomId: group[kGROUPID] as! String, withValues: withValues)
         
-        
-        
         let i = navigationController?.viewControllers.firstIndex(of: self)
         
-        
-        if let previousViewController = navigationController?.viewControllers[i!-1] as? ChatViewController {
-            //let group1 = NSMutableDictionary.init(dictionary: group)
+        if let previousViewController = navigationController?.viewControllers[i! - 1] as? ChatViewController {
+            // let group1 = NSMutableDictionary.init(dictionary: group)
 //            group1.setValue(groupNameTextField.text! as Any, forKey: kNAME)
 //            group1.setValue(avatarString! as Any, forKey: kAVATAR)
 //            group = group1
 //            previousViewController.group = group
-            Group.getGroup(groupId: group![kGROUPID] as! String) { (grp) in
+            Group.getGroup(groupId: group![kGROUPID] as! String) { grp in
                 self.delegate?.updatedGroupMembers(group: grp)
                 self.navigationController?.popViewController(animated: true) {
                     previousViewController.setUIForGroupChat()
                 }
             }
-         
+            
         } else {
-            self.navigationController?.popViewController(animated: true)
+            navigationController?.popViewController(animated: true)
         }
     }
     
     @IBAction func muteGroupPressed(_ sender: Any) {
-        
         var membersToPush = group[kMEMBERSTOPUSH] as! [String]
         
         if !muted {
@@ -409,33 +386,29 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
             muteGroupButton.setTitle("Mute Group", for: .normal)
             muted = false
         }
-
-        Group.updateGroup(groupId:group[kGROUPID] as! String, withValues: [kMEMBERSTOPUSH : membersToPush])
-        updateExistingRecentWithNewValues(forMembers: [FUser.currentId()], chatRoomId: group[kGROUPID] as! String, withValues: [kMEMBERSTOPUSH : membersToPush])
+        
+        Group.updateGroup(groupId: group[kGROUPID] as! String, withValues: [kMEMBERSTOPUSH: membersToPush])
+        updateExistingRecentWithNewValues(forMembers: [FUser.currentId()], chatRoomId: group[kGROUPID] as! String, withValues: [kMEMBERSTOPUSH: membersToPush])
     }
     
     @IBAction func leaveGroupPressed(_ sender: Any) {
-        
         let members = (group![kMEMBERS] as! [String]).filter { $0 != FUser.currentId() }
-        let membersToPush =  (group![kMEMBERSTOPUSH] as! [String]).filter { $0 != FUser.currentId() }
-        Group.updateGroup(groupId: group![kGROUPID] as! String, withValues: [kMEMBERS : members, kMEMBERSTOPUSH : membersToPush])
-        updateExistingRecentWithNewValues(forMembers: [FUser.currentId()], chatRoomId: group![kGROUPID] as! String, withValues: [kMEMBERS : members, kMEMBERSTOPUSH : allMembersToPush])
-        self.navigationController?.popToRootViewController(animated: true)
-    
+        let membersToPush = (group![kMEMBERSTOPUSH] as! [String]).filter { $0 != FUser.currentId() }
+        Group.updateGroup(groupId: group![kGROUPID] as! String, withValues: [kMEMBERS: members, kMEMBERSTOPUSH: membersToPush])
+        updateExistingRecentWithNewValues(forMembers: [FUser.currentId()], chatRoomId: group![kGROUPID] as! String, withValues: [kMEMBERS: members, kMEMBERSTOPUSH: allMembersToPush])
+        navigationController?.popToRootViewController(animated: true)
     }
     
     var groupId: String!
     
-    //MARK: Helpers
+    // MARK: Helpers
     
     func setupUI() {
-        
-        self.title = "Group"
+        title = "Group"
         groupNameTextField.text = (group[kNAME] as! String)
-        imageFromData(pictureData: group[kAVATAR] as! String) { (avatarImage) in
+        imageFromData(pictureData: group[kAVATAR] as! String) { avatarImage in
             
             if avatarImage != nil {
-                
                 self.cameraButtonOutlet.image = avatarImage
                 self.groupIcon = avatarImage
                 self.cameraButtonOutlet.maskCircle()
@@ -447,12 +420,10 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
     }
     
     func showIconOptions() {
-        
         let alert = UIAlertController(title: nil, message: "Change group photo", preferredStyle: .actionSheet)
         
         if groupIcon != nil {
-            
-            let resetAction = UIAlertAction(title: "Remove Current Photo", style: .destructive) { (alert) in
+            let resetAction = UIAlertAction(title: "Remove Current Photo", style: .destructive) { _ in
                 
                 self.groupIcon = nil
                 self.cameraButtonOutlet.image = UIImage(named: "groupph")
@@ -461,36 +432,32 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
             alert.addAction(resetAction)
         }
         
-        alert.addAction(UIAlertAction(title: "Take Photo", style: .default, handler: {(action: UIAlertAction) in
+        alert.addAction(UIAlertAction(title: "Take Photo", style: .default, handler: { (_: UIAlertAction) in
             self.getImage(fromSourceType: .camera)
         }))
-        alert.addAction(UIAlertAction(title: "Choose From Library", style: .default, handler: {(action: UIAlertAction) in
+        alert.addAction(UIAlertAction(title: "Choose From Library", style: .default, handler: { (_: UIAlertAction) in
             self.getImage(fromSourceType: .photoLibrary)
         }))
-        
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
         alert.view.tintColor = UIColor.getAppColor(.light)
-        if ( UIDevice().userInterfaceIdiom == .pad ) {
+        if UIDevice().userInterfaceIdiom == .pad {
             if let currentPopoverpresentioncontroller = alert.popoverPresentationController {
                 currentPopoverpresentioncontroller.sourceView = editButtonOutlet
                 currentPopoverpresentioncontroller.sourceRect = editButtonOutlet.bounds
                 
                 currentPopoverpresentioncontroller.permittedArrowDirections = .up
-                self.present(alert, animated: true, completion: nil)
+                present(alert, animated: true, completion: nil)
             }
         } else {
-            
-            self.present(alert, animated: true, completion: nil)
+            present(alert, animated: true, completion: nil)
         }
     }
     
     func getImage(fromSourceType sourceType: UIImagePickerController.SourceType) {
-        
-        //Check is source type available
+        // Check is source type available
         if UIImagePickerController.isSourceTypeAvailable(sourceType) {
-            
             let imagePickerController = UIImagePickerController()
             imagePickerController.delegate = self
             imagePickerController.allowsEditing = false
@@ -502,31 +469,22 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
     // UIImagePicker delegate
     
     func imagePickerController(_ picker: UIImagePickerController,
-                               didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any])
-    {
+                               didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         guard let selectedImage = info[.originalImage] as? UIImage else {
             fatalError("Expected a dictionary containing an image, but was provided the following: \(info)")
         }
-        let chosenImage = selectedImage.resizeTo(MB: 1) //2
-        groupIcon = chosenImage //4
+        let chosenImage = selectedImage.resizeTo(MB: 1) // 2
+        groupIcon = chosenImage // 4
         //        let screenWidth = UIScreen.main.bounds
         //        print("*** * * * * * * * * *                  * **** ** **---------- * * * * ** * *:::::::::: \(screenWidth.size.width)")
         //        avatarImage = resizeImage(image: avatarImage!, targetSize: CGSize(width: screenWidth.size.width, height: screenWidth.size.width))
-        self.cameraButtonOutlet.image = self.groupIcon!
-        self.cameraButtonOutlet.maskCircle()
+        cameraButtonOutlet.image = groupIcon!
+        cameraButtonOutlet.maskCircle()
         
-        dismiss(animated:true, completion: nil) //5
+        dismiss(animated: true, completion: nil) // 5
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true, completion: nil)
     }
 }
-
-//extension UICollectionView {
-//    func reloadData(_ completion: @escaping () -> Void) {
-//        reloadData()
-//        DispatchQueue.main.async { completion() }
-//    }
-//}
-

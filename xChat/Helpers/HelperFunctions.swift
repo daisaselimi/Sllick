@@ -6,17 +6,17 @@
 //  Copyright © 2019 com.isaselimi. All rights reserved.
 //
 
-import Foundation
-import UIKit
-import FirebaseFirestore
 import AVFoundation
 import Contacts
+import FirebaseFirestore
+import Foundation
+import UIKit
 
-//MARK: GLOBAL FUNCTIONS
+// MARK: GLOBAL FUNCTIONS
+
 private let dateFormat = "yyyyMMddHHmmss"
 
 func dateFormatter() -> DateFormatter {
-    
     let dateFormatter = DateFormatter()
     
     dateFormatter.timeZone = TimeZone(secondsFromGMT: TimeZone.current.secondsFromGMT())
@@ -26,13 +26,11 @@ func dateFormatter() -> DateFormatter {
     return dateFormatter
 }
 
-
 func imageFromInitials(firstName: String?, lastName: String?, withBlock: @escaping (_ image: UIImage) -> Void) {
-    
     var string: String!
     var size = 36
     
-    if firstName != nil && lastName != nil {
+    if firstName != nil, lastName != nil {
         string = String(firstName!.first!).uppercased() + String(lastName!.first!).uppercased()
     } else {
         string = String(firstName!.first!).uppercased()
@@ -58,7 +56,6 @@ func imageFromInitials(firstName: String?, lastName: String?, withBlock: @escapi
 }
 
 func imageFromData(pictureData: String, withBlock: (_ image: UIImage?) -> Void) {
-    
     var image: UIImage?
     
     let decodedData = NSData(base64Encoded: pictureData, options: NSData.Base64DecodingOptions(rawValue: 0))
@@ -68,7 +65,7 @@ func imageFromData(pictureData: String, withBlock: (_ image: UIImage?) -> Void) 
     withBlock(image)
 }
 
-//func timeElapsed(date: Date) -> String {
+// func timeElapsed(date: Date) -> String {
 //
 //    let seconds = NSDate().timeIntervalSince(date)
 //
@@ -101,35 +98,34 @@ func imageFromData(pictureData: String, withBlock: (_ image: UIImage?) -> Void) 
 //    }
 //
 //    return elapsed!
-//}
+// }
 
 func timeElapsed(seconds: Int) -> String {
     var elapsed: String!
     
-        if (seconds < 60) {
-            elapsed = "just now"
-        } else if (seconds < 60 * 60) {
-            let minutes = Int(seconds / 60)
-    
-            let minText = "m"
-            elapsed = "\(minutes)\(minText)"
-    
-        } else if (seconds < 24 * 60 * 60) {
-            let hours = Int(seconds / (60 * 60))
-            let hourText = "h"
-            elapsed = "\(hours)\(hourText)"
-        } else {
-            let currentDateFormater = dateFormatter()
-            currentDateFormater.dateFormat = "dd/MM/YYYY"
-    
-            elapsed = "more than a day ago)"
-        }
+    if seconds < 60 {
+        elapsed = "just now"
+    } else if seconds < 60 * 60 {
+        let minutes = Int(seconds / 60)
+        
+        let minText = "m"
+        elapsed = "\(minutes)\(minText)"
+        
+    } else if seconds < 24 * 60 * 60 {
+        let hours = Int(seconds / (60 * 60))
+        let hourText = "h"
+        elapsed = "\(hours)\(hourText)"
+    } else {
+        let currentDateFormater = dateFormatter()
+        currentDateFormater.dateFormat = "dd/MM/YYYY"
+        
+        elapsed = "more than a day ago)"
+    }
     
     return elapsed
 }
 
 func timeElapsed(date: Date) -> String {
-    
     let seconds = NSDate().timeIntervalSince(date)
     
     var elapsed: String?
@@ -158,12 +154,11 @@ func timeElapsed(date: Date) -> String {
         let currentDateFormater = dateFormatter()
         currentDateFormater.dateFormat = "HH:mm"
         elapsed = "\(currentDateFormater.string(from: date))"
-    }
-    else if seconds < 24 * 60 * 60 * 7 {
-      let currentDateFormater = dateFormatter()
+    } else if seconds < 24 * 60 * 60 * 7 {
+        let currentDateFormater = dateFormatter()
         currentDateFormater.dateFormat = "E"
         elapsed = "\(currentDateFormater.string(from: date))"
-    }else if seconds < 24 * 60 * 60 * 365 {
+    } else if seconds < 24 * 60 * 60 * 365 {
         let currentDateFormater = dateFormatter()
         currentDateFormater.dateFormat = "d MMM"
         elapsed = "\(currentDateFormater.string(from: date))"
@@ -177,46 +172,39 @@ func timeElapsed(date: Date) -> String {
     return elapsed!
 }
 
-//for avatars
+// for avatars
 func dataImageFromString(pictureString: String, withBlock: (_ image: Data?) -> Void) {
-    
     let imageData = NSData(base64Encoded: pictureString, options: NSData.Base64DecodingOptions(rawValue: 0))
     
     withBlock(imageData as Data?)
 }
 
-
-//for calls and chats
+// for calls and chats
 func dictionaryFromSnapshots(snapshots: [DocumentSnapshot]) -> [NSDictionary] {
-    
     var allMessages: [NSDictionary] = []
 //    for snapshot in snapshots{
 //        allMessages.append(snapshot.data() as! NSDictionary)
 //    }
-    allMessages = snapshots.map({ $0.data()! as NSDictionary })
+    allMessages = snapshots.map { $0.data()! as NSDictionary }
     return allMessages
 }
 
 func dictionaryFromSnapshots(snapshots: [DocumentSnapshot], endIndex: Int) -> [NSDictionary] {
-    
     var allMessages: [NSDictionary] = []
-    for snapshot in snapshots.prefix(endIndex){
+    for snapshot in snapshots.prefix(endIndex) {
         allMessages.append(snapshot.data() as! NSDictionary)
     }
     return allMessages
 }
 
 func formatCallTime(date: Date) -> String {
-    
     let seconds = NSDate().timeIntervalSince(date)
     
     var elapsed: String?
     
-    
-    if (seconds < 60) {
+    if seconds < 60 {
         elapsed = "Just now"
-    }  else if (seconds < 24 * 60 * 60) {
-        
+    } else if seconds < 24 * 60 * 60 {
         let currentDateFormater = dateFormatter()
         currentDateFormater.dateFormat = "HH:mm"
         
@@ -231,57 +219,50 @@ func formatCallTime(date: Date) -> String {
     return elapsed!
 }
 
-func resize(image:UIImage) -> Data? {
-    if let imageData = image.pngData(){ //if there is an image start the checks and possible compression
-    let size = imageData.count / 1024
-        if size > 1024 { //if the image data size is > 1024
-        let compressionValue = CGFloat(1024 / Double(size))//get the compression value needed in order to bring the image down to 1024
-            return image.jpegData(compressionQuality: compressionValue) //return the compressed image data
+func resize(image: UIImage) -> Data? {
+    if let imageData = image.pngData() { // if there is an image start the checks and possible compression
+        let size = imageData.count / 1024
+        if size > 1024 { // if the image data size is > 1024
+            let compressionValue = CGFloat(1024 / Double(size)) // get the compression value needed in order to bring the image down to 1024
+            return image.jpegData(compressionQuality: compressionValue) // return the compressed image data
+        } else { // if your image <= 1024 nothing needs to be done and return it as is
+            return imageData
         }
-        else{ //if your image <= 1024 nothing needs to be done and return it as is
-          return imageData
-        }
-    }
-    else{ //if it cant get image data return nothing
+    } else { // if it cant get image data return nothing
         return nil
     }
 }
 
-
-//MARK: UIImageExtension
+// MARK: UIImageExtension
 
 extension UIImage {
-    
-    var isPortrait:  Bool    { return size.height > size.width }
-    var isLandscape: Bool    { return size.width > size.height }
-    var breadth:     CGFloat { return min(size.width, size.height) }
-    var breadthSize: CGSize  { return CGSize(width: breadth, height: breadth) }
-    var breadthRect: CGRect  { return CGRect(origin: .zero, size: breadthSize) }
+    var isPortrait: Bool { return size.height > size.width }
+    var isLandscape: Bool { return size.width > size.height }
+    var breadth: CGFloat { return min(size.width, size.height) }
+    var breadthSize: CGSize { return CGSize(width: self.breadth, height: self.breadth) }
+    var breadthRect: CGRect { return CGRect(origin: .zero, size: self.breadthSize) }
     
     var circleMasked: UIImage? {
-        UIGraphicsBeginImageContextWithOptions(breadthSize, false, scale)
+        UIGraphicsBeginImageContextWithOptions(self.breadthSize, false, scale)
         defer { UIGraphicsEndImageContext() }
-        guard let cgImage = cgImage?.cropping(to: CGRect(origin: CGPoint(x: isLandscape ? floor((size.width - size.height) / 2) : 0, y: isPortrait  ? floor((size.height - size.width) / 2) : 0), size: breadthSize)) else { return nil }
-        UIBezierPath(ovalIn: breadthRect).addClip()
-        UIImage(cgImage: cgImage).draw(in: breadthRect)
+        guard let cgImage = cgImage?.cropping(to: CGRect(origin: CGPoint(x: isLandscape ? floor((size.width - size.height) / 2) : 0, y: isPortrait ? floor((size.height - size.width) / 2) : 0), size: breadthSize)) else { return nil }
+        UIBezierPath(ovalIn: self.breadthRect).addClip()
+        UIImage(cgImage: cgImage).draw(in: self.breadthRect)
         return UIGraphicsGetImageFromCurrentImageContext()
     }
-
-    
-
     
     func scaleImageToSize(newSize: CGSize) -> UIImage {
         var scaledImageRect = CGRect.zero
         
-        let aspectWidth = newSize.width/size.width
-        let aspectheight = newSize.height/size.height
+        let aspectWidth = newSize.width / size.width
+        let aspectheight = newSize.height / size.height
         
         let aspectRatio = max(aspectWidth, aspectheight)
         
-        scaledImageRect.size.width = size.width * aspectRatio;
-        scaledImageRect.size.height = size.height * aspectRatio;
-        scaledImageRect.origin.x = (newSize.width - scaledImageRect.size.width) / 2.0;
-        scaledImageRect.origin.y = (newSize.height - scaledImageRect.size.height) / 2.0;
+        scaledImageRect.size.width = size.width * aspectRatio
+        scaledImageRect.size.height = size.height * aspectRatio
+        scaledImageRect.origin.x = (newSize.width - scaledImageRect.size.width) / 2.0
+        scaledImageRect.origin.y = (newSize.height - scaledImageRect.size.height) / 2.0
         
         UIGraphicsBeginImageContext(newSize)
         draw(in: scaledImageRect)
@@ -292,19 +273,17 @@ extension UIImage {
     }
     
     func correctlyOrientedImage() -> UIImage {
-         if self.imageOrientation == .up {
-             return self
-         }
-
-         UIGraphicsBeginImageContextWithOptions(size, false, scale)
-         draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
-         let normalizedImage = UIGraphicsGetImageFromCurrentImageContext();
-         UIGraphicsEndImageContext();
-
-         return normalizedImage ?? self;
+        if self.imageOrientation == .up {
+            return self
+        }
+        
+        UIGraphicsBeginImageContextWithOptions(size, false, scale)
+        draw(in: CGRect(x: 0, y: 0, width: size.width, height: size.height))
+        let normalizedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return normalizedImage ?? self
     }
-    
-    
 }
 
 extension UIImageView {
@@ -316,59 +295,52 @@ extension UIImageView {
     }
 }
 
-
-
 extension UIImage {
-    
-    
     func cropsToSquare() -> UIImage {
         let refWidth = CGFloat(self.cgImage!.width)
         let refHeight = CGFloat(self.cgImage!.height)
         let cropSize = refWidth > refHeight ? refHeight : refWidth
-
+        
         let x = (refWidth - cropSize) / 2.0
         let y = (refHeight - cropSize) / 2.0
-
+        
         let cropRect = CGRect(x: x, y: y, width: cropSize, height: cropSize)
         let imageRef = self.cgImage!.cropping(to: cropRect)!
         let cropped = UIImage(cgImage: imageRef, scale: 0.0, orientation: self.imageOrientation)
-
+        
         return cropped
     }
     
     func imageWithColor(color1: UIColor) -> UIImage {
         UIGraphicsBeginImageContextWithOptions(self.size, false, self.scale)
         color1.setFill()
-
+        
         let context = UIGraphicsGetCurrentContext()!
         context.translateBy(x: 0, y: self.size.height)
-        context.scaleBy(x: 1.0, y: -1.0);
+        context.scaleBy(x: 1.0, y: -1.0)
         context.setBlendMode(CGBlendMode.normal)
-
+        
         let rect = CGRect(x: 0, y: 0, width: self.size.width, height: self.size.height) as CGRect
         context.clip(to: rect, mask: self.cgImage!)
         context.fill(rect)
-
+        
         let newImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
-
+        
         return newImage
     }
 }
 
 extension UINavigationController {
-
     func popViewController(animated: Bool = true, completion: @escaping () -> Void) {
         CATransaction.begin()
         CATransaction.setCompletionBlock(completion)
-        popViewController(animated: animated)
+        self.popViewController(animated: animated)
         CATransaction.commit()
     }
 }
 
-
 extension UIView {
-    
     @IBInspectable var cornerRadiusV: CGFloat {
         get {
             return layer.cornerRadius
@@ -418,8 +390,8 @@ extension UIView {
     }
     
     func shakeDeletingCell() {
-       let transformAnim  = CAKeyframeAnimation(keyPath:"transform")
-        transformAnim.values  = [NSValue(caTransform3D: CATransform3DMakeRotation(0.04, 0.0, 0.0, 1.0)),NSValue(caTransform3D: CATransform3DMakeRotation(-0.04 , 0, 0, 1))]
+        let transformAnim = CAKeyframeAnimation(keyPath: "transform")
+        transformAnim.values = [NSValue(caTransform3D: CATransform3DMakeRotation(0.04, 0.0, 0.0, 1.0)), NSValue(caTransform3D: CATransform3DMakeRotation(-0.04, 0, 0, 1))]
         transformAnim.autoreverses = true
         transformAnim.duration = 0.1
         transformAnim.repeatCount = Float.infinity
@@ -432,70 +404,65 @@ extension UIView {
 }
 
 extension UICollectionView {
-    
     func setEmptyMessage(_ message: String) {
-        let messageLabel = UILabel(frame: CGRect(x: 0, y: 0, width: self.bounds.size.width-10, height: self.bounds.size.height))
+        let messageLabel = UILabel(frame: CGRect(x: 0, y: 0, width: self.bounds.size.width - 10, height: self.bounds.size.height))
         messageLabel.text = message
         messageLabel.textColor = .systemGray3
-        messageLabel.numberOfLines = 0;
-        messageLabel.textAlignment = .center;
+        messageLabel.numberOfLines = 0
+        messageLabel.textAlignment = .center
         messageLabel.font = UIFont(name: "TrebuchetMS", size: 15)
         messageLabel.sizeToFit()
-
-        self.backgroundView = messageLabel;
+        
+        self.backgroundView = messageLabel
     }
-
+    
     func restore() {
         self.backgroundView = nil
     }
 }
 
 extension UITableView {
-
     func setEmptyMessage(_ message: String) {
-        let messageLabel = UILabel(frame: CGRect(x: 0, y: 0, width: self.bounds.size.width-10, height: self.bounds.size.height))
+        let messageLabel = UILabel(frame: CGRect(x: 0, y: 0, width: self.bounds.size.width - 10, height: self.bounds.size.height))
         messageLabel.text = message
         messageLabel.textColor = .systemGray3
-        messageLabel.numberOfLines = 0;
-        messageLabel.textAlignment = .center;
+        messageLabel.numberOfLines = 0
+        messageLabel.textAlignment = .center
         messageLabel.font = UIFont(name: "TrebuchetMS", size: 15)
         messageLabel.sizeToFit()
-
-        self.backgroundView = messageLabel;
-        self.separatorStyle = .none;
+        
+        self.backgroundView = messageLabel
+        self.separatorStyle = .none
     }
-
+    
     func restore() {
         self.backgroundView = nil
-       // self.separatorStyle = .singleLine
+        // self.separatorStyle = .singleLine
     }
 }
 
-extension Array where Element : Equatable {
-    
-    public mutating func mergeElements<C : Collection>(newElements: C) where C.Iterator.Element == Element{
-        let filteredList = newElements.filter({!self.contains($0)})
+extension Array where Element: Equatable {
+    public mutating func mergeElements<C: Collection>(newElements: C) where C.Iterator.Element == Element {
+        let filteredList = newElements.filter { !self.contains($0) }
         self.append(contentsOf: filteredList)
     }
-    
 }
 
-@IBDesignable class MyButton: UIButton
-{
+@IBDesignable class MyButton: UIButton {
     override func layoutSubviews() {
         super.layoutSubviews()
-
-        updateCornerRadius()
+        
+        self.updateCornerRadius()
     }
-
+    
     @IBInspectable var rounded: Bool = false {
         didSet {
-            updateCornerRadius()
+            self.updateCornerRadius()
         }
     }
-
+    
     func updateCornerRadius() {
-        layer.cornerRadius = rounded ? frame.size.height / 2 : 0
+        layer.cornerRadius = self.rounded ? frame.size.height / 2 : 0
     }
 }
 
@@ -524,11 +491,11 @@ extension UIColor {
     }
     
     class func getAppColor(_ withBrightness: Brightness) -> UIColor {
-        switch  withBrightness {
+        switch withBrightness {
         case .dark:
             return UIColor(hexString: kAPPLIGHTCOLORSTRING)
         case .light:
-             //return UIColor(hexString: kAPPDARKCOLORSTRING)
+            // return UIColor(hexString: kAPPDARKCOLORSTRING)
             return UIColor(named: "outgoingBubbleColor")!
         }
     }
@@ -536,59 +503,58 @@ extension UIColor {
 
 extension String {
     func capitalizingFirstLetter() -> String {
-      return prefix(1).uppercased() + self.lowercased().dropFirst()
+        return prefix(1).uppercased() + self.lowercased().dropFirst()
     }
-
+    
     mutating func capitalizeFirstLetter() {
-      self = self.capitalizingFirstLetter()
+        self = self.capitalizingFirstLetter()
     }
 }
 
 extension UIImage {
-
     func resize(withPercentage percentage: CGFloat) -> UIImage? {
-        var newRect = CGRect(origin: .zero, size: CGSize(width: size.width*percentage, height: size.height*percentage))
+        var newRect = CGRect(origin: .zero, size: CGSize(width: size.width * percentage, height: size.height * percentage))
         UIGraphicsBeginImageContextWithOptions(newRect.size, true, 1)
         self.draw(in: newRect)
-        defer {UIGraphicsEndImageContext()}
+        defer { UIGraphicsEndImageContext() }
         return UIGraphicsGetImageFromCurrentImageContext()
     }
-
+    
     func resizeTo(MB: Double) -> UIImage? {
-        guard let fileSize = self.pngData()?.count else {return nil}
-        let fileSizeInMB = CGFloat(fileSize)/(1024.0*1024.0)//form bytes to MB
-        let percentage = 1/fileSizeInMB
-        return resize(withPercentage: percentage)
+        guard let fileSize = self.pngData()?.count else { return nil }
+        let fileSizeInMB = CGFloat(fileSize) / (1024.0 * 1024.0) // form bytes to MB
+        let percentage = 1 / fileSizeInMB
+        return self.resize(withPercentage: percentage)
     }
     
     func resizeTo(MB: Double, completion: @escaping (UIImage) -> Void) {
-        guard let fileSize = self.pngData()?.count else {return}
-             let fileSizeInMB = CGFloat(fileSize)/(1024.0*1024.0)//form bytes to MB
-             let percentage = 1/fileSizeInMB
-             completion(resize(withPercentage: percentage)!)
+        guard let fileSize = self.pngData()?.count else { return }
+        let fileSizeInMB = CGFloat(fileSize) / (1024.0 * 1024.0) // form bytes to MB
+        let percentage = 1 / fileSizeInMB
+        completion(self.resize(withPercentage: percentage)!)
     }
 }
 
 extension UIFont {
     var bold: UIFont {
-        return with(.traitBold)
+        return self.with(.traitBold)
     }
-
+    
     var italic: UIFont {
-        return with(.traitItalic)
+        return self.with(.traitItalic)
     }
-
+    
     var boldItalic: UIFont {
-        return with([.traitBold, .traitItalic])
+        return self.with([.traitBold, .traitItalic])
     }
-
+    
     func with(_ traits: UIFontDescriptor.SymbolicTraits...) -> UIFont {
         guard let descriptor = self.fontDescriptor.withSymbolicTraits(UIFontDescriptor.SymbolicTraits(traits).union(self.fontDescriptor.symbolicTraits)) else {
             return self
         }
         return UIFont(descriptor: descriptor, size: 0)
     }
-
+    
     func without(_ traits: UIFontDescriptor.SymbolicTraits...) -> UIFont {
         guard let descriptor = self.fontDescriptor.withSymbolicTraits(self.fontDescriptor.symbolicTraits.subtracting(UIFontDescriptor.SymbolicTraits(traits))) else {
             return self
@@ -598,68 +564,59 @@ extension UIFont {
 }
 
 extension UINavigationController {
-    
-    open override var shouldAutorotate: Bool {
+    override open var shouldAutorotate: Bool {
         return true
     }
     
-    open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+    override open var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return (visibleViewController?.supportedInterfaceOrientations) ?? .allButUpsideDown
     }
 }
 
 extension UITabBarController {
-    
-    open override var shouldAutorotate: Bool {
+    override open var shouldAutorotate: Bool {
         return true
     }
     
-    open override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+    override open var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return (selectedViewController?.supportedInterfaceOrientations) ?? .allButUpsideDown
     }
 }
 
-
-
 extension UIApplication {
-
     class func getTopViewController(base: UIViewController? = UIApplication.shared.keyWindow?.rootViewController) -> UIViewController? {
-
         if let nav = base as? UINavigationController {
-            return getTopViewController(base: nav.visibleViewController)
-
+            return self.getTopViewController(base: nav.visibleViewController)
+            
         } else if let tab = base as? UITabBarController, let selected = tab.selectedViewController {
-            return getTopViewController(base: selected)
-
+            return self.getTopViewController(base: selected)
+            
         } else if let presented = base?.presentedViewController {
-            return getTopViewController(base: presented)
+            return self.getTopViewController(base: presented)
         }
         return base
     }
 }
 
 extension UIBarButtonItem {
-
     static func menuButton(_ target: Any?, action: Selector, image: UIImage) -> UIBarButtonItem {
-        
         let button = UIButton(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
         button.setImage(image, for: .normal)
         button.addTarget(target, action: action, for: .touchUpInside)
         button.imageView?.contentMode = .scaleAspectFill
-              button.layer.cornerRadius = 0.5 * button.bounds.size.width
-              button.clipsToBounds = true
-
+        button.layer.cornerRadius = 0.5 * button.bounds.size.width
+        button.clipsToBounds = true
+        
         let menuBarItem = UIBarButtonItem(customView: button)
         menuBarItem.customView?.translatesAutoresizingMaskIntoConstraints = false
         menuBarItem.customView?.heightAnchor.constraint(equalToConstant: 30).isActive = true
         menuBarItem.customView?.widthAnchor.constraint(equalToConstant: 30).isActive = true
-
+        
         return menuBarItem
     }
 }
 
 func customizeNavigationBar(color: UIColor = .systemBackground, colorName: String = "bwBackground", alpha: Double = 0.9) {
-         
     let navBarAppearance = UINavigationBarAppearance()
     navBarAppearance.configureWithOpaqueBackground()
     navBarAppearance.backgroundColor = UIColor(named: colorName)?.withAlphaComponent(CGFloat(alpha))
@@ -673,14 +630,12 @@ func customizeNavigationBar(color: UIColor = .systemBackground, colorName: Strin
 extension Array {
     func chunked(into size: Int) -> [[Element]] {
         return stride(from: 0, to: count, by: size).map {
-            Array(self[$0 ..< Swift.min($0 + size, count)])
+            Array(self[$0..<Swift.min($0 + size, count)])
         }
     }
 }
 
-
-
-func checkCameraAccess(viewController: UIViewController, completion: @escaping(CNAuthorizationStatus) -> ()) {
+func checkCameraAccess(viewController: UIViewController, completion: @escaping (CNAuthorizationStatus) -> Void) {
     switch AVCaptureDevice.authorizationStatus(for: .video) {
     case .denied:
         print("Denied, request permission from settings")
@@ -706,36 +661,31 @@ func checkCameraAccess(viewController: UIViewController, completion: @escaping(C
 }
 
 func checkMicPermission(viewController: UIViewController, whenSomeoneIsCalling receivedCall: Bool = false, completion: @escaping (CNAuthorizationStatus) -> Void) {
-
     switch AVAudioSession.sharedInstance().recordPermission {
     case AVAudioSessionRecordPermission.granted:
         UserDefaults.standard.set(false, forKey: "Don't ask for mic permission")
         completion(.authorized)
     case AVAudioSessionRecordPermission.denied:
-        !receivedCall ? presentSettings(viewController: viewController, titleText: "Microphone access denied") : !UserDefaults.standard.bool(forKey:  "Don't ask for mic permission") ? showReceivedCallDialog(viewController: viewController) : completion(.denied)
-       // completion(.denied)
+        !receivedCall ? presentSettings(viewController: viewController, titleText: "Microphone access denied") : !UserDefaults.standard.bool(forKey: "Don't ask for mic permission") ? showReceivedCallDialog(viewController: viewController) : completion(.denied)
+    // completion(.denied)
     case AVAudioSessionRecordPermission.undetermined:
-        AVAudioSession.sharedInstance().requestRecordPermission({ (granted) in
+        AVAudioSession.sharedInstance().requestRecordPermission { granted in
             if granted {
                 UserDefaults.standard.set(false, forKey: "Don't ask for mic permission")
                 completion(.authorized)
             } else {
                 completion(.denied)
             }
-        })
+        }
     default:
         break
     }
 }
 
-
 func showReceivedCallDialog(viewController: UIViewController) {
     let alertController = UIAlertController(title: "Someone is trying to call you",
                                             message: "Microphone access is currently denied. Open settings to change permission",
                                             preferredStyle: .alert)
-   
-    
- 
     
     alertController.addAction(UIAlertAction(title: "Settings", style: .default) { _ in
         if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -746,10 +696,10 @@ func showReceivedCallDialog(viewController: UIViewController) {
     })
     
     alertController.addAction(UIAlertAction(title: "Don't ask again", style: .destructive, handler: { _ in
-            UserDefaults.standard.set(true, forKey: "Don't ask for mic permission")
+        UserDefaults.standard.set(true, forKey: "Don't ask for mic permission")
      }))
     
-     alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+    alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
     
     viewController.present(alertController, animated: true)
 }
@@ -779,7 +729,7 @@ func checkContactsAccess(viewController: UIViewController, completion: @escaping
         presentSettings(viewController: viewController, titleText: "Contacts access denied")
         completion(.denied)
     case .restricted, .notDetermined:
-        CNContactStore().requestAccess(for: .contacts) { granted, error in
+        CNContactStore().requestAccess(for: .contacts) { granted, _ in
             if granted {
                 print("Permission granted, proceed")
                 completion(.authorized)
@@ -794,13 +744,12 @@ func checkContactsAccess(viewController: UIViewController, completion: @escaping
     completion(.denied)
 }
 
-
 struct MyVariables {
     static var globalContactsVariable: [String] = [] {
-           didSet {
-               NotificationCenter.default.post(name: .globalContactsVariable, object: nil)
-           }
-       }
+        didSet {
+            NotificationCenter.default.post(name: .globalContactsVariable, object: nil)
+        }
+    }
     
     static var internetConnectionState: Bool = true {
         didSet {
@@ -819,7 +768,6 @@ struct MyVariables {
     }
 }
 
-
 extension Date {
     func stripTime() -> Date {
         let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: self)
@@ -829,28 +777,28 @@ extension Date {
 }
 
 extension DispatchQueue {
-    
-    static func background(delay: Double = 0.0, background: (()->Void)? = nil, completion: (() -> Void)? = nil) {
+    static func background(delay: Double = 0.0, background: (() -> Void)? = nil, completion: (() -> Void)? = nil) {
         DispatchQueue.global(qos: .background).async {
             background?()
             if let completion = completion {
-                DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: {
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                     completion()
-                })
+                }
             }
         }
     }
 }
 
 extension UITableView {
-    func hideTableHeaderView() -> Void {
+    func hideTableHeaderView() {
         self.beginUpdates()
         UIView.animate(withDuration: 0.2, animations: {
             self.tableHeaderView = nil
         })
         self.endUpdates()
     }
-    func showTableHeaderView(header: UIView) -> Void {
+    
+    func showTableHeaderView(header: UIView) {
         let headerView = header
         self.beginUpdates()
         let headerFrame = headerView.frame
@@ -860,20 +808,20 @@ extension UITableView {
             self.tableHeaderView?.frame = headerFrame
             self.tableHeaderView?.alpha = 0
             self.endUpdates()
-        }, completion: { (ok) in
+        }, completion: { _ in
             self.tableHeaderView?.alpha = 1
         })
     }
 }
 
 extension String {
-    subscript (bounds: CountableClosedRange<Int>) -> String {
+    subscript(bounds: CountableClosedRange<Int>) -> String {
         let start = index(startIndex, offsetBy: bounds.lowerBound)
         let end = index(startIndex, offsetBy: bounds.upperBound)
         return String(self[start...end])
     }
     
-    subscript (bounds: CountableRange<Int>) -> String {
+    subscript(bounds: CountableRange<Int>) -> String {
         let start = index(startIndex, offsetBy: bounds.lowerBound)
         let end = index(startIndex, offsetBy: bounds.upperBound)
         return String(self[start..<end])
@@ -882,43 +830,38 @@ extension String {
     func removeExtraSpaces() -> String {
         return self.replacingOccurrences(of: "[\\s\n]+", with: " ", options: .regularExpression, range: nil)
     }
-    
 }
 
 extension UIViewController {
-    func showInputDialog(title:String? = nil,
-                         subtitle:String? = nil,
-                         actionTitle:String? = "Add",
-                         cancelTitle:String? = "Cancel",
-                         inputPlaceholder:String? = nil,
-                         inputKeyboardType:UIKeyboardType = UIKeyboardType.default,
+    func showInputDialog(title: String? = nil,
+                         subtitle: String? = nil,
+                         actionTitle: String? = "Add",
+                         cancelTitle: String? = "Cancel",
+                         inputPlaceholder: String? = nil,
+                         inputKeyboardType: UIKeyboardType = UIKeyboardType.default,
                          cancelHandler: ((UIAlertAction) -> Swift.Void)? = nil,
                          actionHandler: ((_ text: String?) -> Void)? = nil) {
-
         let alert = UIAlertController(title: title, message: subtitle, preferredStyle: .alert)
-        alert.addTextField { (textField:UITextField) in
+        alert.addTextField { (textField: UITextField) in
             textField.placeholder = inputPlaceholder
             textField.keyboardType = inputKeyboardType
             textField.isSecureTextEntry = true
         }
-        alert.addAction(UIAlertAction(title: actionTitle, style: .destructive, handler: { (action:UIAlertAction) in
-            guard let textField =  alert.textFields?.first else {
+        alert.addAction(UIAlertAction(title: actionTitle, style: .destructive, handler: { (_: UIAlertAction) in
+            guard let textField = alert.textFields?.first else {
                 actionHandler?(nil)
                 return
             }
             actionHandler?(textField.text)
         }))
         alert.addAction(UIAlertAction(title: cancelTitle, style: .cancel, handler: cancelHandler))
-
+        
         self.present(alert, animated: true, completion: nil)
     }
 }
 
-
 extension Date {
-    
     func timeAgoSinceDate() -> String {
-        
         // From Time
         let fromDate = self
         
@@ -927,32 +870,27 @@ extension Date {
         
         // Estimation
         // Year
-        if let interval = Calendar.current.dateComponents([.year], from: fromDate, to: toDate).year, interval > 0  {
-            
+        if let interval = Calendar.current.dateComponents([.year], from: fromDate, to: toDate).year, interval > 0 {
             return interval == 1 ? "\(interval)" + " " + "year ago" : "\(interval)" + " " + "years ago"
         }
         
         // Month
-        if let interval = Calendar.current.dateComponents([.month], from: fromDate, to: toDate).month, interval > 0  {
-            
+        if let interval = Calendar.current.dateComponents([.month], from: fromDate, to: toDate).month, interval > 0 {
             return interval == 1 ? "\(interval)" + " " + "month ago" : "\(interval)" + " " + "months ago"
         }
         
         // Day
-        if let interval = Calendar.current.dateComponents([.day], from: fromDate, to: toDate).day, interval > 0  {
-            
+        if let interval = Calendar.current.dateComponents([.day], from: fromDate, to: toDate).day, interval > 0 {
             return interval == 1 ? "\(interval)" + " " + "day ago" : "\(interval)" + " " + "days ago"
         }
         
         // Hours
         if let interval = Calendar.current.dateComponents([.hour], from: fromDate, to: toDate).hour, interval > 0 {
-            
             return interval == 1 ? "\(interval)" + " " + "hour ago" : "\(interval)" + " " + "hours ago"
         }
         
         // Minute
         if let interval = Calendar.current.dateComponents([.minute], from: fromDate, to: toDate).minute, interval > 0 {
-            
             return interval == 1 ? "\(interval)" + " " + "minute ago" : "\(interval)" + " " + "minutes ago"
         }
         
@@ -960,53 +898,48 @@ extension Date {
     }
     
     func timeAgoInMessages() -> String {
-          
-          // From Time
-          let fromDate = self
-          
-          // To Time
-          let toDate = Date()
+        // From Time
+        let fromDate = self
+        
+        // To Time
+        let toDate = Date()
         
         let dateFormatter = DateFormatter()
-          // Estimation
-          // Year
-          if let interval = Calendar.current.dateComponents([.year], from: fromDate, to: toDate).year, interval > 0  {
+        // Estimation
+        // Year
+        if let interval = Calendar.current.dateComponents([.year], from: fromDate, to: toDate).year, interval > 0 {
             dateFormatter.dateFormat = "MMM d, yyy, HH:mm"
             return dateFormatter.string(from: fromDate)
-          }
-          
-          // Month
-          if let interval = Calendar.current.dateComponents([.month], from: fromDate, to: toDate).month, interval > 0  {
-              
-               dateFormatter.dateFormat = "MMM d, HH:mm"
-                         return dateFormatter.string(from: fromDate)
-          }
+        }
         
-          
-          // Day
-          if let interval = Calendar.current.dateComponents([.day], from: fromDate, to: toDate).day, interval > 0  {
+        // Month
+        if let interval = Calendar.current.dateComponents([.month], from: fromDate, to: toDate).month, interval > 0 {
+            dateFormatter.dateFormat = "MMM d, HH:mm"
+            return dateFormatter.string(from: fromDate)
+        }
+        
+        // Day
+        if let interval = Calendar.current.dateComponents([.day], from: fromDate, to: toDate).day, interval > 0 {
             if interval >= 7 {
                 dateFormatter.dateFormat = "MMM d, HH:mm"
-                                       return dateFormatter.string(from: fromDate)
+                return dateFormatter.string(from: fromDate)
             }
-                      dateFormatter.dateFormat = "E, HH:mm"
-                              return dateFormatter.string(from: fromDate)
-          }
-          
-          // Hours
-             dateFormatter.dateFormat = "HH:mm"
-                                                 return dateFormatter.string(from: fromDate)
-      }
+            dateFormatter.dateFormat = "E, HH:mm"
+            return dateFormatter.string(from: fromDate)
+        }
+        
+        // Hours
+        dateFormatter.dateFormat = "HH:mm"
+        return dateFormatter.string(from: fromDate)
+    }
 }
 
 extension UIImage {
-    
     func isEqualToImage(image: UIImage) -> Bool {
         let data1: NSData = self.pngData()! as NSData
         let data2: NSData = image.pngData()! as NSData
         return data1.isEqual(data2)
     }
-    
 }
 
 extension String {
@@ -1017,14 +950,7 @@ extension String {
 
 extension UICollectionView {
     func reloadData(_ completion: @escaping () -> Void) {
-        reloadData()
+        self.reloadData()
         DispatchQueue.main.async { completion() }
     }
 }
-
-
-
-
-
-
-

@@ -18,7 +18,7 @@ class Encryption {
         return encryptedData.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue: 0))
     }
     
-    class func decryptText(chatRoomId: String, encryptedMessage: String, completion: @escaping (String) -> Void){
+    class func decryptText(chatRoomId: String, encryptedMessage: String, completion: @escaping (String) -> Void) {
         let decryptor = RNCryptor.Decryptor(password: chatRoomId)
         let encryptedData = NSData(base64Encoded: encryptedMessage, options: NSData.Base64DecodingOptions(rawValue: 0))
         

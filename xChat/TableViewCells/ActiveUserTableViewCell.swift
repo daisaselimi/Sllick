@@ -9,35 +9,35 @@
 import UIKit
 
 class ActiveUserTableViewCell: UITableViewCell {
+    
+    @IBOutlet var fullNameTextField: UILabel!
+    @IBOutlet var avatarImageView: UIImageView!
+    @IBOutlet var activityIndicatorView: UIView!
+    @IBOutlet var activityColorView: UIView!
 
-    @IBOutlet weak var fullNameTextField: UILabel!
-    @IBOutlet weak var avatarImageView: UIImageView!
-    @IBOutlet weak var activityIndicatorView: UIView!
-    @IBOutlet weak var activityColorView: UIView!
-    
     var indexPath: IndexPath!
-    
+
     override func awakeFromNib() {
         super.awakeFromNib()
-   
+
         // Initialization code
     }
-    
+
     func generateCellWith(fUser: FUser, indexPath: IndexPath, isOnline: Bool = false) {
         activityIndicatorView.layer.cornerRadius = activityIndicatorView.frame.width / 2
-           activityColorView.layer.cornerRadius = activityColorView.frame.width / 2
-           avatarImageView.maskCircle()
+        activityColorView.layer.cornerRadius = activityColorView.frame.width / 2
+        avatarImageView.maskCircle()
         self.indexPath = indexPath
         activityIndicatorView.isHidden = !isOnline
-        self.fullNameTextField.text = fUser.fullname
-        if(fUser.avatar != "") {
-            imageFromData(pictureData: fUser.avatar) { (image) in
+        fullNameTextField.text = fUser.fullname
+        if fUser.avatar != "" {
+            imageFromData(pictureData: fUser.avatar) { image in
                 if avatarImageView != nil {
                     self.avatarImageView.image = image
                 }
             }
         } else {
-            self.avatarImageView.image = UIImage(named: "avatarph")
+            avatarImageView.image = UIImage(named: "avatarph")
         }
     }
 
@@ -46,5 +46,4 @@ class ActiveUserTableViewCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
-
 }

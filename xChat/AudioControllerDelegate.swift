@@ -9,7 +9,6 @@
 import Foundation
 
 class AudioContollerDelegate: NSObject, SINAudioControllerDelegate {
-    
     var muted: Bool!
     var speaker: Bool!
     
@@ -21,7 +20,7 @@ class AudioContollerDelegate: NSObject, SINAudioControllerDelegate {
         self.muted = false
     }
     
-    //not needed
+    // not needed
     func audioControllerSpeakerEnabled(_ audioController: SINAudioController!) {
         self.speaker = true
     }
@@ -29,5 +28,4 @@ class AudioContollerDelegate: NSObject, SINAudioControllerDelegate {
     func audioControllerSpeakerDisabled(_ audioController: SINAudioController!) {
         self.speaker = false
     }
-    
 }

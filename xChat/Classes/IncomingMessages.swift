@@ -18,16 +18,15 @@ class IncomingMessage {
     }
     
     func createMessage(messageDictionary: NSDictionary, chatRoomId: String) -> JSQMessage? {
-        
         var message: JSQMessage?
         
         let type = messageDictionary[kTYPE] as! String
         
         switch type {
         case kTEXT: createTextMessage(messageDicitionary: messageDictionary, chatRoomId: chatRoomId) {
-                decryptedTxt in
-                message = decryptedTxt
-            }
+            decryptedTxt in
+            message = decryptedTxt
+        }
         case kPICTURE: message = createPictureMessage(messageDictionary: messageDictionary)
         case kVIDEO: message = createVideoMessage(messageDictionary: messageDictionary)
         case kAUDIO: message = createAudioMessage(messageDictionary: messageDictionary)
@@ -42,9 +41,7 @@ class IncomingMessage {
         return nil
     }
     
-    
-    func  createTextMessage(messageDicitionary: NSDictionary, chatRoomId: String, completion: @escaping (JSQMessage) -> Void) {
-        
+    func createTextMessage(messageDicitionary: NSDictionary, chatRoomId: String, completion: @escaping (JSQMessage) -> Void) {
         let name = messageDicitionary[kSENDERNAME] as? String
         let userId = messageDicitionary[kSENDERID] as? String
         
@@ -56,23 +53,20 @@ class IncomingMessage {
             } else {
                 date = dateFormatter().date(from: created)
             }
-        }
-        else {
+        } else {
             date = Date()
         }
         
         let text = messageDicitionary[kMESSAGE] as! String
         
-         Encryption.decryptText(chatRoomId: chatRoomId, encryptedMessage: text) {
+        Encryption.decryptText(chatRoomId: chatRoomId, encryptedMessage: text) {
             decryptedTxt in
             
             completion(JSQMessage(senderId: userId, senderDisplayName: name, date: date, text: decryptedTxt))
         }
-       
     }
     
     func createPictureMessage(messageDictionary: NSDictionary) -> JSQMessage {
-        
         let name = messageDictionary[kSENDERNAME] as? String
         let userId = messageDictionary[kSENDERID] as? String
         
@@ -84,17 +78,15 @@ class IncomingMessage {
             } else {
                 date = dateFormatter().date(from: created)
             }
-        }
-        else {
+        } else {
             date = Date()
         }
-        
         
         let mediaItem = PhotoMediaItem(image: nil)
         
         mediaItem?.appliesMediaViewMaskAsOutgoing = returnOutgoingStatusForUser(senderId: userId!)
         
-        downloadImage(imageUrl: messageDictionary[kPICTURE] as! String) { (image) in
+        downloadImage(imageUrl: messageDictionary[kPICTURE] as! String) { image in
             
             if image != nil {
                 mediaItem?.image = image!
@@ -106,7 +98,6 @@ class IncomingMessage {
     }
     
     func createVideoMessage(messageDictionary: NSDictionary) -> JSQMessage {
-        
         let name = messageDictionary[kSENDERNAME] as? String
         let userId = messageDictionary[kSENDERID] as? String
         
@@ -118,24 +109,22 @@ class IncomingMessage {
             } else {
                 date = dateFormatter().date(from: created)
             }
-        }
-        else {
+        } else {
             date = Date()
         }
-        
         
         let videoURL = NSURL(fileURLWithPath: messageDictionary[kVIDEO] as! String)
         
         let mediaItem = VideoMessage(withFileURL: videoURL, maskOutgoing: returnOutgoingStatusForUser(senderId: userId!))
         
-        downloadVideo(videoUrl: messageDictionary[kVIDEO] as! String) { (isReadyToPlay, fileName) in
+        downloadVideo(videoUrl: messageDictionary[kVIDEO] as! String) { _, fileName in
             
             let url = NSURL(fileURLWithPath: fileInDocumentsDirectory(fileName: fileName))
             
             mediaItem.status = kSUCCESS
             mediaItem.fileURL = url
             
-            imageFromData(pictureData: messageDictionary[kPICTURE] as! String) { (image) in
+            imageFromData(pictureData: messageDictionary[kPICTURE] as! String) { image in
                 
                 if image != nil {
                     mediaItem.image = image!
@@ -153,7 +142,6 @@ class IncomingMessage {
     }
     
     func createAudioMessage(messageDictionary: NSDictionary) -> JSQMessage {
-        
         let name = messageDictionary[kSENDERNAME] as? String
         let userId = messageDictionary[kSENDERID] as? String
         
@@ -165,8 +153,7 @@ class IncomingMessage {
             } else {
                 date = dateFormatter().date(from: created)
             }
-        }
-        else {
+        } else {
             date = Date()
         }
         
@@ -176,12 +163,11 @@ class IncomingMessage {
         
         let audioMessage = JSQMessage(senderId: userId!, displayName: name!, media: audioItem)
         
-        
-        downloadAudio(audioUrl: messageDictionary[kAUDIO] as! String) { (fileName) in
+        downloadAudio(audioUrl: messageDictionary[kAUDIO] as! String) { fileName in
             
             let url = NSURL(fileURLWithPath: fileInDocumentsDirectory(fileName: fileName))
             
-            let audioData =  try? Data(contentsOf: url as URL)
+            let audioData = try? Data(contentsOf: url as URL)
             audioItem.audioData = audioData
             self.collectionView.reloadData()
         }

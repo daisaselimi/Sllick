@@ -19,8 +19,8 @@ class VideoMessage: JSQMediaItem {
     init(withFileURL: NSURL, maskOutgoing: Bool) {
         super.init(maskAsOutgoing: maskOutgoing)
         
-        fileURL = withFileURL
-        videoImageView = nil
+        self.fileURL = withFileURL
+        self.videoImageView = nil
     }
     
     required init?(coder: NSCoder) {
@@ -28,15 +28,12 @@ class VideoMessage: JSQMediaItem {
     }
     
     override func mediaView() -> UIView! {
-        
         if let st = status {
-            
             if st == 1 {
                 return nil
             }
             
-            if st == 2 && self.videoImageView == nil {
-                
+            if st == 2, self.videoImageView == nil {
                 let size = self.mediaViewDisplaySize()
                 let outgoing = self.appliesMediaViewMaskAsOutgoing
                 

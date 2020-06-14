@@ -6,8 +6,8 @@
 //  Copyright © 2020 com.isaselimi. All rights reserved.
 //
 
-import UIKit
 import FirebaseFirestore
+import UIKit
 
 class ActiveNowTableViewController: UITableViewController {
     
@@ -21,14 +21,13 @@ class ActiveNowTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // getContacts()
-        //self.title = "Active now"
-        self.tableView.tableFooterView = UIView()
+        // self.title = "Active now"
+        tableView.tableFooterView = UIView()
         tableView.separatorStyle = .none
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onlineUsersChanged),
                                                name: .onlineUsersNotification, object: nil)
     }
-    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -36,17 +35,14 @@ class ActiveNowTableViewController: UITableViewController {
 //        loadUsers()
     }
     
-    
     @objc func onlineUsersChanged() {
         usersOnline = MyVariables.usersOnline
         loadUsers()
     }
     
-    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let user = activeNow[indexPath.row]
-
-
+        
         let chatVC = ChatViewController()
         chatVC.titleName = user.firstname
         chatVC.membersToPush = [FUser.currentId(), user.objectId]
@@ -56,28 +52,25 @@ class ActiveNowTableViewController: UITableViewController {
         chatVC.initialWithUser = user.fullname
         chatVC.initialImage = (tableView.cellForRow(at: indexPath) as! ActiveUserTableViewCell).avatarImageView.image
         chatVC.hidesBottomBarWhenPushed = true
-        self.navigationController?.pushViewController(chatVC, animated: true)
+        navigationController?.pushViewController(chatVC, animated: true)
     }
-    
     
     func loadUsers() {
         print(usersOnline.count)
         if usersOnline.count == 0 {
             activeNow = []
-            setTabItemTitle(controller: self.tabBarController!, title: "Active (0)")
+            setTabItemTitle(controller: tabBarController!, title: "Active (0)")
             
             tableView.reloadData()
         } else {
-            setTabItemTitle(controller: self.tabBarController!, title: "Active (\(self.usersOnline.count))")
-            getUsersFromFirestore(withIds: usersOnline) { (users) in
+            setTabItemTitle(controller: tabBarController!, title: "Active (\(usersOnline.count))")
+            getUsersFromFirestore(withIds: usersOnline) { users in
                 self.activeNow = users
                 
                 self.tableView.reloadData()
             }
         }
-        
     }
-    
     
     // MARK: - Table view data source\
     
@@ -90,7 +83,6 @@ class ActiveNowTableViewController: UITableViewController {
         // #warning Incomplete implementation, return the number of rows
         return activeNow.count
     }
-    
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! ActiveUserTableViewCell
