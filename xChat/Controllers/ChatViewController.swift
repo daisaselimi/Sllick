@@ -338,7 +338,10 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         leftBarButtonView.addSubview(titleLabel)
         leftBarButtonView.addSubview(subTitleLabel)
         
-        let infoButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"), style: .plain, target: self, action: #selector(infoButtonPressed))
+        let img = UIImage(systemName: "ellipsis")
+        
+        
+        let infoButton = UIBarButtonItem(image: img?.rotate(radians: .pi/2), style: .plain, target: self, action: #selector(infoButtonPressed))
         
         navigationItem.rightBarButtonItem = infoButton
         

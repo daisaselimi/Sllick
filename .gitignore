@@ -63,3 +63,7 @@ node_modules/
 
 # dotenv environment variables file
 .env
+
+xChat.xcworkspace/xcuserdata/isaselimi.xcuserdatad/UserInterfaceState.xcuserstate
+
+xChat.xcodeproj/xcuserdata/isaselimi.xcuserdatad/xcschemes/xcschememanagement.plist
