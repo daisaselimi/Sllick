@@ -45,6 +45,13 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         // addNoInternetConnectionLabel(height: 0)
         
         navigationItem.largeTitleDisplayMode = .never
+        observer = NotificationCenter.default.addObserver(forName: .globalContactsVariable, object: nil, queue: .main) { [weak self] _ in
+            
+            self?.activeUsersListeners.forEach { $0.remove() }
+            self?.activeUsersListeners.removeAll()
+            self?.contactsChanged = true
+            self?.checkOnlineStatus(forUsers: MyVariables.globalContactsVariable)
+        }
         loadUserDefaults()
         gradientLoadingBar.gradientColors = [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
         loadContacts()
@@ -295,11 +302,6 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         tabBarController?.tabBar.isHidden = false
         recentChatsTableView.tableFooterView = UIView() // remove table lines when there's nothing to show
-        observer = NotificationCenter.default.addObserver(forName: .globalContactsVariable, object: nil, queue: .main) { [weak self] _ in
-            self?.activeUsersListeners.removeAll()
-            self?.contactsChanged = true
-            self?.checkOnlineStatus(forUsers: MyVariables.globalContactsVariable)
-        }
     }
     
     //    override func viewDidAppear(_ animated: Bool) {

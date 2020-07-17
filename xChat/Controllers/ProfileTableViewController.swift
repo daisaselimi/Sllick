@@ -43,6 +43,7 @@ class ProfileTableViewController: UITableViewController {
         //        self.navigationController?.navigationBar.backgroundColor = .systemBackground
         //        self.navigationController?.navigationBar.alpha = 0.9
         
+        activityLabel.numberOfLines = 0
         navigationItem.largeTitleDisplayMode = .never
         tableView.separatorColor = .separator
         
@@ -55,7 +56,13 @@ class ProfileTableViewController: UITableViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        if user!.blockedUsers.contains(FUser.currentId()) || FUser.currentUser()!.blockedUsers.contains(user!.objectId) {
+            return
+        }
         observer = NotificationCenter.default.addObserver(forName: .globalContactsVariable, object: nil, queue: .main) { [weak self] _ in
+            if self!.user == nil {
+                return
+            }
             if MyVariables.globalContactsVariable.contains(self!.user!.objectId) {
                 self!.setBarButton(imageName: "person.badge.minus.fill", imageType: .systemImage, withTintColor: .systemPink)
                 self!.activityLabel.isHidden = false
@@ -229,7 +236,6 @@ class ProfileTableViewController: UITableViewController {
                 self.navigationController?.popToRootViewController(animated: true)
             }
         })
-        alertController.view.tintColor = UIColor(named: "outgoingBubbleColor")
         present(alertController, animated: true)
     }
     
@@ -305,10 +311,17 @@ class ProfileTableViewController: UITableViewController {
     func setupUI() {
         if user != nil {
             title = "Profile"
-            
-            fullNameLabel.text = user!.fullname
-            activityLabel.text = ""
-            updateBlockStatus()
+            if user!.blockedUsers.contains(FUser.currentId()) || FUser.currentUser()!.blockedUsers.contains(user!.objectId) {
+                fullNameLabel.text = user!.fullname
+                activityLabel.text = FUser.currentUser()!.blockedUsers.contains(user!.objectId) ? "Unblock \(user!.firstname) to allow interaction" : ""
+                blockUserButton.isHidden = true
+                messageButton.isHidden = true
+                callButton.isHidden = true
+            } else {
+                fullNameLabel.text = user!.fullname
+                activityLabel.text = ""
+                updateBlockStatus()
+            }
             
             if userDictionary.isEmpty {
                 imageFromData(pictureData: user!.avatar) { avatarImage in

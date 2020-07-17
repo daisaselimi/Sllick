@@ -19,6 +19,7 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
     @IBOutlet var groupMembersCollectionView: UICollectionView!
     @IBOutlet var saveButtonOutlet: MyButton!
     @IBOutlet var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var muteStatusImageView: UIImageView!
     
     @IBOutlet var muteGroupButton: UIButton!
     
@@ -52,6 +53,8 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
         allMembersToPush = group[kMEMBERSTOPUSH] as! [String]
         muted = !(group[kMEMBERSTOPUSH] as! [String]).contains(FUser.currentId())
         muteGroupButton.setTitle(muted ? "Unmute Group" : "Mute Group", for: .normal)
+        muteStatusImageView.image = UIImage(systemName: muted ? "bell.circle.fill" : "bell.circle")
+        
         saveButtonOutlet.backgroundColor = .systemOrange
 //        saveButtonOutlet.layer.borderWidth = 0.5
 //        saveButtonOutlet.layer.borderColor = UIColor.secondaryLabel.cgColor
@@ -380,10 +383,12 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
         if !muted {
             membersToPush = membersToPush.filter { $0 != FUser.currentId() }
             muteGroupButton.setTitle("Unmute Group", for: .normal)
+            muteStatusImageView.image = UIImage(systemName: "bell.circle.fill")
             muted = true
         } else {
             membersToPush.append(FUser.currentId())
             muteGroupButton.setTitle("Mute Group", for: .normal)
+            muteStatusImageView.image = UIImage(systemName: "bell.circle")
             muted = false
         }
         
@@ -392,11 +397,21 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
     }
     
     @IBAction func leaveGroupPressed(_ sender: Any) {
-        let members = (group![kMEMBERS] as! [String]).filter { $0 != FUser.currentId() }
-        let membersToPush = (group![kMEMBERSTOPUSH] as! [String]).filter { $0 != FUser.currentId() }
-        Group.updateGroup(groupId: group![kGROUPID] as! String, withValues: [kMEMBERS: members, kMEMBERSTOPUSH: membersToPush])
-        updateExistingRecentWithNewValues(forMembers: [FUser.currentId()], chatRoomId: group![kGROUPID] as! String, withValues: [kMEMBERS: members, kMEMBERSTOPUSH: allMembersToPush])
-        navigationController?.popToRootViewController(animated: true)
+        
+        let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let leaveGroup = UIAlertAction(title: "Leave group", style: .destructive) { _ in
+            let members = (self.group![kMEMBERS] as! [String]).filter { $0 != FUser.currentId() }
+            let membersToPush = (self.group![kMEMBERSTOPUSH] as! [String]).filter { $0 != FUser.currentId() }
+            Group.updateGroup(groupId: self.group![kGROUPID] as! String, withValues: [kMEMBERS: members, kMEMBERSTOPUSH: membersToPush])
+            updateExistingRecentWithNewValues(forMembers: [FUser.currentId()], chatRoomId: self.group![kGROUPID] as! String, withValues: [kMEMBERS: members, kMEMBERSTOPUSH: self.allMembersToPush])
+            self.navigationController?.popToRootViewController(animated: true)
+        }
+        
+        optionMenu.addAction(leaveGroup)
+        optionMenu.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        present(optionMenu, animated: true, completion: nil)
+       
     }
     
     var groupId: String!
@@ -441,7 +456,6 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
-        alert.view.tintColor = UIColor.getAppColor(.light)
         if UIDevice().userInterfaceIdiom == .pad {
             if let currentPopoverpresentioncontroller = alert.popoverPresentationController {
                 currentPopoverpresentioncontroller.sourceView = editButtonOutlet

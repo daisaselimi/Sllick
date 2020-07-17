@@ -182,7 +182,7 @@ class SettingsTableViewController: UITableViewController {
     }
     
     func tellAFriend() {
-        let text = "Hey! Let's chat on Sllick: <\(kAPPURL)>"
+        let text = "Hey! Let's chat on Sllick: \(kAPPURL)"
         
         let objectsToShare: [Any] = [text]
         
@@ -238,7 +238,6 @@ class SettingsTableViewController: UITableViewController {
         
         optionMenu.addAction(deleteAction)
         optionMenu.addAction(cancelAction)
-        optionMenu.view.tintColor = UIColor.getAppColor(.light)
         if UIDevice().userInterfaceIdiom == .pad {
             if let currentPopoverpresentioncontroller = optionMenu.popoverPresentationController {
                 currentPopoverpresentioncontroller.sourceView = deleteButtonOutlet
@@ -274,7 +273,6 @@ class SettingsTableViewController: UITableViewController {
         
         optionMenu.addAction(logOutAction)
         optionMenu.addAction(cancelAction)
-        optionMenu.view.tintColor = UIColor.getAppColor(.light)
         present(optionMenu, animated: true, completion: nil)
     }
     

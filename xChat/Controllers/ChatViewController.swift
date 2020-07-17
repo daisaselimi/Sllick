@@ -209,7 +209,10 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         super.viewWillAppear(animated)
         
         if !MyVariables.globalContactsVariable.contains((memberIds.filter { $0 != FUser.currentId() })[0]) {
-            subTitleLabel.text = "Sllick Chat"
+            if let isGroup = isGroup {
+                if !isGroup { subTitleLabel.text = "Sllick Chat" }
+            }
+            
         } else {
             checkActivityStatus()
         }
@@ -340,8 +343,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         
         let img = UIImage(systemName: "ellipsis")
         
-        
-        let infoButton = UIBarButtonItem(image: img?.rotate(radians: .pi/2), style: .plain, target: self, action: #selector(infoButtonPressed))
+        let infoButton = UIBarButtonItem(image: img?.rotate(radians: .pi / 2), style: .plain, target: self, action: #selector(infoButtonPressed))
         
         navigationItem.rightBarButtonItem = infoButton
         
@@ -440,6 +442,10 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     }
     
     func checkActivityStatus() {
+        if let isGroup = isGroup {
+            if isGroup { return }
+        }
+        
         if firstLoading {
             firstLoading = false
             return

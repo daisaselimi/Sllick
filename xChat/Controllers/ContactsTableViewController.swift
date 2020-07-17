@@ -431,7 +431,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
     // MARK: IBActions
     
     @objc func inviteButtonPressed() {
-        let text = "Hey! Let's chat on Sllick: <\(kAPPURL)>"
+        let text = "Hey! Let's chat on Sllick: \(kAPPURL)"
         
         let objectsToShare: [Any] = [text]
         

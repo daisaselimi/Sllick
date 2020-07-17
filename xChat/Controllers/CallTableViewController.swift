@@ -116,10 +116,10 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
                 let sortedDictionary = dictionaryFromSnapshots(snapshots: snapshot.documents, endIndex: callsToShow)
                 print("e\(sortedDictionary.count)")
                 for callDictionary in sortedDictionary {
-//                    print("all calls --- \(self.allCalls.count)")
-//                    print("calls to show  --- \(callsToShow)")
-//                    print("all docs  --- \(snapshot.documents.count)")
-//
+                    //                    print("all calls --- \(self.allCalls.count)")
+                    //                    print("calls to show  --- \(callsToShow)")
+                    //                    print("all docs  --- \(snapshot.documents.count)")
+                    //
                     
                     let call = CallClass(_dictionary: callDictionary)
                     self.allCalls.append(call)
@@ -210,8 +210,19 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
                         }
                         
                         getUsersFromFirestore(withIds: [userId]) { users in
+                            if users.isEmpty {
+                                self.showMessage("\(self.filteredCalls[indexPath.row].callerFullName) left Sllick 😢", type: .error)
+                                tableView.isUserInteractionEnabled = true
+                                return
+                            }
                             user = users[0]
-                            self.callUser(user: user)
+                            if user.blockedUsers.contains(FUser.currentId()) {
+                                self.showMessage("User is not available for call", type: .error)
+                            } else if (FUser.currentUser()?.blockedUsers.contains(user.objectId))! {
+                                self.showMessage("Unblock \(user.firstname) to call them", type: .error)
+                            } else {
+                                self.callUser(user: user)
+                            }
                             tableView.isUserInteractionEnabled = true
                         }
                     } else {
@@ -222,8 +233,19 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
                         }
                         
                         getUsersFromFirestore(withIds: [userId]) { users in
+                            if users.isEmpty {
+                                self.showMessage("\(self.allCalls[indexPath.row].callerFullName) left Sllick 😢", type: .error)
+                                tableView.isUserInteractionEnabled = true
+                                return
+                            }
                             user = users[0]
-                            self.callUser(user: user)
+                            if user.blockedUsers.contains(FUser.currentId()) {
+                                self.showMessage("User is not available for call", type: .error)
+                            } else if (FUser.currentUser()?.blockedUsers.contains(user.objectId))! {
+                                self.showMessage("Unblock \(user.firstname) to call them", type: .error)
+                            } else {
+                                self.callUser(user: user)
+                            }
                             tableView.isUserInteractionEnabled = true
                         }
                     }

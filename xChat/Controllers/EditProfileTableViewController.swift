@@ -274,7 +274,6 @@ class EditProfileTableViewController: UITableViewController, UIImagePickerContro
         
         alert.preferredAction = cancelAction
         
-        alert.view.tintColor = UIColor.getAppColor(.light)
         present(alert, animated: true, completion: {
             alert.view.superview?.isUserInteractionEnabled = true
             alert.view.superview?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.dismissOnTapOutside)))

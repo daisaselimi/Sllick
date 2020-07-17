@@ -352,7 +352,9 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
                     let fUser = FUser(_dictionary: userDictionary)
                     
                     if fUser.objectId != FUser.currentId(), !fUser.blockedUsers.contains(FUser.currentUser()!.objectId) {
-                        self.allUsers.append(fUser)
+                        if !(FUser.currentUser()?.blockedUsers.contains(fUser.objectId))! {
+                            self.allUsers.append(fUser)
+                        }
                     }
                 }
                 
@@ -513,6 +515,9 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
         
         if searchController.isActive, searchController.searchBar.text != "" {
             user = filteredUsers[indexPath.row]
+            if checkBlockedStatus(withUser: user) {
+                return
+            }
         }
         else {
             let sectionTitle = sectionTitleList[indexPath.section]

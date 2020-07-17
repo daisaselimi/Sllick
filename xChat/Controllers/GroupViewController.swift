@@ -315,7 +315,6 @@ class GroupViewController: UIViewController, UIImagePickerControllerDelegate, UI
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
-        alert.view.tintColor = UIColor.getAppColor(.light)
         if UIDevice().userInterfaceIdiom == .pad {
             if let currentPopoverpresentioncontroller = alert.popoverPresentationController {
                 currentPopoverpresentioncontroller.sourceView = editButtonOutlet

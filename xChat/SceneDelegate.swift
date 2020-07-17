@@ -16,6 +16,7 @@ import PushKit
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINCallClientDelegate, SINManagedPushDelegate, PKPushRegistryDelegate {
+    
     var window: UIWindow?
     var authListener: AuthStateDidChangeListenerHandle?
     
@@ -41,7 +42,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
         }
         
         // loadUserDefaults()
-        authListener = Auth.auth().addStateDidChangeListener { _, user in
+        self.authListener = Auth.auth().addStateDidChangeListener { _, user in
             
             Auth.auth().removeStateDidChangeListener(self.authListener!)
             
@@ -195,8 +196,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
     }
     
     func sceneWillEnterForeground(_ scene: UIScene) {
-        if callKitProvider != nil {
-            let call = callKitProvider.currentEstablishedCall()
+        if self.callKitProvider != nil {
+            let call = self.callKitProvider.currentEstablishedCall()
             
             if call != nil {
                 var top = self.window?.rootViewController
@@ -234,15 +235,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
     // MARK: Sinch
     
     func initSinchWithUserId(userId: String) {
-        if _client == nil {
-            _client = Sinch.client(withApplicationKey: kSINCHKEY, applicationSecret: kSINCHSECRET, environmentHost: "sandbox.sinch.com", userId: userId)
-            _client.delegate = self
-            _client.call()?.delegate = self
-            _client.setSupportCalling(true)
-            _client.enableManagedPushNotifications()
-            _client.start()
-            _client.startListeningOnActiveConnection()
-            callKitProvider = SINCallKitProvider(withClient: _client)
+        if self._client == nil {
+            self._client = Sinch.client(withApplicationKey: kSINCHKEY, applicationSecret: kSINCHSECRET, environmentHost: "sandbox.sinch.com", userId: userId)
+            self._client.delegate = self
+            self._client.call()?.delegate = self
+            self._client.setSupportCalling(true)
+            self._client.enableManagedPushNotifications()
+            self._client.start()
+            self._client.startListeningOnActiveConnection()
+            self.callKitProvider = SINCallKitProvider(withClient: self._client)
         }
     }
     
@@ -250,14 +251,37 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
     
     func managedPush(_ managedPush: SINManagedPush!, didReceiveIncomingPushWithPayload payload: [AnyHashable: Any]!, forType pushType: String!) {
         print("managed push")
-        if pushType == "PKPushTypeVoIP" {
-            self.handleRemoteNotification(userInfo: payload as NSDictionary)
+        if pushType == "PKPushTypeVoIP" {}
+        
+        weak var notification = SINPushHelper.queryPushNotificationPayload(payload)
+        
+        if notification?.isValid != nil, notification?.isCall() != nil {
+            let callId = UUID(uuidString: notification?.call().callId ?? "")
+            
+            let callUpdate = CXCallUpdate()
+            callUpdate.remoteHandle = CXHandle(type: .generic, value: notification?.call().remoteUserId ?? "")
+            
+            if let callId = callId {
+                DispatchQueue.main.async {
+                    self.callKitProvider._provider.reportNewIncomingCall(
+                        with: callId,
+                        update: callUpdate) { error in
+                        if error != nil {
+                            return
+                        } else {
+                            DispatchQueue.main.async {
+                                self.handleRemoteNotification(userInfo: payload as NSDictionary)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
     
     func handleRemoteNotification(userInfo: NSDictionary) {
         print("got rem not")
-        if _client == nil {
+        if self._client == nil {
             if let userId = UserDefaults.standard.object(forKey: kUSERID) {
                 self.initSinchWithUserId(userId: userId as! String)
             }
@@ -301,13 +325,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
     
     func client(_ client: SINCallClient!, willReceiveIncomingCall call: SINCall!) {
         print("will receive incoming call")
-        callKitProvider.reportNewIncomingCall(call: call)
+        self.callKitProvider.reportNewIncomingCall(call: call)
     }
     
     func client(_ client: SINCallClient!, didReceiveIncomingCall call: SINCall!) {
         print("........did receive call")
         
         // present call view
+        if (FUser.currentUser()?.blockedUsers.contains(call.callId))! {
+            return
+        }
         var top = self.window?.rootViewController
         
         while top?.presentedViewController != nil {
@@ -408,16 +435,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
                 callUpdate.remoteHandle = phoneNumber
                 
                 // Report the call to CallKit, and let it display the call UI.
-                callKitProvider._provider.reportNewIncomingCall(with: callUUID,
-                                                                update: callUpdate, completion: { error in
-                                                                    if error != nil {
-                                                                        // If the system allows the call to proceed, make a data record for it.
-                                                                        // let newCall = VoipCall(callUUID, phoneNumber: phoneNumber)
-                                                                        return
-                                                                    }
-                                                                    
-                                                                    // Tell PushKit that the notification is handled.
-                                                                    completion()
+                self.callKitProvider._provider.reportNewIncomingCall(with: callUUID,
+                                                                     update: callUpdate, completion: { error in
+                                                                         if error != nil {
+                                                                             // If the system allows the call to proceed, make a data record for it.
+                                                                             // let newCall = VoipCall(callUUID, phoneNumber: phoneNumber)
+                                                                             return
+                                                                         }
+                                                                         
+                                                                         // Tell PushKit that the notification is handled.
+                                                                         completion()
                })
                 
                 // Asynchronously register with the telephony server and
