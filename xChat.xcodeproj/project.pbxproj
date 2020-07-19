@@ -56,6 +56,7 @@
 		7F8C893123945D7C00432EAE /* GroupTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F8C893023945D7C00432EAE /* GroupTableViewController.swift */; };
 		7F8CFCE82379A8A1003E0A12 /* Encryption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F8CFCE72379A8A1003E0A12 /* Encryption.swift */; };
 		7FBDCCBE23776DA400CE92EA /* NewGroupViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FBDCCBD23776DA400CE92EA /* NewGroupViewController.swift */; };
+		7FC7139624C488AC0020310C /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 7FC7139524C488AC0020310C /* README.md */; };
 		7FD5B92D2371962B008343C3 /* BlockedUsersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD5B92C2371962B008343C3 /* BlockedUsersViewController.swift */; };
 		7FD5B92F2371A6D3008343C3 /* BackgroundsCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD5B92E2371A6D3008343C3 /* BackgroundsCollectionViewController.swift */; };
 		7FD5B9312371A6E9008343C3 /* BackgroundsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD5B9302371A6E9008343C3 /* BackgroundsCollectionViewCell.swift */; };
@@ -161,6 +162,7 @@
 		7F8C893023945D7C00432EAE /* GroupTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupTableViewController.swift; sourceTree = "<group>"; };
 		7F8CFCE72379A8A1003E0A12 /* Encryption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encryption.swift; sourceTree = "<group>"; };
 		7FBDCCBD23776DA400CE92EA /* NewGroupViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewGroupViewController.swift; sourceTree = "<group>"; };
+		7FC7139524C488AC0020310C /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		7FCDF1B5249287120065B75D /* absl.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = absl.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7FD5B92C2371962B008343C3 /* BlockedUsersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockedUsersViewController.swift; sourceTree = "<group>"; };
 		7FD5B92E2371A6D3008343C3 /* BackgroundsCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundsCollectionViewController.swift; sourceTree = "<group>"; };
@@ -303,6 +305,7 @@
 		7FFB47102356069E00CC10A2 = {
 			isa = PBXGroup;
 			children = (
+				7FC7139524C488AC0020310C /* README.md */,
 				7FFB471B2356069E00CC10A2 /* xChat */,
 				7F85E7F8241E880800333662 /* OneSignalNotificationServiceExtension */,
 				7FFB471A2356069E00CC10A2 /* Products */,
@@ -464,6 +467,7 @@
 			files = (
 				7F4023DA23C292710001CB65 /* gr_ls.png in Resources */,
 				7F50AEA32426858700CE11A7 /* ringback.wav in Resources */,
+				7FC7139624C488AC0020310C /* README.md in Resources */,
 				7F3FD5DF2356686500354313 /* GoogleService-Info.plist in Resources */,
 				7FFB47292356069F00CC10A2 /* LaunchScreen.storyboard in Resources */,
 				7FFB47262356069F00CC10A2 /* Assets.xcassets in Resources */,
