@@ -48,6 +48,7 @@
 		7F54E3FA236481F000BC6F1B /* Downloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F54E3F9236481F000BC6F1B /* Downloader.swift */; };
 		7F56B557239C2C520054D9F5 /* sent-no-bg.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F56B556239C2C520054D9F5 /* sent-no-bg.png */; };
 		7F5DBD7B237AFB3F00D4D1CC /* ImagePicker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5DBD7A237AFB3F00D4D1CC /* ImagePicker.framework */; };
+		7F6ABC7F24C74BA90057FEC4 /* Constants-Blueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F6ABC7E24C74BA90057FEC4 /* Constants-Blueprint.swift */; };
 		7F85E7F2241D234100333662 /* PushNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F85E7F1241D234100333662 /* PushNotifications.swift */; };
 		7F85E7FA241E880800333662 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F85E7F9241E880800333662 /* NotificationService.swift */; };
 		7F85E7FE241E880800333662 /* OneSignalNotificationServiceExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 7F85E7F7241E880800333662 /* OneSignalNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -151,6 +152,7 @@
 		7F54E3F9236481F000BC6F1B /* Downloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Downloader.swift; sourceTree = "<group>"; };
 		7F56B556239C2C520054D9F5 /* sent-no-bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sent-no-bg.png"; sourceTree = "<group>"; };
 		7F5DBD7A237AFB3F00D4D1CC /* ImagePicker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = ImagePicker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7F6ABC7E24C74BA90057FEC4 /* Constants-Blueprint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Constants-Blueprint.swift"; sourceTree = "<group>"; };
 		7F6BB4E4239F11AD00AE22CE /* SentDebug.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = SentDebug.entitlements; sourceTree = "<group>"; };
 		7F6BB4E5239F11AE00AE22CE /* Sent.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Sent.entitlements; sourceTree = "<group>"; };
 		7F85E7F1241D234100333662 /* PushNotifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushNotifications.swift; sourceTree = "<group>"; };
@@ -219,6 +221,7 @@
 				7F3FD5E623566C5700354313 /* CollectionReference.swift */,
 				7F3FD5E423566C4E00354313 /* HelperFunctions.swift */,
 				7F54E3F9236481F000BC6F1B /* Downloader.swift */,
+				7F6ABC7E24C74BA90057FEC4 /* Constants-Blueprint.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -305,7 +308,6 @@
 		7FFB47102356069E00CC10A2 = {
 			isa = PBXGroup;
 			children = (
-				7FC7139524C488AC0020310C /* README.md */,
 				7FFB471B2356069E00CC10A2 /* xChat */,
 				7F85E7F8241E880800333662 /* OneSignalNotificationServiceExtension */,
 				7FFB471A2356069E00CC10A2 /* Products */,
@@ -364,6 +366,7 @@
 		EC78F393DC29F83D3CADFA85 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7FC7139524C488AC0020310C /* README.md */,
 				7FCDF1B5249287120065B75D /* absl.framework */,
 				7F50AE9D24265D0E00CE11A7 /* PushKit.framework */,
 				7F5DBD7A237AFB3F00D4D1CC /* ImagePicker.framework */,
@@ -600,6 +603,7 @@
 				7F0F38352456328000470EF8 /* AccountTableViewController.swift in Sources */,
 				7F4E7F62243FC365004D6E42 /* ActiveNowTableViewController.swift in Sources */,
 				7F0F52E7236719A7001062AA /* AudioViewController.swift in Sources */,
+				7F6ABC7F24C74BA90057FEC4 /* Constants-Blueprint.swift in Sources */,
 				7F2B38062359FF12002867EF /* ChatsViewController.swift in Sources */,
 				7F2B38002359D825002867EF /* SettingsTableViewController.swift in Sources */,
 				7F8CFCE82379A8A1003E0A12 /* Encryption.swift in Sources */,

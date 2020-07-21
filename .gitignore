@@ -69,3 +69,5 @@ node_modules/
 xChat.xcworkspace/xcuserdata/isaselimi.xcuserdatad/UserInterfaceState.xcuserstate
 
 xChat.xcodeproj/xcuserdata/isaselimi.xcuserdatad/xcschemes/xcschememanagement.plist
+
+xChat/Helpers/Constants.swift
