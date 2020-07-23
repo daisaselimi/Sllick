@@ -721,7 +721,7 @@ func showReceivedCallDialog(viewController: UIViewController) {
         UserDefaults.standard.set(true, forKey: "Don't ask for mic permission")
      }))
     
-    alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+    alertController.addAction(UIAlertAction(title: "Cancel", style: .destructive))
     
     viewController.present(alertController, animated: true)
 }
@@ -730,7 +730,7 @@ func presentSettings(viewController: UIViewController, titleText: String) {
     let alertController = UIAlertController(title: titleText,
                                             message: "Open settings to change permission",
                                             preferredStyle: .alert)
-    alertController.addAction(UIAlertAction(title: "Cancel", style: .default))
+    alertController.addAction(UIAlertAction(title: "Cancel", style: .destructive))
     alertController.addAction(UIAlertAction(title: "Settings", style: .cancel) { _ in
         if let url = URL(string: UIApplication.openSettingsURLString) {
             UIApplication.shared.open(url, options: [:], completionHandler: { _ in
@@ -974,5 +974,12 @@ extension UICollectionView {
     func reloadData(_ completion: @escaping () -> Void) {
         self.reloadData()
         DispatchQueue.main.async { completion() }
+    }
+}
+
+extension UIAlertController{
+    open override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        self.view.tintColor = .label
     }
 }

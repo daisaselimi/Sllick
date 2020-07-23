@@ -19,6 +19,7 @@ class FinishRegistrationTableViewController: UITableViewController, ImagePickerD
     @IBOutlet var countryTextField: UITextField!
     @IBOutlet var cityTextField: UITextField!
     @IBOutlet var phoneTextField: FPNTextField!
+    @IBOutlet weak var doneButton: UIBarButtonItem!
     
     var phoneNumber: String = ""
     var countryCode: String = ""
@@ -77,11 +78,12 @@ class FinishRegistrationTableViewController: UITableViewController, ImagePickerD
     @IBAction func doneButtonPressed(_ sender: Any) {
         dismissKeyboard()
         gradientLoadingBar.fadeIn()
-        
+        doneButton.isEnabled = false
         if allFieldsAreFilled() {
             if phoneNumber == "Not Valid" {
                 gradientLoadingBar.fadeOut()
                 showMessage("Phone number is not valid", type: .error)
+                doneButton.isEnabled = true
                 return
             }
             FUser.registerUserWith(email: email, password: password, firstName: nameTextField.text!, lastName: surnameTextField.text!) { error in
@@ -96,6 +98,7 @@ class FinishRegistrationTableViewController: UITableViewController, ImagePickerD
                         default: self.showMessage("An error occurred", type: .error)
                         }
                     }
+                    self.doneButton.isEnabled = true
                 }
                 else {
                     self.gradientLoadingBar.fadeOut()
@@ -106,6 +109,7 @@ class FinishRegistrationTableViewController: UITableViewController, ImagePickerD
         else {
             gradientLoadingBar.fadeOut()
             showMessage("All fields are required", type: .error)
+            doneButton.isEnabled = true
         }
     }
     
@@ -133,7 +137,7 @@ class FinishRegistrationTableViewController: UITableViewController, ImagePickerD
     
     func finishRegistration(withValues: [String: Any]) {
         updateCurrentUserInFirestore(withValues: withValues) { error in
-            
+            self.doneButton.isEnabled = true
             if error != nil {
                 self.showMessage("An error occurred", type: .error)
                 

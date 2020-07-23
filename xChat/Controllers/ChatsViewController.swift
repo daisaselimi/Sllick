@@ -161,12 +161,17 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 if !self.contactsChanged {
                     if !snapshot.isEmpty {
                         let documents = snapshot.documents
-                        self.usersOnline = []
+                        //self.usersOnline = []
                         for doc in documents {
                             let userId = doc["userId"] as! String
                             
                             if doc["state"] as! String == "Online", !self.usersOnline.contains(userId) {
                                 self.usersOnline.append(userId)
+                            } else if doc["state"] as! String == "Offline" {
+                                if self.usersOnline.contains(userId) {
+                                    let idx = self.usersOnline.firstIndex(of: userId)
+                                    self.usersOnline.remove(at: idx!)
+                                }
                             }
                         }
                         MyVariables.usersOnline = self.usersOnline

@@ -766,6 +766,7 @@
                         <outlet property="avatarImageView" destination="8yQ-QT-Ekh" id="cDK-RF-quF"/>
                         <outlet property="cityTextField" destination="K9o-pT-IHt" id="nRP-BL-dQh"/>
                         <outlet property="countryTextField" destination="t9o-S2-o68" id="3HI-3C-9Fc"/>
+                        <outlet property="doneButton" destination="t8j-mV-HBb" id="31V-jR-g7i"/>
                         <outlet property="nameTextField" destination="1L6-Wo-MOe" id="K0v-8i-eA1"/>
                         <outlet property="phoneTextField" destination="8yX-Vc-IES" id="Io3-7R-0q0"/>
                         <outlet property="surnameTextField" destination="UXi-Jk-hmZ" id="LCk-Ih-8nx"/>

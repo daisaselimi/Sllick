@@ -41,6 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         setupUIForAlerts()
         GradientLoadingBar.shared.gradientColors = [UIColor.getAppColor(.light), .systemTeal, UIColor.getAppColor(.dark)]
+        UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = .label
         
         // UIBarButtonItem.appearance().setBackButtonTitlePositionAdjustment(UIOffset(horizontal: -1000.0, vertical: 0.0), for: .default)
         // print(FUser.currentUser()!.objectId)

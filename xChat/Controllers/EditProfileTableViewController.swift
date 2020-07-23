@@ -273,7 +273,6 @@ class EditProfileTableViewController: UITableViewController, UIImagePickerContro
         alert.addAction(cancelAction)
         
         alert.preferredAction = cancelAction
-        
         present(alert, animated: true, completion: {
             alert.view.superview?.isUserInteractionEnabled = true
             alert.view.superview?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.dismissOnTapOutside)))
