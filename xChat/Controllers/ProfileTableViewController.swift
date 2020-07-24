@@ -214,7 +214,7 @@ class ProfileTableViewController: UITableViewController {
                                                 message: "Are you sure you want to block them?",
                                                 preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alertController.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+        alertController.addAction(UIAlertAction(title: "OK", style: .destructive) { _ in
             var currentBlockedIds = FUser.currentUser()!.blockedUsers
             if currentBlockedIds.contains(self.user!.objectId) {
                 let index = currentBlockedIds.firstIndex(of: self.user!.objectId)

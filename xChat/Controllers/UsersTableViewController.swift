@@ -70,6 +70,8 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
         }
     }
     
+    
+    
     func getContacts() {
         reference(.Contact).whereField("userID", isEqualTo: FUser.currentId()).getDocuments { snapshot, error in
             if error != nil {
@@ -439,10 +441,24 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
     }
     
     // MARK: Search controller functions
+    var previousSearch: String = ""
     
     func updateSearchResults(for searchController: UISearchController) {
+        
+        
         NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(filterContentForSearchText), object: nil)
         searchTxt = searchController.searchBar.text!.lowercased().removeExtraSpaces()
+        if searchTxt.removeExtraSpaces().isEmpty {
+            tableView.reloadData()
+            searchingEnded()
+            return
+        }
+        if previousSearch != "" && searchTxt == previousSearch {
+            searchingEnded()
+            return
+        }
+        searchInProgress()
+        previousSearch = searchTxt
         perform(#selector(filterContentForSearchText), with: nil, afterDelay: 0.5)
     }
     
@@ -452,15 +468,18 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
         //        })        self.filteredUsers = []
         
         filteredUsers = []
-        tableView.reloadData()
+        
+        // tableView.reloadData()
         
         reference(.UserKeywords).whereField("keywords", arrayContains: searchTxt).getDocuments { snapshot, error in
             print("hereeeeeeeeeeee")
             if error != nil {
                 self.showMessage("Could not fetch users", type: .error)
+                self.searchingEnded()
                 return
             }
             guard snapshot != nil else {
+                self.searchingEnded()
                 return
             }
             if !snapshot!.isEmpty {
@@ -482,10 +501,25 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
                             return true
                         }
                     }
-                    self.tableView.reloadData()
+                    self.searchingEnded()
                 }
             }
+            else {
+                self.filteredUsers = []
+                self.searchingEnded()
+            }
         }
+    }
+    
+    func searchInProgress() {
+        gradientLoadingBar.fadeIn()
+        tableView.isUserInteractionEnabled = false
+    }
+    
+    func searchingEnded() {
+        gradientLoadingBar.fadeOut()
+        tableView.isUserInteractionEnabled = true
+        tableView.reloadData()
     }
     
     func splitDataIntoSections() {

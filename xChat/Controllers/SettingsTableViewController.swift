@@ -252,7 +252,7 @@ class SettingsTableViewController: UITableViewController {
     }
     
     func logOutUser() {
-        let optionMenu = UIAlertController(title: "Logging out", message: "Are you sure you want to log out?", preferredStyle: .actionSheet)
+        let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         let loUser: String = FUser.currentId()
         let logOutAction = UIAlertAction(title: "Log Out", style: .destructive) { _ in

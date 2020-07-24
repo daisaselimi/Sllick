@@ -721,7 +721,7 @@ func showReceivedCallDialog(viewController: UIViewController) {
         UserDefaults.standard.set(true, forKey: "Don't ask for mic permission")
      }))
     
-    alertController.addAction(UIAlertAction(title: "Cancel", style: .destructive))
+    alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
     
     viewController.present(alertController, animated: true)
 }
