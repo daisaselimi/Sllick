@@ -89,7 +89,7 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
         if allFieldsAreFilled() {
             if phoneNumber == "Not Valid" {
                 gradientLoadingBar.fadeOut()
-                showMessage("Phone number is not valid", type: .error)
+                showMessage(kPHONENUMBERNOTVALID, type: .error)
                 return
             }
             FUser.registerUserWith(email: email, password: password, firstName: nameTextField.text!, lastName: surnameTextField.text!) { error in
@@ -99,9 +99,9 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
                     ProgressHUD.dismiss()
                     if let errCode = AuthErrorCode(rawValue: error!._code) {
                         switch errCode {
-                        case .emailAlreadyInUse: self.showMessage("Email already in use", type: .error)
-                        case .invalidEmail: self.showMessage("Invalid email", type: .error)
-                        default: self.showMessage("An error occurred", type: .error)
+                        case .emailAlreadyInUse: self.showMessage(kEMAILALREADYINUSE, type: .error)
+                        case .invalidEmail: self.showMessage(kEMAILNOTVALID, type: .error)
+                        default: self.showMessage(kSOMETHINGWENTWRONG, type: .error)
                         }
                     }
                 }
@@ -113,7 +113,7 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
         }
         else {
             gradientLoadingBar.fadeOut()
-            showMessage("All fields are required", type: .error)
+            showMessage(kEMPTYFIELDS, type: .error)
         }
     }
     

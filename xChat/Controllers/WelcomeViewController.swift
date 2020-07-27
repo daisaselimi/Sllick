@@ -55,7 +55,7 @@ class WelcomeViewController: UIViewController {
         if emailTextField.text != "", passwordTextField.text != "", repeatPasswordTextField.text != "" {
             if passwordTextField.text == repeatPasswordTextField.text! {
                 if passwordTextField.text!.count < 6 {
-                    showMessage("Password should contain at least 6 characters", type: .error)
+                    showMessage(kPASSWORDLENGTH6CHARS, type: .error)
                     return
                 }
                 
@@ -93,7 +93,7 @@ class WelcomeViewController: UIViewController {
         if emailTextField.text != "", passwordTextField.text != "", repeatPasswordTextField.text != "" {
             if passwordTextField.text == repeatPasswordTextField.text! {
                 if passwordTextField.text!.count < 6 {
-                    showMessage("Password should contain at least 6 characters", type: .error)
+                    showMessage(kPASSWORDLENGTH6CHARS, type: .error)
                     return
                 }
                 

@@ -161,7 +161,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 if !self.contactsChanged {
                     if !snapshot.isEmpty {
                         let documents = snapshot.documents
-                        //self.usersOnline = []
+                        // self.usersOnline = []
                         for doc in documents {
                             let userId = doc["userId"] as! String
                             
@@ -266,7 +266,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     @objc func internetConnectionChanged() {
         if !MyVariables.internetConnectionState {
-            recentChatsTableView.showTableHeaderView(header: getTableViewHeader(title: "No internet connection", backgroundColor: .systemGray6, textColor: .label))
+            recentChatsTableView.showTableHeaderView(header: getTableViewHeader(title: kNOINTERNETCONNECTION, backgroundColor: .systemGray6, textColor: .label))
         } else {
             recentChatsTableView.hideTableHeaderView()
         }
@@ -777,9 +777,9 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         if payload.additionalData != nil {
             let additionalData = payload.additionalData
             if (UIApplication.getTopViewController() as? ChatViewController)?.chatRoomId == (additionalData!["chatRoomId"] as! String) {
-                print("WOAHHHHH")
+                
             } else {
-                print("SHOWING NOTIFICATION!!!")
+                
                 let center = UNUserNotificationCenter.current()
                 
                 let content = UNMutableNotificationContent()

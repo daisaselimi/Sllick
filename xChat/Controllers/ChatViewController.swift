@@ -266,7 +266,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     
     @objc func internetConnectionChanged() {
         if !MyVariables.internetConnectionState {
-            showMessage("No internet connection", type: .warning, options: [.autoHide(false), .hideOnTap(false), .textColor(.label)])
+            showMessage(kNOINTERNETCONNECTION, type: .warning, options: [.autoHide(false), .hideOnTap(false), .textColor(.label)])
             // self.loadViewIfNeeded()
         } else {
             hideMessage()
@@ -1282,7 +1282,7 @@ extension ChatViewController {
     
     override func didPressAccessoryButton(_ sender: UIButton!) {
         if !MyVariables.internetConnectionState {
-            showMessage("No internet connection", type: .warning, options: [.autoHide(false), .hideOnTap(false), .textColor(.label)])
+            showMessage(kNOINTERNETCONNECTION, type: .warning, options: [.autoHide(false), .hideOnTap(false), .textColor(.label)])
             return
         }
         let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
@@ -1363,7 +1363,7 @@ extension ChatViewController {
             collectionView.reloadData()
         } else {
             if !MyVariables.internetConnectionState {
-                showMessage("No internet connection", type: .warning, options: [.autoHide(false), .hideOnTap(false), .textColor(.label)])
+                showMessage(kNOINTERNETCONNECTION, type: .warning, options: [.autoHide(false), .hideOnTap(false), .textColor(.label)])
                 return
             }
             internetConnectionChanged()

@@ -220,9 +220,9 @@ class SettingsTableViewController: UITableViewController {
                         if let errCode = AuthErrorCode(rawValue: error!._code) {
                             switch errCode {
                             case .wrongPassword:
-                                self.showMessage("Wrong password", type: .error)
+                                self.showMessage(kWRONGPASSWORD, type: .error)
                             case .tooManyRequests:
-                                self.showMessage("Please wait before you try again", type: .error)
+                                self.showMessage(kWAITBEFOREYOUTRYAGAIN, type: .error)
                             default:
                                 self.showMessage(kSOMETHINGWENTWRONG, type: .error)
                             }

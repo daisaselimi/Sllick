@@ -24,7 +24,10 @@ func recentBadgeCount(withBlock: @escaping (_ badgeNumber: Int) -> Void) {
             for recent in recents {
                 let currentRecent = recent.data() as NSDictionary
                 
-                badge += currentRecent[kCOUNTER] as! Int
+                if (UIApplication.getTopViewController() as? ChatViewController)?.chatRoomId != (currentRecent["chatRoomID"] as! String) {
+                    badge += currentRecent[kCOUNTER] as! Int
+                }
+                
                 counter += 1
                 
                 if counter == recents.count {
