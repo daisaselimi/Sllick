@@ -199,8 +199,8 @@ class ProfileTableViewController: UITableViewController {
                     self.activityLabel.textColor = .systemGreen
                 } else {
                     let lastChanged = (doc["last_changed"] as! Timestamp)
-                    var timestamp = lastChanged.dateValue().timeIntervalSince1970
-                    var date = Date(timeIntervalSince1970: timestamp)
+                    let timestamp = lastChanged.dateValue().timeIntervalSince1970
+                    let date = Date(timeIntervalSince1970: timestamp)
                     
                     self.activityLabel.text = "Active \(date.timeAgoSinceDate())"
                     self.activityLabel.textColor = .secondaryLabel
@@ -248,15 +248,16 @@ class ProfileTableViewController: UITableViewController {
                 return
             }
             // self.navigationItem.rightBarButtonItems?.first?.isEnabled = true
-            let data = document?.data()
-            var contacts = data?["contacts"] as! [String]
-            if contacts.contains(user) {
-                let idx = contacts.firstIndex(of: user)
-                contacts.remove(at: idx!)
-                reference(.Contact).document(ofUser).updateData(["contacts": contacts])
-                //                self.setBarButton(imageName: "person.badge.plus.fill", imageType: .systemImage, withTintColor: .systemGreen)
-                //                self.isInContacts = false
-                //                self.activityLabel.isHidden = true
+            if let data = document?.data() {
+                var contacts = data["contacts"] as! [String]
+                if contacts.contains(user) {
+                    let idx = contacts.firstIndex(of: user)
+                    contacts.remove(at: idx!)
+                    reference(.Contact).document(ofUser).updateData(["contacts": contacts])
+                    //                self.setBarButton(imageName: "person.badge.plus.fill", imageType: .systemImage, withTintColor: .systemGreen)
+                    //                self.isInContacts = false
+                    //                self.activityLabel.isHidden = true
+                }
             }
         }
     }

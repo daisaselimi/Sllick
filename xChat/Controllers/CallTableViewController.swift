@@ -6,11 +6,12 @@
 //  Copyright © 2020 com.isaselimi. All rights reserved.
 //
 
+import DZNEmptyDataSet
 import FirebaseFirestore
 import ProgressHUD
 import UIKit
 
-class CallTableViewController: UITableViewController, UISearchResultsUpdating {
+class CallTableViewController: UITableViewController, UISearchResultsUpdating, DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
     
     var allCalls: [CallClass] = []
     var filteredCalls: [CallClass] = []
@@ -40,6 +41,15 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
         searchController.dimsBackgroundDuringPresentation = false
         definesPresentationContext = true
         loadCalls()
+    }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        if tableView.emptyDataSetSource == nil {
+            tableView.emptyDataSetSource = self
+            tableView.emptyDataSetDelegate = self
+            tableView.reloadEmptyDataSet()
+        }
     }
     
     var firstLoad = false
@@ -131,14 +141,14 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
                         return
                     }
                 }
-                if self.allCalls.count == 0 {
-                    self.tableView.setEmptyMessage("No calls")
-                } else {
-                    self.tableView.restore()
-                }
+                //                if self.allCalls.count == 0 {
+                //                    self.tableView.setEmptyMessage("No calls")
+                //                } else {
+                //                    self.tableView.restore()
+                //                }
                 
             } else {
-                self.tableView.setEmptyMessage("No calls")
+                // self.tableView.setEmptyMessage("No calls")
             }
         }
     }
@@ -165,10 +175,10 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
             
             if let err = err {
                 print("\(err.localizedDescription)")
-                self.tableView.setEmptyMessage("No calls")
+                // self.tableView.setEmptyMessage("No calls")
             } else if snapshot!.isEmpty {
                 self.fetchingMore = false
-                self.tableView.setEmptyMessage("No calls")
+                // self.tableView.setEmptyMessage("No calls")
                 return
             } else {
                 let sortedDictionary = dictionaryFromSnapshots(snapshots: snapshot!.documents)
@@ -178,9 +188,9 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
                     self.allCalls.append(call)
                 }
                 if self.allCalls.count == 0 {
-                    self.tableView.setEmptyMessage("No calls")
+                    // self.tableView.setEmptyMessage("No calls")
                 } else {
-                    self.tableView.restore()
+                    // self.tableView.restore()
                 }
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
@@ -303,5 +313,23 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating {
     
     func updateSearchResults(for searchController: UISearchController) {
         filteredContentForSearchText(searchText: searchController.searchBar.text!)
+    }
+    
+    // MARK: DZN data source/delegate methods
+    
+    func image(forEmptyDataSet scrollView: UIScrollView!) -> UIImage! {
+        return UIImage(named: "calling")
+    }
+    
+    func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        return NSAttributedString(string: "NO CALLS", attributes: [NSAttributedString.Key.foregroundColor: UIColor.label, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16.0)])
+    }
+    
+    func description(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        return NSAttributedString(string: "All calls will appear here. You can call someone from their profile.", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14.0)])
+    }
+    
+    func emptyDataSetShouldAllowScroll(_ scrollView: UIScrollView!) -> Bool {
+        return true
     }
 }

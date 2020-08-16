@@ -8,8 +8,9 @@
 
 import FirebaseFirestore
 import UIKit
+import DZNEmptyDataSet
 
-class ActiveNowTableViewController: UITableViewController {
+class ActiveNowTableViewController: UITableViewController, DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
     
     var contacts: [String] = []
     var usersOnline: [String] = []
@@ -24,6 +25,9 @@ class ActiveNowTableViewController: UITableViewController {
         // self.title = "Active now"
         tableView.tableFooterView = UIView()
         tableView.separatorStyle = .none
+
+      //  tableView.emptyDataSetSource = self
+       
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onlineUsersChanged),
                                                name: .onlineUsersNotification, object: nil)
@@ -33,6 +37,21 @@ class ActiveNowTableViewController: UITableViewController {
         super.viewWillAppear(animated)
 //        usersOnline = MyVariables.usersOnline
 //        loadUsers()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+//                if (self.tableView.contentOffset.y < 0 && self.tableView.isEmptyDataSetVisible) {
+//            self.tableView.contentOffset = CGPoint.zero;
+//        }
+    }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        if tableView?.emptyDataSetSource == nil {
+            tableView?.emptyDataSetSource = self
+             tableView.emptyDataSetDelegate = self
+            tableView?.reloadEmptyDataSet()
+        }
     }
     
     @objc func onlineUsersChanged() {
@@ -92,5 +111,23 @@ class ActiveNowTableViewController: UITableViewController {
         cell.selectionStyle = .none
         cell.generateCellWith(fUser: user, indexPath: indexPath, isOnline: true)
         return cell
+    }
+
+    // MARK: DZN data source/delegate methods
+    
+    func image(forEmptyDataSet scrollView: UIScrollView!) -> UIImage! {
+        return UIImage(named: "balloon")
+    }
+    
+    func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        return NSAttributedString(string: "NO ACTIVE USERS", attributes: [NSAttributedString.Key.foregroundColor : UIColor.label, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16.0)])
+    }
+    
+    func description(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        return NSAttributedString(string: "People who are active and in your contacts list will appear here.", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14.0)])
+    }
+    
+    func emptyDataSetShouldAllowScroll(_ scrollView: UIScrollView!) -> Bool {
+        return true
     }
 }

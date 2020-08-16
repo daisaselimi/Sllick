@@ -154,7 +154,7 @@ class NewGroupViewController: UIViewController, UICollectionViewDataSource, UICo
             }
             alert.addAction(resetAction)
         }
-        alert.addAction(UIAlertAction(title: "Cancel", style: .default, handler: nil))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
         if UIDevice().userInterfaceIdiom == .pad {
             if let currentPopoverpresentioncontroller = alert.popoverPresentationController {

@@ -6,6 +6,7 @@
 //  Copyright © 2019 com.isaselimi. All rights reserved.
 //
 
+import DZNEmptyDataSet
 import Firebase
 import FirebaseFirestore
 import GradientLoadingBar
@@ -43,7 +44,6 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         super.viewDidLoad()
         //        navigationItem.leftBarButtonItem = UIBarButtonItem.menuButton(self, action: #selector(presentSettings), image: UIImage(named: "avatarph")!)
         // addNoInternetConnectionLabel(height: 0)
-        
         navigationItem.largeTitleDisplayMode = .never
         observer = NotificationCenter.default.addObserver(forName: .globalContactsVariable, object: nil, queue: .main) { [weak self] _ in
             
@@ -432,7 +432,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         let muteAction = UIContextualAction(style: .normal, title: nil) { _, _, _ in
             self.updatePushMembers(recent: tempRecent, mute: mute)
-            UIView.transition(with: tableView, duration: 0.1, options: .transitionCrossDissolve, animations: { self.recentChatsTableView.reloadData() }, completion: nil)
+            UIView.transition(with: tableView, duration: 0.5, options: .transitionCrossDissolve, animations: { self.recentChatsTableView.reloadData() }, completion: nil)
         }
         
         deleteRecent.backgroundColor = UIColor.systemBackground
@@ -499,6 +499,13 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
         
         recentListener = reference(.Recent).whereField(kUSERID, isEqualTo: FUser.currentId()).addSnapshotListener { snapshot, error in
+            
+            if self.recentChatsTableView?.emptyDataSetSource == nil {
+                self.recentChatsTableView?.emptyDataSetSource = self
+                self.recentChatsTableView.emptyDataSetDelegate = self
+                self.recentChatsTableView?.reloadEmptyDataSet()
+            }
+            
             if let error = error {
                 if let errorCode = AuthErrorCode(rawValue: error._code) {
                     switch errorCode.rawValue {
@@ -531,10 +538,10 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 }
                 
                 if self.recentChats.isEmpty {
-                    self.recentChatsTableView.setEmptyMessage("No chats to show")
+                    // self.recentChatsTableView.setEmptyMessage("No chats to show")
                 } else {
                     // self.getContacts()
-                    self.recentChatsTableView.restore()
+                    //  self.recentChatsTableView.restore()
                 }
                 if self.searchController.isActive, self.searchController.searchBar.text != "" {
                     self.updateSearchResults(for: self.searchController)
@@ -543,7 +550,6 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 
                 self.gradientLoadingBar.fadeOut()
             } else {
-                self.recentChatsTableView.setEmptyMessage("No chats to show")
                 self.gradientLoadingBar.fadeOut()
             }
         }
@@ -587,13 +593,9 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         groupButton.setTitle("New Group", for: .normal)
         let buttonColor = UIColor.getAppColor(.light)
         groupButton.setTitleColor(buttonColor, for: .normal)
-        
-        //        let lineView = UIView(frame: CGRect(x: 0, y: headerView.frame.height-1, width: recentChatsTableView.frame.width, height: 1))
-        //        lineView.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
         headerView.backgroundColor = .secondarySystemBackground
         buttonView.addSubview(groupButton)
         headerView.addSubview(buttonView)
-        // headerView.addSubview(lineView)
         recentChatsTableView.tableHeaderView = headerView
     }
     
@@ -626,23 +628,6 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         }
         
         if recent[kTYPE] as! String == kPRIVATE {
-            //            reference(.User).document(recent[kWITHUSERUSERID] as! String).getDocument { (snapshot, error) in
-            //
-            //                guard let snapshot = snapshot else { return }
-            //
-            //                if snapshot.exists {
-            //
-            //                    let userDictionary = snapshot.data()! as NSDictionary
-            //                    let tempUser = FUser(_dictionary: userDictionary)
-            //
-            //
-            //                    cell.isUserInteractionEnabled = true
-            //
-            //                    self.showUserProfile(userDictionary: userDictionary)
-            //                  //      self.gradientLoadingBar.fadeOut()
-            //                }
-            //            }
-            
             let fullNameArray = (recent[kWITHUSERFULLNAME] as! String).components(separatedBy: " ")
             let firstName = fullNameArray[0]
             let lastName = fullNameArray[fullNameArray.count - 1]
@@ -652,24 +637,6 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             let profilePicture = (recentChatsTableView.cellForRow(at: indexPath) as! RecentChatsTableViewCell).avatarImageView.image!
             showUserProfile(userDictionary: userDictionary, profilePicture: profilePicture)
         } else if recent[kTYPE] as! String == kGROUP {
-            //               self.gradientLoadingBar.fadeIn()
-            //                         cell.isUserInteractionEnabled = false
-            //            let groupVC = UIStoryboard.init(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "groupView") as! GroupTableViewController
-            //            reference(.Group).document(recent[kCHATROOMID] as! String).getDocument { (snapshot, error) in
-            //
-            //                guard let snapshot = snapshot else { return }
-            //
-            //                if snapshot.exists {
-            //                    groupVC.group = snapshot.data()! as NSDictionary
-            //                    DispatchQueue.main.async {
-            //
-            //
-            //                        cell.isUserInteractionEnabled = true
-            //                        self.navigationController?.pushViewController(groupVC, animated: true)
-            //                            self.gradientLoadingBar.fadeOut()
-            //                    }
-            //                }
-            //            }
             tabBarController?.tabBar.isHidden = true
             restartChat(recent: recent)
             
@@ -762,24 +729,14 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             if topVC is ChatsViewController {
                 return
             }
-            
-            //            if (topVC is ProfileTableViewController) {
-            //                let i = navigationController?.viewControllers.firstIndex(of: self)
-            //                if let previousViewController = navigationController?.viewControllers[i!-1] as? ChatViewController {
-            //                    if ((topVC as! ProfileTableViewController).user!.objectId == previousViewController.withUsers[0].objectId) {
-            //                        return
-            //                    }
-            //                }
-            //            }
         }
+        
         let payload = notification.userInfo!["notificationPayload"] as! OSNotificationPayload
-        // check the message belongs to this room then if you want show your local notification , if you want do nothing
+        // check if the message belongs to this room then if you want show your local notification , if you want do nothing
         if payload.additionalData != nil {
             let additionalData = payload.additionalData
             if (UIApplication.getTopViewController() as? ChatViewController)?.chatRoomId == (additionalData!["chatRoomId"] as! String) {
-                
             } else {
-                
                 let center = UNUserNotificationCenter.current()
                 
                 let content = UNMutableNotificationContent()
@@ -825,20 +782,28 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
 }
 
-//
-// extension UIApplication {
-//
-//    class func getTopViewController(base: UIViewController? = UIApplication.shared.keyWindow?.rootViewController) -> UIViewController? {
-//
-//        if let nav = base as? UINavigationController {
-//            return getTopViewController(base: nav.visibleViewController)
-//
-//        } else if let tab = base as? UITabBarController, let selected = tab.selectedViewController {
-//            return getTopViewController(base: selected)
-//
-//        } else if let presented = base?.presentedViewController {
-//            return getTopViewController(base: presented)
-//        }
-//        return base
-//    }
-// }
+extension ChatsViewController: DZNEmptyDataSetDelegate, DZNEmptyDataSetSource {
+    func image(forEmptyDataSet scrollView: UIScrollView!) -> UIImage! {
+        return UIImage(named: "chatting")
+    }
+    
+    func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        return NSAttributedString(string: "NO RECENT CHATS", attributes: [NSAttributedString.Key.foregroundColor: UIColor.label, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16.0)])
+    }
+    
+    func description(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        return NSAttributedString(string: "All your chats will appear here. You can chat with your contacts or any other Sllick user.", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14.0)])
+    }
+    
+    func emptyDataSetShouldAllowScroll(_ scrollView: UIScrollView!) -> Bool {
+        return true
+    }
+    
+    func buttonTitle(forEmptyDataSet scrollView: UIScrollView!, for state: UIControl.State) -> NSAttributedString! {
+        return NSAttributedString(string: "Start chatting", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemYellow, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 13.0)])
+    }
+    
+    func emptyDataSet(_ scrollView: UIScrollView!, didTap button: UIButton!) {
+        selectUserForChat(isGroup: false)
+    }
+}

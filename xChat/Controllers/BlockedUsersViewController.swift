@@ -8,12 +8,14 @@
 
 import ProgressHUD
 import UIKit
+import GradientLoadingBar
 
 class BlockedUsersViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UserTableViewCellDelegate {
     
     @IBOutlet var tableView: UITableView!
     var blockedUsers: [FUser] = []
     @IBOutlet var notificationLabel: UILabel!
+    private let gradientLoadingBar = GradientLoadingBar()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -73,12 +75,12 @@ class BlockedUsersViewController: UIViewController, UITableViewDataSource, UITab
     
     func loadBlockedUsers() {
         if FUser.currentUser()!.blockedUsers.count > 0 {
-            ProgressHUD.show()
-            
+            self.gradientLoadingBar.gradientColors = [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
             getUsersFromFirestore(withIds: FUser.currentUser()!.blockedUsers) { allBlockedUsers in
                 
                 ProgressHUD.dismiss()
                 self.blockedUsers = allBlockedUsers
+                self.gradientLoadingBar.fadeOut()
                 self.tableView.reloadData()
             }
         }

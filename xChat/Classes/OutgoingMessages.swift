@@ -16,7 +16,7 @@ class OutgoingMessage {
     
     // text message
     init(message: String, senderId: String, senderName: String, date: Date, status: String, type: String) {
-        messageDictionary = NSMutableDictionary(objects: [message, senderId, senderName, dateFormatter().string(from: date), status, type], forKeys: [kMESSAGE as NSCopying, kSENDERID as NSCopying, kSENDERNAME as NSCopying, kDATE as NSCopying, kSTATUS as NSCopying, kTYPE as NSCopying])
+        messageDictionary = NSMutableDictionary(objects: [message, senderId, senderName, dateFormatter().string(from: date), !MyVariables.internetConnectionState ? kWAITINGTOSEND : kDELIVERED, type], forKeys: [kMESSAGE as NSCopying, kSENDERID as NSCopying, kSENDERNAME as NSCopying, kDATE as NSCopying, kSTATUS as NSCopying, kTYPE as NSCopying])
     }
     
     // picture message
@@ -55,7 +55,7 @@ class OutgoingMessage {
         switch messageDictionary[kTYPE] as! String {
             case kPICTURE: pushText = "Sent a picture."
             case kVIDEO: pushText = "Sent a video."
-            case kLOCATION: pushText = "Sent their location."
+            case kAUDIO: pushText = "Sent an audio message."
             default:
                 pushText = plainMessage != "" ? plainMessage : "Sent a message."
         }
@@ -67,17 +67,15 @@ class OutgoingMessage {
         reference(.Message).document(FUser.currentId()).collection(chatRoomId).document(withId).delete()
     }
     
-    class func updateMessage(withId: String, chatRoomId: String, memberIds: [String]) {
-        let readDate = dateFormatter().string(from: Date())
-        
-        let values = [kSTATUS: kREAD, kREADDATE: readDate]
-        
+    class func updateMessage(withId: String, chatRoomId: String, memberIds: [String], values: [String : String]) {
         for userId in memberIds {
             reference(.Message).document(userId).collection(chatRoomId).document(withId).getDocument { snapshot, _ in
                 guard let snapshot = snapshot else { return }
                 
                 if snapshot.exists {
-                    reference(.Message).document(userId).collection(chatRoomId).document(withId).updateData(values)
+                    if snapshot.data()![kSTATUS] as! String != kREAD {
+                       reference(.Message).document(userId).collection(chatRoomId).document(withId).updateData(values)
+                    }
                 }
             }
         }

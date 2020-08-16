@@ -46,10 +46,12 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
         definesPresentationContext = true
+        filterSegmentedControl.isSpringLoaded = true
+        filterSegmentedControl.selectedSegmentIndex = 2
         tableView.separatorStyle = .none
         getContacts()
         firstLoad = true
-        loadUsers(filter: kCITY)
+        loadUsers()
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
         
@@ -321,7 +323,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
         }
     }
     
-    func loadUsers(filter: String) {
+    func loadUsers(filter: String = "All") {
         gradientLoadingBar.fadeIn()
         
         var query: Query!
@@ -469,7 +471,7 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
         
         filteredUsers = []
         
-        // tableView.reloadData()
+        tableView.reloadData()
         
         reference(.UserKeywords).whereField("keywords", arrayContains: searchTxt).getDocuments { snapshot, error in
             print("hereeeeeeeeeeee")
@@ -564,3 +566,4 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
         navigationController?.pushViewController(viewController, animated: true)
     }
 }
+

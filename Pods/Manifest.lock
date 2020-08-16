@@ -220,6 +220,7 @@ PODS:
     - BoringSSL-GRPC/Interface (= 0.0.7)
   - BoringSSL-GRPC/Interface (0.0.7)
   - DACircularProgress (2.3.1)
+  - DZNEmptyDataSet (1.8.1)
   - Firebase/Auth (6.26.0):
     - Firebase/CoreOnly
     - FirebaseAuth (~> 6.5.3)
@@ -361,6 +362,7 @@ PODS:
 
 DEPENDENCIES:
   - AMPopTip
+  - DZNEmptyDataSet
   - Firebase/Auth
   - Firebase/Database
   - Firebase/Firestore
@@ -390,6 +392,7 @@ SPEC REPOS:
     - AMPopTip
     - BoringSSL-GRPC
     - DACircularProgress
+    - DZNEmptyDataSet
     - Firebase
     - FirebaseAuth
     - FirebaseAuthInterop
@@ -435,6 +438,7 @@ SPEC CHECKSUMS:
   AMPopTip: e0ed2967892b18d1e55505c015fa06e535003fdc
   BoringSSL-GRPC: 8edf627ee524575e2f8d19d56f068b448eea3879
   DACircularProgress: 4dd437c0fc3da5161cb289e07ac449493d41db71
+  DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
   Firebase: 7cf5f9c67f03cb3b606d1d6535286e1080e57eb6
   FirebaseAuth: 7047aec89c0b17ecd924a550c853f0c27ac6015e
   FirebaseAuthInterop: a0f37ae05833af156e72028f648d313f7e7592e9
@@ -475,6 +479,6 @@ SPEC CHECKSUMS:
   SKPhotoBrowser: 343de95d89dc7913763c5dda243cc6e606e4a168
   TextFieldEffects: 529b8aff706fb40f82c41c780c0777941a893796
 
-PODFILE CHECKSUM: 4cde6f5d9ce727a1bbde01a081e9ccb1d1a6a298
+PODFILE CHECKSUM: e7778de09c4b2e05f45c13c614c0b58a3fe6175f
 
 COCOAPODS: 1.8.3

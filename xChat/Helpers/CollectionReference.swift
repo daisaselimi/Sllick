@@ -18,6 +18,7 @@ public enum FCollectionReference: String {
     case Call
     case Contact
     case UserKeywords
+    case status
 }
 
 public func reference(_ collectionReference: FCollectionReference) -> CollectionReference {

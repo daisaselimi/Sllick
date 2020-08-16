@@ -30,7 +30,7 @@ class RecentChatsTableViewCell: UITableViewCell {
 //        self.avatarImageView.image = nil // or set a placeholder image
 //        nameLabel.text = ""
 //        lastMessageLabel.text = ""
-//        dateLabel.text = ""
+        dateLabel.text = ""
 //        messageCounterLabel.text = ""
     }
     
@@ -71,44 +71,6 @@ class RecentChatsTableViewCell: UITableViewCell {
         
         nameLabel.text = recentChat[kWITHUSERFULLNAME] as? String
         onlineIndicatorView.isHidden = !isOnline
-        
-        var decryptedText = ""
-        DispatchQueue.global().async {
-            Encryption.decryptText(chatRoomId: recentChat[kCHATROOMID] as! String, encryptedMessage: recentChat[kLASTMESSAGE] as! String) { decryptedTxt in
-                
-                decryptedText = decryptedTxt
-                var messageContent = ""
-                if recentChat[kLASTMESSAGETYPE] as! String == "group_created" {
-                    DispatchQueue.main.async {
-                        self.lastMessageLabel.text = "No new messages"
-                        self.lastMessageLabel.font = self.lastMessageLabel.font.italic
-                    }
-                    return
-                } else if recentChat[kLASTMESSAGETYPE] as! String == "removed_message" {
-                    DispatchQueue.main.async {
-                        self.lastMessageLabel.text = "You removed a message"
-                        self.lastMessageLabel.font = self.lastMessageLabel.font.italic
-                    }
-                    return
-                }
-                if self.currentUserRecent(recent: recentChat[kSENDERID] as! String) {
-                    messageContent = "You"
-                } else if isGroup || self.containsMedia(message: recentChat[kLASTMESSAGETYPE] as! String) {
-                    messageContent = recentChat[kSENDERNAME] as! String
-                }
-                
-                if recentChat[kLASTMESSAGETYPE] as! String == kPICTURE || recentChat[kLASTMESSAGETYPE] as! String == kVIDEO {
-                    messageContent += " sent a \(decryptedText)"
-                } else if recentChat[kLASTMESSAGETYPE] as! String == kAUDIO {
-                    messageContent += " sent an audio message"
-                } else {
-                    messageContent += (isGroup || self.currentUserRecent(recent: recentChat[kSENDERID] as! String) ? ": " : "") + decryptedText
-                }
-                DispatchQueue.main.async {
-                    self.lastMessageLabel.text = messageContent
-                }
-            }
-        }
         
         messageCounterLabel.text = recentChat[kCOUNTER] as? String
         
@@ -160,6 +122,44 @@ class RecentChatsTableViewCell: UITableViewCell {
         }
         
         dateLabel.text = "・" + timeElapsed(date: date)
+        
+        var decryptedText = ""
+        //  DispatchQueue.global().async {
+        // Encryption.decryptText(chatRoomId: recentChat[kCHATROOMID] as! String, encryptedMessage: recentChat[kLASTMESSAGE] as! String) { decryptedTxt in
+        
+        decryptedText = recentChat[kLASTMESSAGE] as! String // decryptedTxt
+        var messageContent = ""
+        if recentChat[kLASTMESSAGETYPE] as! String == "group_created" {
+            // DispatchQueue.main.async {
+            lastMessageLabel.text = "No new messages"
+            lastMessageLabel.font = lastMessageLabel.font.italic
+            // }
+            return
+        } else if recentChat[kLASTMESSAGETYPE] as! String == "removed_message" {
+            //   DispatchQueue.main.async {
+            lastMessageLabel.text = "You removed a message"
+            lastMessageLabel.font = lastMessageLabel.font.italic
+            //  }
+            return
+        }
+        if currentUserRecent(recent: recentChat[kSENDERID] as! String) {
+            messageContent = "You"
+        } else if isGroup || containsMedia(message: recentChat[kLASTMESSAGETYPE] as! String) {
+            messageContent = recentChat[kSENDERNAME] as! String
+        }
+        
+        if recentChat[kLASTMESSAGETYPE] as! String == kPICTURE || recentChat[kLASTMESSAGETYPE] as! String == kVIDEO {
+            messageContent += " sent a \(decryptedText)"
+        } else if recentChat[kLASTMESSAGETYPE] as! String == kAUDIO {
+            messageContent += " sent an audio message"
+        } else {
+            messageContent += (isGroup || currentUserRecent(recent: recentChat[kSENDERID] as! String) ? ": " : "") + decryptedText
+        }
+        // DispatchQueue.main.async {
+        lastMessageLabel.text = messageContent
+        // }
+        //    }
+        //  }
     }
     
     func containsMedia(message: String) -> Bool {

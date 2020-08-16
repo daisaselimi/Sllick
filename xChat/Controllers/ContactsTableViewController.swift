@@ -7,6 +7,7 @@
 //
 
 import Contacts
+import DZNEmptyDataSet
 import FirebaseFirestore
 import ProgressHUD
 import UIKit
@@ -21,6 +22,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
     var isSyncing: Bool = false
     var firstLoad: Bool = false
     var workItem: DispatchWorkItem?
+    var emptySetDescription: String = ""
     
     // for inviting users in group
     var isInviting = false
@@ -154,12 +156,12 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
     func checkForNoData() {
         if matchedUsers.count == 0 {
             if !isGroup {
-                tableView.setEmptyMessage("No contacts to show. Tap sync button to start syncing your contacts")
+                // tableView.setEmptyMessage("No contacts to show. Tap sync button to start syncing your contacts")
             } else {
-                tableView.setEmptyMessage("No contacts to show")
+                // tableView.setEmptyMessage("No contacts to show")
             }
         } else {
-            tableView.restore()
+            // tableView.restore()
         }
     }
     
@@ -504,7 +506,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
                                 
                                 let fUser = FUser(_dictionary: userDictionary)
                                 
-                                if fUser.objectId != FUser.currentId() {
+                                if fUser.objectId != FUser.currentId(), !(FUser.currentUser()?.blockedUsers.contains(fUser.objectId))! {
                                     self.users.append(fUser)
                                 }
                             }
@@ -530,7 +532,8 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
     func loadAddedUsers() {
         //  ProgressHUD.show()
         reference(.Contact).whereField("userID", isEqualTo: FUser.currentId()).addSnapshotListener { snapshot, _ in
-            
+            self.tableView.emptyDataSetDelegate = self
+            self.tableView.emptyDataSetSource = self
             guard let snapshot = snapshot else {
                 ProgressHUD.dismiss()
                 self.tableView.isUserInteractionEnabled = true
@@ -563,6 +566,8 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
                 }
             } else if snapshot.isEmpty {
                 self.checkForNoData()
+                self.tableView.reloadEmptyDataSet()
+                
                 if !(self.isGroup || self.isInviting) {
                     self.navigationItem.rightBarButtonItems?.last?.isEnabled = true
                 }
@@ -703,6 +708,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
     // MARK: Helpers
     
     func setupButtons() {
+        emptySetDescription = "Your contacts will appear here. You can add someone by swiping or on their profile."
         if isGroup, !isInviting {
             let nextButton = UIBarButtonItem(title: "Next", style: .plain, target: self, action: #selector(nextButtonPressed))
             navigationItem.rightBarButtonItem = nextButton
@@ -712,6 +718,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
             navigationItem.rightBarButtonItem = doneButton
             navigationItem.rightBarButtonItems!.first!.isEnabled = false
         } else {
+            emptySetDescription = "Your contacts will appear here. Tap sync button to sync your phone contacts or search for other users."
             let inviteImage = UIImage(systemName: "square.and.arrow.up.fill")
             let syncImage = UIImage(systemName: "arrow.2.circlepath.circle")
             let nearMeImage = UIImage(systemName: "paperplane.fill")
@@ -751,5 +758,33 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
         if let previousViewController = navigationController?.viewControllers[i! - 1] as? GroupTableViewController {
             navigationController?.popViewController(animated: true)
         }
+    }
+}
+
+extension ContactsTableViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
+    func image(forEmptyDataSet scrollView: UIScrollView!) -> UIImage! {
+        return UIImage(named: "astronaut")
+    }
+    
+    func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        return NSAttributedString(string: "NO CONTACTS", attributes: [NSAttributedString.Key.foregroundColor: UIColor.label, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16.0)])
+    }
+    
+    func description(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        return NSAttributedString(string: emptySetDescription, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14.0)])
+    }
+    
+    func emptyDataSetShouldAllowScroll(_ scrollView: UIScrollView!) -> Bool {
+        return true
+    }
+    
+    func buttonTitle(forEmptyDataSet scrollView: UIScrollView!, for state: UIControl.State) -> NSAttributedString! {
+        return NSAttributedString(string: "Explore other users", attributes: [NSAttributedString.Key.foregroundColor: UIColor.getAppColor(.light), NSAttributedString.Key.font: UIFont.systemFont(ofSize: 13.0)])
+    }
+    
+    func emptyDataSet(_ scrollView: UIScrollView!, didTap button: UIButton!) {
+        let userVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "usersTableView") as! UsersTableViewController
+        userVC.delegate = self
+        navigationController?.pushViewController(userVC, animated: true)
     }
 }

@@ -331,26 +331,26 @@ extension UIImage {
     }
     
     func rotate(radians: Float) -> UIImage? {
-           var newSize = CGRect(origin: CGPoint.zero, size: self.size).applying(CGAffineTransform(rotationAngle: CGFloat(radians))).size
-           // Trim off the extremely small float value to prevent core graphics from rounding it up
-           newSize.width = floor(newSize.width)
-           newSize.height = floor(newSize.height)
-
-           UIGraphicsBeginImageContextWithOptions(newSize, false, self.scale)
-           let context = UIGraphicsGetCurrentContext()!
-
-           // Move origin to middle
-           context.translateBy(x: newSize.width/2, y: newSize.height/2)
-           // Rotate around middle
-           context.rotate(by: CGFloat(radians))
-           // Draw the image at its center
-           self.draw(in: CGRect(x: -self.size.width/2, y: -self.size.height/2, width: self.size.width, height: self.size.height))
-
-           let newImage = UIGraphicsGetImageFromCurrentImageContext()
-           UIGraphicsEndImageContext()
-
-           return newImage
-       }
+        var newSize = CGRect(origin: CGPoint.zero, size: self.size).applying(CGAffineTransform(rotationAngle: CGFloat(radians))).size
+        // Trim off the extremely small float value to prevent core graphics from rounding it up
+        newSize.width = floor(newSize.width)
+        newSize.height = floor(newSize.height)
+        
+        UIGraphicsBeginImageContextWithOptions(newSize, false, self.scale)
+        let context = UIGraphicsGetCurrentContext()!
+        
+        // Move origin to middle
+        context.translateBy(x: newSize.width / 2, y: newSize.height / 2)
+        // Rotate around middle
+        context.rotate(by: CGFloat(radians))
+        // Draw the image at its center
+        self.draw(in: CGRect(x: -self.size.width / 2, y: -self.size.height / 2, width: self.size.width, height: self.size.height))
+        
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return newImage
+    }
 }
 
 extension UINavigationController {
@@ -919,7 +919,7 @@ extension Date {
         return "just now"
     }
     
-    func timeAgoInMessages() -> String {
+    func timeAgoInMessages(fullTimeAgo: Bool = false) -> String {
         // From Time
         let fromDate = self
         
@@ -929,30 +929,61 @@ extension Date {
         let dateFormatter = DateFormatter()
         // Estimation
         // Year
-        if let interval = Calendar.current.dateComponents([.year], from: fromDate, to: toDate).year, interval > 0 {
-            dateFormatter.dateFormat = "MMM d, yyy, HH:mm"
-            return dateFormatter.string(from: fromDate)
-        }
         
-        // Month
-        if let interval = Calendar.current.dateComponents([.month], from: fromDate, to: toDate).month, interval > 0 {
-            dateFormatter.dateFormat = "MMM d, HH:mm"
-            return dateFormatter.string(from: fromDate)
-        }
-        
-        // Day
-        if let interval = Calendar.current.dateComponents([.day], from: fromDate, to: toDate).day, interval > 0 {
-            if interval >= 7 {
-                dateFormatter.dateFormat = "MMM d, HH:mm"
+        if fullTimeAgo {
+            if Calendar.current.isDateInToday(fromDate) {
+                return "・Today・"
+            }
+            else if Calendar.current.isDateInYesterday(fromDate) {
+                return "Yesterday"
+            }
+            else if let interval = Calendar.current.dateComponents([.year], from: fromDate, to: toDate).year, interval > 0 {
+                dateFormatter.dateFormat = "MMMM d, yyy"
+                return dateFormatter.string(from: fromDate)
+            } else {
+                dateFormatter.dateFormat = "EEEE, d MMMM"
                 return dateFormatter.string(from: fromDate)
             }
-            dateFormatter.dateFormat = "E, HH:mm"
+        } else {
+            dateFormatter.dateFormat = "HH:mm"
             return dateFormatter.string(from: fromDate)
         }
-        
-        // Hours
-        dateFormatter.dateFormat = "HH:mm"
-        return dateFormatter.string(from: fromDate)
+//        
+//        if fullTimeAgo {
+//            if Calendar.current.isDateInToday(fromDate) {
+//                return "・Today・"
+//            }
+//            
+//            if Calendar.current.isDateInYesterday(fromDate) {
+//                return "Yesterday"
+//            }
+//            
+//            if let interval = Calendar.current.dateComponents([.year], from: fromDate, to: toDate).year, interval > 0 {
+//                dateFormatter.dateFormat = "MMMM d, yyy"
+//                return dateFormatter.string(from: fromDate)
+//            }
+//            
+//            // Month
+//            if let interval = Calendar.current.dateComponents([.month], from: fromDate, to: toDate).month, interval > 0 {
+//                dateFormatter.dateFormat = "EEEE, d MMMM"
+//                return dateFormatter.string(from: fromDate)
+//            }
+//            
+//            // Day
+//            if let interval = Calendar.current.dateComponents([.day], from: fromDate, to: toDate).day, interval > 0 {
+//                if interval >= 7 {
+//                    dateFormatter.dateFormat = "EEEE, d MMMM"
+//                    return dateFormatter.string(from: fromDate)
+//                }
+//                dateFormatter.dateFormat = "EEEE"
+//                return dateFormatter.string(from: fromDate)
+//            }
+//            
+//        } else {
+//            dateFormatter.dateFormat = "HH:mm"
+//            return dateFormatter.string(from: fromDate)
+//        }
+//        return ""
     }
 }
 
@@ -977,9 +1008,23 @@ extension UICollectionView {
     }
 }
 
-extension UIAlertController{
-    open override func viewDidLayoutSubviews() {
+extension UIAlertController {
+    override open func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         self.view.tintColor = .label
+    }
+}
+
+extension UICollectionView {
+    
+    func reloadDataAndScrollToPreviousPosition() {
+        let oldOffset = self.contentOffset.y
+        let oldHeight = self.contentSize.height
+        let reverseOffset = oldHeight - oldOffset
+        
+        self.reloadData()
+        
+        self.layoutIfNeeded()
+        self.contentOffset = CGPoint(x: 0.0, y: self.contentSize.height - reverseOffset)
     }
 }

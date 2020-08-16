@@ -15,9 +15,9 @@ import MBProgressHUD
 let storage = Storage.storage()
 
 func uploadImage(image: UIImage, chatRoomId: String, view: UIView, completion: @escaping (_ imageLink: String?) -> Void) {
-    let progressHUD = MBProgressHUD.showAdded(to: view, animated: true)
+   // let progressHUD = MBProgressHUD.showAdded(to: view, animated: true)
     
-    progressHUD.mode = .determinateHorizontalBar
+  //  progressHUD.mode = .determinateHorizontalBar
     
     let dateString = dateFormatter().string(from: Date())
     
@@ -32,7 +32,7 @@ func uploadImage(image: UIImage, chatRoomId: String, view: UIView, completion: @
     task = storageRef.putData(imageData!, metadata: nil, completion: { _, error in
         task.removeAllObservers()
         
-        progressHUD.hide(animated: true)
+   //     progressHUD.hide(animated: true)
         
         if error != nil {
             print("error uploading image \(error!.localizedDescription)")
@@ -45,10 +45,10 @@ func uploadImage(image: UIImage, chatRoomId: String, view: UIView, completion: @
         }
     })
     
-    task.observe(StorageTaskStatus.progress) { snapshot in
-        
-        progressHUD.progress = Float((snapshot.progress?.completedUnitCount)!) / Float((snapshot.progress?.totalUnitCount)!)
-    }
+//    task.observe(StorageTaskStatus.progress) { snapshot in
+//
+//        progressHUD.progress = Float((snapshot.progress?.completedUnitCount)!) / Float((snapshot.progress?.totalUnitCount)!)
+//    }
 }
 
 func downloadImage(imageUrl: String, completion: @escaping (_ image: UIImage?) -> Void) {
@@ -118,9 +118,9 @@ func fileExistsAtPath(path: String) -> Bool {
 // Video
 
 func uploadVideo(video: NSData, chatRoomId: String, view: UIView, completion: @escaping (_ videoLink: String?) -> Void) {
-    let progressHUD = MBProgressHUD.showAdded(to: view, animated: true)
-    
-    progressHUD.mode = .determinateHorizontalBar
+//    let progressHUD = MBProgressHUD.showAdded(to: view, animated: true)
+//
+//    progressHUD.mode = .determinateHorizontalBar
     
     let dateString = dateFormatter().string(from: Date())
     
@@ -133,7 +133,7 @@ func uploadVideo(video: NSData, chatRoomId: String, view: UIView, completion: @e
     task = storageRef.putData(video as Data, metadata: nil, completion: { _, error in
         
         task.removeAllObservers()
-        progressHUD.hide(animated: true)
+    //    progressHUD.hide(animated: true)
         
         if error != nil {
             print("error couldnt upload video \(error!.localizedDescription)")
@@ -147,9 +147,9 @@ func uploadVideo(video: NSData, chatRoomId: String, view: UIView, completion: @e
         }
     })
     
-    task.observe(StorageTaskStatus.progress) { snapshot in
-        progressHUD.progress = Float((snapshot.progress?.completedUnitCount)!) / Float((snapshot.progress?.totalUnitCount)!)
-    }
+//    task.observe(StorageTaskStatus.progress) { snapshot in
+//        progressHUD.progress = Float((snapshot.progress?.completedUnitCount)!) / Float((snapshot.progress?.totalUnitCount)!)
+//    }
 }
 
 func downloadVideo(videoUrl: String, completion: @escaping (_ isReadyToPlay: Bool, _ videoFileName: String) -> Void) {
@@ -186,9 +186,9 @@ func downloadVideo(videoUrl: String, completion: @escaping (_ isReadyToPlay: Boo
 
 // Audio messages
 func uploadAudio(audioPath: String, chatRoomId: String, view: UIView, completion: @escaping (_ audioLink: String?) -> Void) {
-    let progressHUD = MBProgressHUD.showAdded(to: view, animated: true)
-    
-    progressHUD.mode = .determinateHorizontalBar
+//    let progressHUD = MBProgressHUD.showAdded(to: view, animated: true)
+//
+//    progressHUD.mode = .determinateHorizontalBar
     
     let dateString = dateFormatter().string(from: Date())
     
@@ -202,7 +202,7 @@ func uploadAudio(audioPath: String, chatRoomId: String, view: UIView, completion
     task = storageRef.putData(audio! as Data, metadata: nil, completion: { _, error in
         
         task.removeAllObservers()
-        progressHUD.hide(animated: true)
+        //progressHUD.hide(animated: true)
         
         if error != nil {
             print("error couldnt upload audio \(error!.localizedDescription)")
@@ -216,9 +216,9 @@ func uploadAudio(audioPath: String, chatRoomId: String, view: UIView, completion
         }
     })
     
-    task.observe(StorageTaskStatus.progress) { snapshot in
-        progressHUD.progress = Float((snapshot.progress?.completedUnitCount)!) / Float((snapshot.progress?.totalUnitCount)!)
-    }
+//    task.observe(StorageTaskStatus.progress) { snapshot in
+//        progressHUD.progress = Float((snapshot.progress?.completedUnitCount)!) / Float((snapshot.progress?.totalUnitCount)!)
+//    }
 }
 
 func downloadAudio(audioUrl: String, completion: @escaping (_ audioFileName: String) -> Void) {

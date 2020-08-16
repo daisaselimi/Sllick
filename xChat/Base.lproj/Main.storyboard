@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Wnm-6u-UKt">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Wnm-6u-UKt">
     <device id="retina5_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
@@ -1040,7 +1040,7 @@
                                                     <color key="textColor" red="0.23422299998665819" green="0.23422299998665819" blue="0.23422299998665819" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="12/02/2019" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" enabled="NO" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MwA-In-YLv">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="//" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" enabled="NO" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MwA-In-YLv">
                                                     <rect key="frame" x="90" y="39" width="296" height="24"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="24" id="dq3-bq-pLp"/>
@@ -1071,7 +1071,7 @@
                                                         <constraint firstAttribute="width" constant="15" id="sj8-YO-QVo"/>
                                                     </constraints>
                                                 </view>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="addGroup" translatesAutoresizingMaskIntoConstraints="NO" id="EKm-rR-hm0">
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="avatarph-7" translatesAutoresizingMaskIntoConstraints="NO" id="EKm-rR-hm0">
                                                     <rect key="frame" x="15" y="7.6666666666666643" width="60" height="59.999999999999993"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="60" id="jWY-pv-lJt"/>
@@ -1759,7 +1759,7 @@
                             <rect key="frame" x="0.0" y="0.0" width="414" height="62"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
-                                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="x6K-Rp-Th2">
+                                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="x6K-Rp-Th2" customClass="HB">
                                     <rect key="frame" x="8" y="15.666666666666664" width="398" height="32"/>
                                     <segments>
                                         <segment title="My City"/>
@@ -3623,12 +3623,12 @@ We reserve all rights to terminate accounts, edit or remove content and cancel o
     <color key="tintColor" name="outgoingBubbleColor"/>
     <resources>
         <image name="3xsent" width="100" height="100"/>
-        <image name="addGroup" width="21.333333969116211" height="21.333333969116211"/>
         <image name="answer" width="250.33332824707031" height="250.33332824707031"/>
         <image name="arrow.right.circle.fill" catalog="system" width="128" height="121"/>
         <image name="arrowshape.turn.up.right.circle.fill" catalog="system" width="128" height="121"/>
         <image name="avatarPlaceholder" width="101" height="101"/>
         <image name="avatarph" width="300" height="300"/>
+        <image name="avatarph-7" width="128" height="128"/>
         <image name="bell.circle.fill" catalog="system" width="128" height="121"/>
         <image name="bg1" width="1125" height="2436"/>
         <image name="bg9" width="1125" height="2436"/>

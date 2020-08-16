@@ -29,6 +29,7 @@ target 'xChat' do
   
   pod 'OneSignal'
   pod 'SinchRTC'
+  pod 'DZNEmptyDataSet'
 
   pod 'NVActivityIndicatorView'
 pod 'GradientLoadingBar', '~> 2.0'

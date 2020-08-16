@@ -24,8 +24,8 @@ class AudioViewController {
         controller.title = "Record"
         controller.maximumRecordDuration = kAUDIOMAXDURATION
         controller.allowCropping = true
+        controller.barStyle =  userDefaults.bool(forKey: kDARKMODESTATUS) ? UIBarStyle.black : UIBarStyle.default
         controller.normalTintColor = UIColor.getAppColor(.dark)
         controller.highlightedTintColor = UIColor.getAppColor(.light)
-        target.presentBlurredAudioRecorderViewControllerAnimated(controller)
-    }
+        target.presentBlurredAudioRecorderViewControllerAnimated(controller)    }
 }

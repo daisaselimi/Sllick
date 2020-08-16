@@ -59,11 +59,11 @@ class IncomingMessage {
         
         let text = messageDicitionary[kMESSAGE] as! String
         
-        Encryption.decryptText(chatRoomId: chatRoomId, encryptedMessage: text) {
-            decryptedTxt in
+      //  Encryption.decryptText(chatRoomId: chatRoomId, encryptedMessage: text) {
+          //  decryptedTxt in
             
-            completion(JSQMessage(senderId: userId, senderDisplayName: name, date: date, text: decryptedTxt))
-        }
+            completion(JSQMessage(senderId: userId, senderDisplayName: name, date: date, text: text))
+      //  }
     }
     
     func createPictureMessage(messageDictionary: NSDictionary) -> JSQMessage {
@@ -90,7 +90,7 @@ class IncomingMessage {
             
             if image != nil {
                 mediaItem?.image = image!
-                self.collectionView.reloadData()
+                self.collectionView.reloadDataAndScrollToPreviousPosition()
             }
         }
         
@@ -128,10 +128,10 @@ class IncomingMessage {
                 
                 if image != nil {
                     mediaItem.image = image!
-                    self.collectionView.reloadData()
+                    self.collectionView.reloadDataAndScrollToPreviousPosition()
                 }
             }
-            self.collectionView.reloadData()
+            //self.collectionView.reloadDataAndScrollToPreviousPosition()
         }
         
         return JSQMessage(senderId: userId, senderDisplayName: name, date: date, media: mediaItem)
@@ -158,10 +158,15 @@ class IncomingMessage {
         }
         
         let audioItem = JSQAudioMediaItem(data: nil)
-        
+        let color = UIColor(named: "outgoingBubbleColor")!
+        audioItem.audioViewAttributes.tintColor = color
+        audioItem.audioViewAttributes.playButtonImage = UIImage(systemName: "play.circle", withConfiguration: UIImage.SymbolConfiguration(pointSize: 20))!.withTintColor(color, renderingMode: .alwaysOriginal)
+        audioItem.audioViewAttributes.pauseButtonImage = UIImage(systemName: "pause.circle", withConfiguration: UIImage.SymbolConfiguration(pointSize: 20))!.withTintColor(color, renderingMode: .alwaysOriginal)
+        audioItem.audioViewAttributes.controlInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        audioItem.audioViewAttributes.backgroundColor = #colorLiteral(red: 0.9131445512, green: 0.9222015808, blue: 0.9403156726, alpha: 1)
         audioItem.appliesMediaViewMaskAsOutgoing = returnOutgoingStatusForUser(senderId: userId!)
         
-        let audioMessage = JSQMessage(senderId: userId!, displayName: name!, media: audioItem)
+        let audioMessage = JSQMessage(senderId: userId!, senderDisplayName: name!, date: date, media: audioItem)
         
         downloadAudio(audioUrl: messageDictionary[kAUDIO] as! String) { fileName in
             
@@ -169,7 +174,7 @@ class IncomingMessage {
             
             let audioData = try? Data(contentsOf: url as URL)
             audioItem.audioData = audioData
-            self.collectionView.reloadData()
+            self.collectionView.reloadDataAndScrollToPreviousPosition()
         }
         return audioMessage!
     }

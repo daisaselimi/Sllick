@@ -11,7 +11,7 @@ import UIKit
 
 private let reuseIdentifier = "Cell"
 
-class BackgroundsCollectionViewController: UICollectionViewController {
+class BackgroundsCollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
     
     var backgrounds: [UIImage] = []
     let userDefaults = UserDefaults.standard
@@ -62,7 +62,7 @@ class BackgroundsCollectionViewController: UICollectionViewController {
     // MARK: UICollectionViewDelegate
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        userDefaults.set(imageNamesArray[indexPath.row], forKey: kBACKGROUBNDIMAGE)
+        userDefaults.set(imageNamesArray[indexPath.row], forKey: kBACKGROUNDIMAGE)
         userDefaults.synchronize()
         ProgressHUD.showSuccess()
     }
@@ -80,8 +80,12 @@ class BackgroundsCollectionViewController: UICollectionViewController {
     // MARK: IBActions
     
     @objc func resetToDefault() {
-        userDefaults.removeObject(forKey: kBACKGROUBNDIMAGE)
+        userDefaults.removeObject(forKey: kBACKGROUNDIMAGE)
         userDefaults.synchronize()
         ProgressHUD.showSuccess()
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: UIScreen.main.bounds.size.width / 3 - 14, height: 200)
     }
 }

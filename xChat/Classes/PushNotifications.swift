@@ -15,11 +15,15 @@ func sendPushNotification(membersToPush: [String], message: String, isGroup: Boo
     print("UTP**************************************\(updatedMembersToPush)*************************************")
     getMembersToPush(members: updatedMembersToPush) { usersPushIds in
         
-        if usersPushIds.filter({ $0 == "" }).count >= 1 {
-            print("---- NIL PUSH IDS ----")
+//        if usersPushIds.filter({ $0 == "" }).count >= 1 {
+//            print("---- NIL PUSH IDS ----")
+//            return
+//        }
+        
+        let currentUser = FUser.currentUser()!
+        if usersPushIds.filter({ $0 != "" }).isEmpty {
             return
         }
-        let currentUser = FUser.currentUser()!
         print("UTP**************************************\(usersPushIds)*************************************")
         
         if !isGroup {
@@ -30,7 +34,7 @@ func sendPushNotification(membersToPush: [String], message: String, isGroup: Boo
                 "summary_arg": currentUser.fullname,
                 "ios_badgeType": "Increase",
                 "ios_badgeCount": "1",
-                "include_player_ids": usersPushIds,
+                "include_player_ids": usersPushIds.filter { $0 != "" },
                 "data": ["chatRoomId": chatRoomId, "membersToPush": membersToPush, "memberIds": memberIds, "titleName": titleName, "isGroup": isGroup, "withUser": currentUser.fullname]
             ])
         }
@@ -42,7 +46,7 @@ func sendPushNotification(membersToPush: [String], message: String, isGroup: Boo
                 "summary_arg": currentUser.fullname,
                 "ios_badgeType": "Increase",
                 "ios_badgeCount": "1",
-                "include_player_ids": usersPushIds,
+                "include_player_ids": usersPushIds.filter { $0 != "" },
                 "data": ["chatRoomId": chatRoomId, "membersToPush": membersToPush, "memberIds": memberIds, "titleName": titleName, "isGroup": isGroup, "withUser": currentUser.fullname]
             ])
         }
