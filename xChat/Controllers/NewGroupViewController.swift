@@ -6,8 +6,6 @@
 //  Copyright © 2019 com.isaselimi. All rights reserved.
 //
 
-import ImagePicker
-import ProgressHUD
 import UIKit
 
 class NewGroupViewController: UIViewController, UICollectionViewDataSource, UICollectionViewDelegate, GroupMemberCollectionViewCellDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
@@ -30,11 +28,11 @@ class NewGroupViewController: UIViewController, UICollectionViewDataSource, UICo
         imageViewGestureRecognizer.addTarget(self, action: #selector(avatarTapped))
         groupIconImageView.isUserInteractionEnabled = true
         groupIconImageView.image = UIImage(systemName: "camera.circle.fill")
-        groupIconImageView.tintColor = .systemYellow
+        groupIconImageView.tintColor = UIColor.getAppColor(.light)
         groupIconImageView.addGestureRecognizer(imageViewGestureRecognizer)
         viewGestureRecognizer.addTarget(self, action: #selector(viewTapped))
         view.addGestureRecognizer(viewGestureRecognizer)
-        navigationController?.navigationItem.title = "Create group"
+        navigationItem.title = "Create group"
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Create", style: .plain, target: self, action: #selector(createButtonPressed))
         
         // Do any additional setup after loading the view.
@@ -86,7 +84,7 @@ class NewGroupViewController: UIViewController, UICollectionViewDataSource, UICo
             print(chatVC.titleName!)
             chatVC.memberIds = (group.groupDictionary[kMEMBERS] as! [String])
             chatVC.membersToPush = (group.groupDictionary[kMEMBERS] as! [String])
-            chatVC.initialImage = groupIconImageView.image
+            chatVC.initialImage = UIImage(named: "groupph")
             chatVC.initialWithUser = groupSubjectTextField.text!
             chatVC.chatRoomId = groupId
             chatVC.isGroup = true
@@ -94,7 +92,7 @@ class NewGroupViewController: UIViewController, UICollectionViewDataSource, UICo
             navigationController?.pushViewController(chatVC, animated: true)
             
         } else {
-            ProgressHUD.showError("Subject is required")
+            self.showMessage("Group name is required", type: .error)
         }
     }
     
@@ -122,10 +120,6 @@ class NewGroupViewController: UIViewController, UICollectionViewDataSource, UICo
     
     func didLongPressAvatarImage(indexPath: IndexPath) {}
     
-    func cancelButtonDidPress(_ imagePicker: ImagePickerController) {
-        dismiss(animated: true, completion: nil)
-    }
-    
     // MARK: HelperFunctions
     
     func updateParticipantsLabel() {
@@ -146,11 +140,11 @@ class NewGroupViewController: UIViewController, UICollectionViewDataSource, UICo
         }))
         
         if groupIcon != nil || (groupIconImageView.image != nil && (groupIconImageView.image! != UIImage(systemName: "camera.circle.fill"))) {
-            let resetAction = UIAlertAction(title: "Reset", style: .destructive) { _ in
+            let resetAction = UIAlertAction(title: "Remove Current Photo", style: .destructive) { _ in
                 
                 self.groupIcon = nil
                 self.groupIconImageView.image = UIImage(systemName: "camera.circle.fill")
-                self.groupIconImageView.tintColor = .systemYellow
+                self.groupIconImageView.tintColor = UIColor.getAppColor(.light)
             }
             alert.addAction(resetAction)
         }
@@ -176,6 +170,7 @@ class NewGroupViewController: UIViewController, UICollectionViewDataSource, UICo
             imagePickerController.delegate = self
             imagePickerController.allowsEditing = false
             imagePickerController.sourceType = sourceType
+            imagePickerController.navigationController?.navigationBar.tintColor = .red
             present(imagePickerController, animated: true, completion: nil)
         }
     }

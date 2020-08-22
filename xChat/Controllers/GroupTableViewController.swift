@@ -243,6 +243,7 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
         
         pendingToDelete.remove(allMembers[indexPath.row].objectId)
         let removedId = allMembers[indexPath.row].objectId
+        sendSystemMessage(text: "r-" + allMembers[indexPath.row].fullname + "-" + allMembers[indexPath.row].objectId, chatRoomId: group![kGROUPID] as! String, memberIds: group![kMEMBERS] as! [String], membersToPush: [], group: group!)
         allMembers.remove(at: indexPath.row)
         if allMembers.count == 0 {
             groupMembersCollectionView.setEmptyMessage("No members to show")
@@ -253,6 +254,7 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
         var members = allMembers.map { $0.objectId }
         members.append(FUser.currentId())
         navigationItem.rightBarButtonItems?.first?.isEnabled = false
+       
         Group.updateGroup(groupId: group![kGROUPID] as! String, withValues: [kMEMBERS: members, kMEMBERSTOPUSH: allMembersToPush])
         Group.getGroup(groupId: group![kGROUPID] as! String) { updatedGroup in
             self.group = updatedGroup
@@ -263,7 +265,8 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
         var updateForMembers = members
         updateForMembers.append(removedId)
         groupMembersCollectionView.reloadData()
-        updateExistingRecentWithNewValues(forMembers: updateForMembers, chatRoomId: group![kGROUPID] as! String, withValues: [kMEMBERS: members, kMEMBERSTOPUSH: allMembersToPush])
+//        updateExistingRecentWithNewValues(forMembers: updateForMembers, chatRoomId: group![kGROUPID] as! String, withValues: [kMEMBERS: members, kMEMBERSTOPUSH: allMembersToPush])
+        updateExistingRecentWithNewValues(forMembers: [removedId], chatRoomId: group![kGROUPID] as! String, withValues: [kMEMBERS: members, kMEMBERSTOPUSH: allMembersToPush])
     }
     
     var pendingToDelete: Set<String> = []
@@ -401,8 +404,10 @@ class GroupTableViewController: UITableViewController, UIImagePickerControllerDe
         let optionMenu = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
         let leaveGroup = UIAlertAction(title: "Leave group", style: .destructive) { _ in
+            sendSystemMessage(text: "l-" + FUser.currentUser()!.fullname + "-" + FUser.currentId(), chatRoomId: self.group![kGROUPID] as! String, memberIds: self.group![kMEMBERS] as! [String], membersToPush: [], group: self.group!)
             let members = (self.group![kMEMBERS] as! [String]).filter { $0 != FUser.currentId() }
             let membersToPush = (self.group![kMEMBERSTOPUSH] as! [String]).filter { $0 != FUser.currentId() }
+   
             Group.updateGroup(groupId: self.group![kGROUPID] as! String, withValues: [kMEMBERS: members, kMEMBERSTOPUSH: membersToPush])
             updateExistingRecentWithNewValues(forMembers: [FUser.currentId()], chatRoomId: self.group![kGROUPID] as! String, withValues: [kMEMBERS: members, kMEMBERSTOPUSH: self.allMembersToPush])
             self.navigationController?.popToRootViewController(animated: true)

@@ -784,14 +784,23 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
 
 extension ChatsViewController: DZNEmptyDataSetDelegate, DZNEmptyDataSetSource {
     func image(forEmptyDataSet scrollView: UIScrollView!) -> UIImage! {
+        if searchController.isActive && searchController.searchBar.text != "" {
+            return UIImage()
+        }
         return UIImage(named: "chatting")
     }
     
     func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        if searchController.isActive && searchController.searchBar.text != "" {
+            return NSAttributedString(string: "NO RESULTS", attributes: [NSAttributedString.Key.foregroundColor: UIColor.label, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16.0)])
+        }
         return NSAttributedString(string: "NO RECENT CHATS", attributes: [NSAttributedString.Key.foregroundColor: UIColor.label, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16.0)])
     }
     
     func description(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        if searchController.isActive && searchController.searchBar.text != "" {
+            return NSAttributedString(string: "No results found for \"\(searchController.searchBar.text!)\"", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14.0)])
+        }
         return NSAttributedString(string: "All your chats will appear here. You can chat with your contacts or any other Sllick user.", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14.0)])
     }
     
@@ -800,10 +809,16 @@ extension ChatsViewController: DZNEmptyDataSetDelegate, DZNEmptyDataSetSource {
     }
     
     func buttonTitle(forEmptyDataSet scrollView: UIScrollView!, for state: UIControl.State) -> NSAttributedString! {
+        if searchController.isActive && searchController.searchBar.text != "" {
+            return NSAttributedString()
+        }
         return NSAttributedString(string: "Start chatting", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemYellow, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 13.0)])
     }
     
     func emptyDataSet(_ scrollView: UIScrollView!, didTap button: UIButton!) {
+        if searchController.isActive && searchController.searchBar.text != "" {
+            return
+        }
         selectUserForChat(isGroup: false)
     }
 }

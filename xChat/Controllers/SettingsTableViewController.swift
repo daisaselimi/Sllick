@@ -171,7 +171,9 @@ class SettingsTableViewController: UITableViewController {
     func clearCache() {
         do {
             let files = try FileManager.default.contentsOfDirectory(atPath: getDocumentsURL().path)
-            
+            if files.count == 0 {
+                showMessage("Cache is already empty", type: .warning)
+            }
             for file in files {
                 try FileManager.default.removeItem(atPath: "\(getDocumentsURL().path)/\(file)")
                 showMessage("Cache cleared", type: .success)

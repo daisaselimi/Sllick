@@ -1,11 +1,10 @@
 import Firebase
 import FlagPhoneNumber
 import GradientLoadingBar
-import ImagePicker
 import ProgressHUD
 import UIKit
 
-class FinishRegistrationTableViewController: UITableViewController, ImagePickerDelegate, FPNTextFieldDelegate {
+class FinishRegistrationTableViewController: UITableViewController, FPNTextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     var email: String!
     var password: String!
@@ -19,22 +18,24 @@ class FinishRegistrationTableViewController: UITableViewController, ImagePickerD
     @IBOutlet var countryTextField: UITextField!
     @IBOutlet var cityTextField: UITextField!
     @IBOutlet var phoneTextField: FPNTextField!
-    @IBOutlet weak var doneButton: UIBarButtonItem!
+    @IBOutlet var doneButton: UIBarButtonItem!
     
     var phoneNumber: String = ""
     var countryCode: String = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        gradientLoadingBar.gradientColors = [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
+        gradientLoadingBar.gradientColors = [UIColor.getAppColor(.light), UIColor.getAppColor(.dark), UIColor.getAppColor(.light), UIColor.getAppColor(.dark)]
+        
         phoneTextField.attributedPlaceholder = NSAttributedString(string: phoneTextField.placeholder ?? "",
                                                                   attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
+        // self.gradientLoadingBar.fadeIn()
+        
         phoneTextField.textColor = .white
         viewTapGestureRecognizer.addTarget(self, action: #selector(viewTap))
         
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 107, bottom: 0, right: 0)
         view.isUserInteractionEnabled = true
-        //      topView.addBottomBorderWithColor(color: .opaqueSeparator, width: 0.5)
         view.addGestureRecognizer(viewTapGestureRecognizer)
         phoneTextField.layer.borderWidth = 1.0
         phoneTextField.layer.borderColor = UIColor.clear.cgColor
@@ -52,15 +53,18 @@ class FinishRegistrationTableViewController: UITableViewController, ImagePickerD
     
     func fpnDisplayCountryList() {
         let listController: FPNCountryListViewController = FPNCountryListViewController(style: .insetGrouped)
-        let navigationViewController = UINavigationController(rootViewController: listController)
         
+        let navigationViewControllerx = UINavigationController(rootViewController: listController)
+        navigationViewControllerx.navigationBar.tintColor = UIColor.getAppColor(.light)
         listController.title = "Countries"
+        listController.searchController.searchBar.keyboardAppearance = .light
+        listController.overrideUserInterfaceStyle = .light
         listController.setup(repository: phoneTextField.countryRepository)
         listController.didSelect = { [weak self] country in
             self?.phoneTextField.setFlag(countryCode: country.code)
             self?.countryCode = country.code.rawValue
         }
-        present(navigationViewController, animated: true, completion: nil)
+        present(navigationViewControllerx, animated: true, completion: nil)
     }
     
     @IBAction func cancelButtonPressed(_ sender: Any) {
@@ -78,12 +82,14 @@ class FinishRegistrationTableViewController: UITableViewController, ImagePickerD
     @IBAction func doneButtonPressed(_ sender: Any) {
         dismissKeyboard()
         gradientLoadingBar.fadeIn()
+        doneButton.title = "Signing up..."
         doneButton.isEnabled = false
         if allFieldsAreFilled() {
             if phoneNumber == "Not Valid" {
                 gradientLoadingBar.fadeOut()
-                showMessage("Phone number is not valid", type: .error)
+                showMessage(kPHONENUMBERNOTVALID, type: .error)
                 doneButton.isEnabled = true
+                doneButton.title = "Done"
                 return
             }
             FUser.registerUserWith(email: email, password: password, firstName: nameTextField.text!, lastName: surnameTextField.text!) { error in
@@ -93,12 +99,13 @@ class FinishRegistrationTableViewController: UITableViewController, ImagePickerD
                     ProgressHUD.dismiss()
                     if let errCode = AuthErrorCode(rawValue: error!._code) {
                         switch errCode {
-                        case .emailAlreadyInUse: self.showMessage("Email already in use", type: .error)
-                        case .invalidEmail: self.showMessage("Invalid email", type: .error)
-                        default: self.showMessage("An error occurred", type: .error)
+                        case .emailAlreadyInUse: self.showMessage(kEMAILALREADYINUSE, type: .error)
+                        case .invalidEmail: self.showMessage(kEMAILNOTVALID, type: .error)
+                        default: self.showMessage(kSOMETHINGWENTWRONG, type: .error)
                         }
                     }
                     self.doneButton.isEnabled = true
+                    self.doneButton.title = "Done"
                 }
                 else {
                     self.gradientLoadingBar.fadeOut()
@@ -108,8 +115,9 @@ class FinishRegistrationTableViewController: UITableViewController, ImagePickerD
         }
         else {
             gradientLoadingBar.fadeOut()
-            showMessage("All fields are required", type: .error)
+            showMessage(kEMPTYFIELDS, type: .error)
             doneButton.isEnabled = true
+            doneButton.title = "Done"
         }
     }
     
@@ -187,39 +195,69 @@ class FinishRegistrationTableViewController: UITableViewController, ImagePickerD
     
     // MARK: ImagePickerDelegate
     
-    func wrapperDidPress(_ imagePicker: ImagePickerController, images: [UIImage]) {
-        dismiss(animated: true, completion: nil)
-    }
-    
-    func doneButtonDidPress(_ imagePicker: ImagePickerController, images: [UIImage]) {
-        if images.count > 0 {
-            avatarImage = images.first!
-            avatarImageView.image = avatarImage
-            avatarImageView.maskCircle()
+    func imagePickerController(_ picker: UIImagePickerController,
+                               didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        guard let selectedImage = info[.editedImage] as? UIImage else {
+            fatalError("Expected a dictionary containing an image, but was provided the following: \(info)")
         }
-        dismiss(animated: true, completion: nil)
+        let chosenImage = selectedImage.resizeTo(MB: 1) // 2
+        avatarImage = chosenImage
+        avatarImageView.image = avatarImage!
+        avatarImageView.maskCircle()
+        
+        dismiss(animated: true, completion: nil) // 5
     }
     
-    func cancelButtonDidPress(_ imagePicker: ImagePickerController) {
-        dismiss(animated: true, completion: nil)
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
+    }
+    
+    func showAlert() {
+        let alert = UIAlertController(title: nil, message: "Set your profile picture", preferredStyle: .actionSheet)
+        if !(avatarImage == nil) {
+            let resetAction = UIAlertAction(title: "Remove Current Photo", style: .destructive) { _ in
+                
+                self.avatarImage = nil
+                self.avatarImageView.image = UIImage(named: "avatarph")
+            }
+            alert.addAction(resetAction)
+        }
+        
+        alert.addAction(UIAlertAction(title: "Take Photo", style: .default, handler: { (_: UIAlertAction) in
+            self.getImage(fromSourceType: .camera)
+        }))
+        alert.addAction(UIAlertAction(title: "Choose From Library", style: .default, handler: { (_: UIAlertAction) in
+            self.getImage(fromSourceType: .photoLibrary)
+        }))
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: {
+            _ in
+            
+        })
+        alert.addAction(cancelAction)
+        
+        alert.preferredAction = cancelAction
+        present(alert, animated: true, completion: nil)
     }
     
     @IBAction func avatarTapp(_ sender: Any) {
-        let imagePickerController = ImagePickerController()
-        imagePickerController.delegate = self
-        imagePickerController.imageLimit = 1
-        
-        present(imagePickerController, animated: true, completion: nil)
-        dismissKeyboard()
+        showAlert()
     }
     
     @IBAction func choosePicturePressed(_ sender: Any) {
-        let imagePickerController = ImagePickerController()
-        imagePickerController.delegate = self
-        imagePickerController.imageLimit = 1
-        
-        present(imagePickerController, animated: true, completion: nil)
-        dismissKeyboard()
+        showAlert()
+    }
+    
+    func getImage(fromSourceType sourceType: UIImagePickerController.SourceType) {
+        // Check is source type available
+        if UIImagePickerController.isSourceTypeAvailable(sourceType) {
+            let imagePickerController = UIImagePickerController()
+            imagePickerController.delegate = self
+            imagePickerController.allowsEditing = true
+            imagePickerController.sourceType = sourceType
+            imagePickerController.overrideUserInterfaceStyle = .light
+            present(imagePickerController, animated: true, completion: nil)
+        }
     }
     
     // MARK: FlagPhoneNumber delegate

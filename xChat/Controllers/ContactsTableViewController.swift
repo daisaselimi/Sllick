@@ -47,7 +47,7 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
             CNContactPhoneNumbersKey,
             CNContactImageDataAvailableKey,
             CNContactThumbnailImageDataKey,
-        ] as [Any]
+            ] as [Any]
         
         // Get all the containers
         var allContainers: [CNContainer] = []
@@ -321,63 +321,63 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) ->
         UISwipeActionsConfiguration? {
-        var contactUser: FUser
-        
-        if searchController.isActive, searchController.searchBar.text != "" {
-            contactUser = filteredMatchedUsers[indexPath.row]
-        } else {
-            contactUser = matchedUsers[indexPath.row]
-        }
-        
-        let removeContact = UIContextualAction(style: .normal, title: nil) { _, _, _ in
-            if self.searchController.isActive, self.searchController.searchBar.text != "" {
-                self.filteredMatchedUsers.remove(at: indexPath.row)
-                let objectId = contactUser.objectId
-                self.removeContact(id: objectId)
-                let contactFirstLetter = contactUser.firstname.first?.uppercased()
-                if self.allUsersGrouped[contactFirstLetter!]?.count == 1 {
-                    self.sectionTitleList.removeAll { (letter) -> Bool in
-                        letter == contactFirstLetter!
-                    }
-                }
-                self.allUsersGrouped[contactFirstLetter!] = self.removeFromArray(array: self.allUsersGrouped[contactFirstLetter!]!, withId: objectId)
-                self.matchedUsers = self.removeFromArray(array: self.matchedUsers, withId: objectId)
-                if self.memberIdsOfGroupChat.contains(objectId) {
-                    let index = self.memberIdsOfGroupChat.firstIndex(of: objectId)
-                    self.memberIdsOfGroupChat.remove(at: index!)
-                    self.membersOfGroupChat.remove(at: index!)
-                    self.navigationItem.rightBarButtonItem?.isEnabled = self.memberIdsOfGroupChat.count > 0
-                }
-                
-                self.splitDataInToSection()
+            var contactUser: FUser
+            
+            if searchController.isActive, searchController.searchBar.text != "" {
+                contactUser = filteredMatchedUsers[indexPath.row]
             } else {
-                let sectionTitle = self.sectionTitleList[indexPath.section]
-                let users = self.allUsersGrouped[sectionTitle]
-                let objectId = users![indexPath.row].objectId
-                self.removeContact(id: users![indexPath.row].objectId)
-                if self.allUsersGrouped[sectionTitle]?.count == 1 {
-                    self.sectionTitleList.remove(at: indexPath.section)
-                }
-                self.allUsersGrouped[sectionTitle] = self.removeFromArray(array: self.allUsersGrouped[sectionTitle]!, withId: objectId)
-                self.matchedUsers = self.removeFromArray(array: self.matchedUsers, withId: objectId)
-                if self.memberIdsOfGroupChat.contains(objectId) {
-                    let index = self.memberIdsOfGroupChat.firstIndex(of: objectId)
-                    self.memberIdsOfGroupChat.remove(at: index!)
-                    self.membersOfGroupChat.remove(at: index!)
-                    self.navigationItem.rightBarButtonItem?.isEnabled = self.memberIdsOfGroupChat.count > 0
-                }
-                self.splitDataInToSection()
+                contactUser = matchedUsers[indexPath.row]
             }
-        }
-        
-        removeContact.backgroundColor = UIColor.systemBackground
-        var img = UIGraphicsImageRenderer(size: CGSize(width: 26, height: 25)).image {
-            _ in
-            UIImage(systemName: "person.badge.minus")?.draw(in: CGRect(x: 0, y: 0, width: 26, height: 25))
-        }
-        img = img.imageWithColor(color1: .systemRed)
-        removeContact.image = img
-        return UISwipeActionsConfiguration(actions: [removeContact])
+            
+            let removeContact = UIContextualAction(style: .normal, title: nil) { _, _, _ in
+                if self.searchController.isActive, self.searchController.searchBar.text != "" {
+                    self.filteredMatchedUsers.remove(at: indexPath.row)
+                    let objectId = contactUser.objectId
+                    self.removeContact(id: objectId)
+                    let contactFirstLetter = contactUser.firstname.first?.uppercased()
+                    if self.allUsersGrouped[contactFirstLetter!]?.count == 1 {
+                        self.sectionTitleList.removeAll { (letter) -> Bool in
+                            letter == contactFirstLetter!
+                        }
+                    }
+                    self.allUsersGrouped[contactFirstLetter!] = self.removeFromArray(array: self.allUsersGrouped[contactFirstLetter!]!, withId: objectId)
+                    self.matchedUsers = self.removeFromArray(array: self.matchedUsers, withId: objectId)
+                    if self.memberIdsOfGroupChat.contains(objectId) {
+                        let index = self.memberIdsOfGroupChat.firstIndex(of: objectId)
+                        self.memberIdsOfGroupChat.remove(at: index!)
+                        self.membersOfGroupChat.remove(at: index!)
+                        self.navigationItem.rightBarButtonItem?.isEnabled = self.memberIdsOfGroupChat.count > 0
+                    }
+                    
+                    self.splitDataInToSection()
+                } else {
+                    let sectionTitle = self.sectionTitleList[indexPath.section]
+                    let users = self.allUsersGrouped[sectionTitle]
+                    let objectId = users![indexPath.row].objectId
+                    self.removeContact(id: users![indexPath.row].objectId)
+                    if self.allUsersGrouped[sectionTitle]?.count == 1 {
+                        self.sectionTitleList.remove(at: indexPath.section)
+                    }
+                    self.allUsersGrouped[sectionTitle] = self.removeFromArray(array: self.allUsersGrouped[sectionTitle]!, withId: objectId)
+                    self.matchedUsers = self.removeFromArray(array: self.matchedUsers, withId: objectId)
+                    if self.memberIdsOfGroupChat.contains(objectId) {
+                        let index = self.memberIdsOfGroupChat.firstIndex(of: objectId)
+                        self.memberIdsOfGroupChat.remove(at: index!)
+                        self.membersOfGroupChat.remove(at: index!)
+                        self.navigationItem.rightBarButtonItem?.isEnabled = self.memberIdsOfGroupChat.count > 0
+                    }
+                    self.splitDataInToSection()
+                }
+            }
+            
+            removeContact.backgroundColor = UIColor.systemBackground
+            var img = UIGraphicsImageRenderer(size: CGSize(width: 26, height: 25)).image {
+                _ in
+                UIImage(systemName: "person.badge.minus")?.draw(in: CGRect(x: 0, y: 0, width: 26, height: 25))
+            }
+            img = img.imageWithColor(color1: .systemRed)
+            removeContact.image = img
+            return UISwipeActionsConfiguration(actions: [removeContact])
     }
     
     func removeFromArray(array: [FUser], withId: String) -> [FUser] {
@@ -748,6 +748,10 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
         
         let withValues = [kMEMBERS: tempMembers, kMEMBERSTOPUSH: tempMembersToPush]
         
+        for memberId in memberIdsOfGroupChat {
+            sendSystemMessage(text: "a-" + matchedUsers.filter{$0.objectId == memberId}[0].fullname + "-" + memberId, chatRoomId: group[kGROUPID] as! String, memberIds: tempMembers, membersToPush: [], group: group)
+        }
+        
         Group.updateGroup(groupId: group[kGROUPID] as! String, withValues: withValues)
         
         createRecentsForNewMembers(groupId: group[kGROUPID] as! String, groupName: group[kNAME] as! String, membersToPush: tempMembersToPush, avatar: group[kAVATAR] as! String)
@@ -763,14 +767,23 @@ class ContactsTableViewController: UITableViewController, UISearchResultsUpdatin
 
 extension ContactsTableViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
     func image(forEmptyDataSet scrollView: UIScrollView!) -> UIImage! {
+        if searchController.isActive && searchController.searchBar.text != "" {
+            return UIImage()
+        }
         return UIImage(named: "astronaut")
     }
     
     func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        if searchController.isActive && searchController.searchBar.text != "" {
+            return NSAttributedString(string: "NO RESULTS", attributes: [NSAttributedString.Key.foregroundColor: UIColor.label, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16.0)])
+        }
         return NSAttributedString(string: "NO CONTACTS", attributes: [NSAttributedString.Key.foregroundColor: UIColor.label, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16.0)])
     }
     
     func description(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        if searchController.isActive && searchController.searchBar.text != "" {
+            return NSAttributedString(string: "No results found for \"\(searchController.searchBar.text ?? "your search")\"", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14.0)])
+        }
         return NSAttributedString(string: emptySetDescription, attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14.0)])
     }
     
@@ -779,10 +792,16 @@ extension ContactsTableViewController: DZNEmptyDataSetSource, DZNEmptyDataSetDel
     }
     
     func buttonTitle(forEmptyDataSet scrollView: UIScrollView!, for state: UIControl.State) -> NSAttributedString! {
+        if searchController.isActive && searchController.searchBar.text != "" {
+            return NSAttributedString()
+        }
         return NSAttributedString(string: "Explore other users", attributes: [NSAttributedString.Key.foregroundColor: UIColor.getAppColor(.light), NSAttributedString.Key.font: UIFont.systemFont(ofSize: 13.0)])
     }
     
     func emptyDataSet(_ scrollView: UIScrollView!, didTap button: UIButton!) {
+        if searchController.isActive && searchController.searchBar.text != "" {
+            return
+        }
         let userVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "usersTableView") as! UsersTableViewController
         userVC.delegate = self
         navigationController?.pushViewController(userVC, animated: true)

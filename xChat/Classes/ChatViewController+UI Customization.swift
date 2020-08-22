@@ -42,8 +42,12 @@ extension ChatViewController {
     
     func setUIForGroupChat() {
         imageFromData(pictureData: group![kAVATAR] as! String) { image in
-            if image != nil {
+            if image != nil && isPartOfGroup! {
                 avatarButton.setImage(image!, for: .normal)
+            } else if let isPartOfGrp = isPartOfGroup {
+                if !isPartOfGrp {
+                    avatarButton.setImage(initialImage, for: .normal)
+                }
             } else {
                 avatarButton.setImage(UIImage(named: "groupph"), for: .normal)
             }

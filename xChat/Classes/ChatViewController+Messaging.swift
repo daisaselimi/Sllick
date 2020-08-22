@@ -11,7 +11,7 @@ import Foundation
 import JSQMessagesViewController
 
 extension ChatViewController {
-    
+ 
     func loadMessages() {
         // update message status
         updatedChatListener = reference(.Message).document(FUser.currentId()).collection(chatRoomId).addSnapshotListener { snapshot, _ in
@@ -30,7 +30,9 @@ extension ChatViewController {
                             self.objectMessages.remove(at: index!)
                             self.messages.remove(at: index!)
                             self.objectMessages.insert(dict as NSDictionary, at: index!)
-                            let message = IncomingMessage(collectionVIew_: self.collectionView).createMessage(messageDictionary: dict as NSDictionary, chatRoomId: self.chatRoomId)
+                            let incomingMessage = IncomingMessage(collectionVIew_: self.collectionView)
+                            incomingMessage.isSendingMessage = true
+                            let message = incomingMessage.createMessage(messageDictionary: dict as NSDictionary, chatRoomId: self.chatRoomId)
                             self.messages.insert(message!, at: index!)
                             self.collectionView.reloadData()
                         }
@@ -39,6 +41,7 @@ extension ChatViewController {
                 }
             }
         }
+
         
         // get last 21 messages
         reference(.Message).document(FUser.currentId()).collection(chatRoomId).order(by: kDATE, descending: true).limit(to: 21).getDocuments(completion: { snapshot, error in
@@ -56,16 +59,17 @@ extension ChatViewController {
                 self.inputToolbar.isUserInteractionEnabled = false
                 return
             }
+            
             guard let snapshot = snapshot else {
                 self.initialLoadComplete = true
                 self.listenForNewChat()
                 return
             }
             
+            
             let sorted = (dictionaryFromSnapshots(snapshots: snapshot.documents) as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: true)]) as! [NSDictionary]
             
             // remove bad messages
-            
             self.loadedMessages = sorted
             self.insertMessages()
             self.finishReceivingMessage(animated: false)
@@ -84,7 +88,31 @@ extension ChatViewController {
             self.gradientLoadingBar.fadeOut()
             
         })
+        
+      firstMessagesListener = reference(.Message).document(FUser.currentId()).collection(chatRoomId).order(by: kDATE, descending: true).limit(to: 21).addSnapshotListener(includeMetadataChanges: true) { (snapshot, error) in
+            guard let snapshot = snapshot else { return }
+
+            if !snapshot.isEmpty {
+
+                for diff in snapshot.documentChanges(includeMetadataChanges: true) {
+                    let item = diff.document.data() as NSDictionary
+                    let messageDict: NSMutableDictionary = item as! NSMutableDictionary
+                    if  diff.document.metadata.hasPendingWrites {
+                        messageDict[kSTATUS] = kSENDING
+
+                    } else {
+                        messageDict[kSTATUS] = kDELIVERED
+                        //                                    OutgoingMessage.updateMessage(withId: messageDict[kMESSAGEID] as! String, chatRoomId: self.chatRoomId, memberIds: self.memberIds, values: [kDATE : dateFormatter().string(from: Date())])
+
+                        self.updateMessage(messageDictionary: messageDict)
+                    }
+                }
+            }
+        }
     }
+    
+    
+  
     
     func updateMessage(messageDictionary: NSDictionary) {
         for index in 0..<objectMessages.count {
@@ -105,13 +133,14 @@ extension ChatViewController {
             lastMessageDate = loadedMessages.last![kDATE] as! String
         }
         
-        newChatListener = reference(.Message).document(FUser.currentId()).collection(chatRoomId).whereField(kDATE, isGreaterThan: lastMessageDate).addSnapshotListener { snapshot, _ in
+        newChatListener = reference(.Message).document(FUser.currentId()).collection(chatRoomId).whereField(kDATE, isGreaterThan: lastMessageDate).addSnapshotListener(includeMetadataChanges: true) { snapshot, _ in
             
             guard let snapshot = snapshot else { return }
             
             if !snapshot.isEmpty {
-                for diff in snapshot.documentChanges {
-                    if diff.type == .added {
+                
+                for diff in snapshot.documentChanges(includeMetadataChanges: true) {
+                  // if diff.type == .added {
                         let item = diff.document.data() as NSDictionary
                         
                         if let type = item[kTYPE] {
@@ -119,13 +148,30 @@ extension ChatViewController {
                                 if type as! String == kPICTURE {
                                     self.addNewPictureMessageLink(link: item[kPICTURE] as! String)
                                 }
-                                if self.insertInitialLoadMessages(messageDictionary: item) {
-                                    JSQSystemSoundPlayer.jsq_playMessageReceivedSound()
+                                let messageDict: NSMutableDictionary = item as! NSMutableDictionary
+                                if  diff.document.metadata.hasPendingWrites {
+                                    messageDict[kSTATUS] = kSENDING
+                                   
+                                } else {
+                                    if messageDict[kSTATUS] as! String != kREAD {
+                                        messageDict[kSTATUS] = kDELIVERED
+                                        self.firstMessagesListener?.remove()
+                                        //                                    OutgoingMessage.updateMessage(withId: messageDict[kMESSAGEID] as! String, chatRoomId: self.chatRoomId, memberIds: self.memberIds, values: [kDATE : dateFormatter().string(from: Date())])
+                                        
+                                        self.updateMessage(messageDictionary: messageDict)
+                                    }
+                       
                                 }
-                                self.finishReceivingMessage()
+                                if diff.type != .removed  && (diff.type != .modified){
+                                    if self.insertInitialLoadMessages(messageDictionary: messageDict, isSendingMessage: true) && type as! String != kSYSTEMMESSAGE {
+                                        JSQSystemSoundPlayer.jsq_playMessageReceivedSound()
+                                    }
+                                    self.finishReceivingMessage()
+                                }
+                               
                             }
                         }
-                    }
+                   // }
                 }
             }
         }
@@ -151,12 +197,12 @@ extension ChatViewController {
         // showLoadEarlierMessagesHeader = loadedMessagesCount != loadedMessages.count
     }
     
-    func insertInitialLoadMessages(messageDictionary: NSDictionary) -> Bool {
+    func insertInitialLoadMessages(messageDictionary: NSDictionary, isSendingMessage: Bool = false) -> Bool {
         let incomingMessage = IncomingMessage(collectionVIew_: collectionView!)
-        
+        incomingMessage.isSendingMessage = isSendingMessage
         // check if incoming
         if messageDictionary[kSENDERID] as! String != FUser.currentId() {
-            if messageDictionary[kSTATUS] as! String != kREAD {
+            if messageDictionary[kSTATUS] as! String == kDELIVERED {
                 OutgoingMessage.updateMessage(withId: messageDictionary[kMESSAGEID] as! String,
                                               chatRoomId: chatRoomId, memberIds: memberIds, values: [kSTATUS: kREAD, kREADDATE: dateFormatter().string(from: Date())])
             }
@@ -207,7 +253,7 @@ extension ChatViewController {
                     outgoingMessage = OutgoingMessage(message: encryptedText, pictureLink: imageLink!, senderId: currentUser!.objectId, senderName: currentUser!.firstname, date: date, status: kDELIVERED, type: kPICTURE)
                     
                     JSQSystemSoundPlayer.jsq_playMessageSentSound()
-                    self.finishSendingMessage()
+                    self.finishSendingMediaMessage()
                     
                     outgoingMessage?.sendMessage(chatRoomID: self.chatRoomId, messageDictionary: outgoingMessage!.messageDictionary, memberIds: self.memberIds, membersToPush: self.membersToPush, lastMessageType: kPICTURE, isGroup: self.isGroup! ? true : false, groupName: self.isGroup! ? (self.group![kNAME] as! String) : "", chatTitle: self.titleLabel.text!)
                 }
@@ -224,7 +270,7 @@ extension ChatViewController {
                     outgoingMessage = OutgoingMessage(message: encryptedText, video: videoLink!, thumbnail: dataThumbnail! as NSData, senderId: currentUser!.objectId, senderName: currentUser!.firstname, date: date, status: kDELIVERED, type: kVIDEO)
                     
                     JSQSystemSoundPlayer.jsq_playMessageSentSound()
-                    self.finishSendingMessage()
+                    self.finishSendingMediaMessage()
                     
                     outgoingMessage?.sendMessage(chatRoomID: self.chatRoomId, messageDictionary: outgoingMessage!.messageDictionary, memberIds: self.memberIds, membersToPush: self.membersToPush, lastMessageType: kVIDEO, isGroup: self.isGroup! ? true : false, groupName: self.isGroup! ? (self.group![kNAME] as! String) : "", chatTitle: self.titleLabel.text!)
                 }
@@ -238,10 +284,16 @@ extension ChatViewController {
                     
                     outgoingMessage = OutgoingMessage(message: encryptedText, audio: audioLink!, senderId: currentUser!.objectId, senderName: currentUser!.firstname, date: date, status: kDELIVERED, type: kAUDIO)
                     JSQSystemSoundPlayer.jsq_playMessageSentSound()
-                    self.finishSendingMessage()
+                    self.finishSendingMediaMessage()
                     outgoingMessage?.sendMessage(chatRoomID: self.chatRoomId, messageDictionary: outgoingMessage!.messageDictionary, memberIds: self.memberIds, membersToPush: self.membersToPush, lastMessageType: kAUDIO, isGroup: self.isGroup! ? true : false, groupName: self.isGroup! ? (self.group![kNAME] as! String) : "", chatTitle: self.titleLabel.text!)
                 }
             }
         }
+    }
+    
+    func finishSendingMediaMessage() {
+        let text =  self.inputToolbar.contentView.textView?.text
+        self.finishSendingMessage()
+        self.inputToolbar.contentView.textView?.text = text
     }
 }

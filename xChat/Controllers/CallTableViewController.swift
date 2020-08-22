@@ -318,14 +318,23 @@ class CallTableViewController: UITableViewController, UISearchResultsUpdating, D
     // MARK: DZN data source/delegate methods
     
     func image(forEmptyDataSet scrollView: UIScrollView!) -> UIImage! {
+        if searchController.isActive && searchController.searchBar.text != "" {
+            return UIImage()
+        }
         return UIImage(named: "calling")
     }
     
     func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        if searchController.isActive && searchController.searchBar.text != "" {
+            return NSAttributedString(string: "NO RESULTS", attributes: [NSAttributedString.Key.foregroundColor: UIColor.label, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16.0)])
+        }
         return NSAttributedString(string: "NO CALLS", attributes: [NSAttributedString.Key.foregroundColor: UIColor.label, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16.0)])
     }
     
     func description(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
+        if searchController.isActive && searchController.searchBar.text != "" {
+            return NSAttributedString(string: "No results found for \"\(searchController.searchBar.text ?? "your search")\"", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14.0)])
+        }
         return NSAttributedString(string: "All calls will appear here. You can call someone from their profile.", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14.0)])
     }
     

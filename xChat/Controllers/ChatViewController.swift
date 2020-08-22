@@ -34,7 +34,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     var group: NSDictionary?
     var isPartOfGroup: Bool?
     
-    var legitTypes = [kAUDIO, kVIDEO, kTEXT, kLOCATION, kPICTURE]
+    var legitTypes = [kAUDIO, kVIDEO, kTEXT, kPICTURE, kSYSTEMMESSAGE]
     var messages: [JSQMessage] = []
     var objectMessages: [NSDictionary] = []
     var loadedMessages: [NSDictionary] = []
@@ -60,6 +60,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     var newChatListener: ListenerRegistration!
     var updatedChatListener: ListenerRegistration!
     var groupChangedListener: ListenerRegistration!
+    var firstMessagesListener: ListenerRegistration!
     
     var jsqAvatarDictionary: NSMutableDictionary?
     var avatarImageDictionary: NSMutableDictionary?
@@ -175,7 +176,15 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
                 self.setUIForSingleChat()
             }
         }
-        createTypingObserver()
+        
+        if let isPartOfGrp = isPartOfGroup {
+            if isPartOfGrp {
+                createTypingObserver()
+            }
+        } else {
+             createTypingObserver()
+        }
+       
         loadUserDefaults()
         firstLoadMessages = true
         JSQMessagesCollectionViewCell.registerMenuAction(#selector(delete))
@@ -203,7 +212,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     override func viewWillAppear(_ animated: Bool) {
         // super.viewWillAppear(animated)
         
-        if !MyVariables.globalContactsVariable.contains((memberIds.filter { $0 != FUser.currentId() })[0]) {
+        if memberIds.count > 1, !MyVariables.globalContactsVariable.contains((memberIds.filter { $0 != FUser.currentId() })[0]) {
             if let isGroup = isGroup {
                 if !isGroup { subTitleLabel.text = "Sllick Chat" }
             }
@@ -302,7 +311,6 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     // MARK: Group delegate
     
     func updatedGroupMembers(group: NSDictionary) {
-        print("hihihihh:  \((group[kMEMBERS] as! [String]).count)")
         self.group = group
     }
     
@@ -676,10 +684,13 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
                                 if !(self.group![kMEMBERS] as! [String]).contains(FUser.currentId()) {
                                     self.inputToolbar.isHidden = true
                                     self.avatarButton.isUserInteractionEnabled = false
+                                    self.inputToolbar.contentView.textView.resignFirstResponder()
+                                    self.typingListener?.remove()
                                 } else {
                                     self.inputToolbar.isHidden = false
                                     self.avatarButton.isUserInteractionEnabled = true
                                     updateExistingRecentWithNewValues(forMembers: self.group![kMEMBERS] as! [String], chatRoomId: self.group![kGROUPID] as! String, withValues: [kAVATAR: self.group![kAVATAR] as Any, kWITHUSERFULLNAME: self.group![kNAME]!])
+                                    self.createTypingObserver()
                                 }
                             }
                         }

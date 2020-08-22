@@ -149,7 +149,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
     }
     
     func goToView(named name: String) {
-        //        if name == kMAINAPPLICATION {
+        //        if Chname == kMAINAPPLICATION {
         //            NotificationCenter.default.post(name: NSNotification.Name(rawValue: USER_DID_LOGIN_NOTIFICATION), object: nil, userInfo:  [kUSERID : FUser.currentId()])
         //        }
         let storyboard = UIStoryboard(name: "Main", bundle: nil)

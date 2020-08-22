@@ -20,21 +20,32 @@ extension ChatViewController {
         if data.senderId == FUser.currentId() {
             cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! MessageViewOutgoing
             cell.textView?.textColor = userDefaults.object(forKey: kBACKGROUNDIMAGE) != nil ? .white : .label
-            if messages[indexPath.row].isMediaMessage {
-                (cell as! MessageViewOutgoing).timeLabelForMediaMessages?.text = messages[indexPath.row].date.timeAgoInMessages()
-                (cell as! MessageViewOutgoing).trailingAvatarConstraint.constant = -22
+            if objectMessages[indexPath.row][kTYPE] as! String != kSYSTEMMESSAGE {
+                if messages[indexPath.row].isMediaMessage {
+                    (cell as! MessageViewOutgoing).timeLabelForMediaMessages?.text = messages[indexPath.row].date.timeAgoInMessages()
+                    
+                } else {
+                    (cell as! MessageViewOutgoing).timeLabel?.text = messages[indexPath.row].date.timeAgoInMessages()
+                }
             } else {
-                (cell as! MessageViewOutgoing).timeLabel?.text = messages[indexPath.row].date.timeAgoInMessages()
+                (cell as! MessageViewOutgoing).timeLabel?.text = ""
+            }
+            if messages[indexPath.row].isMediaMessage {
+                (cell as! MessageViewOutgoing).trailingAvatarConstraint.constant = -22
             }
             
         } else {
             cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! MessageViewIncoming
             cell.textView?.textColor = .label
             // cell.textView?.textColor = userDefaults.object(forKey: kBACKGROUBNDIMAGE) != nil ? .white : .label
-            if messages[indexPath.row].isMediaMessage {
-                (cell as! MessageViewIncoming).timeLabelForMediaMessages?.text = messages[indexPath.row].date.timeAgoInMessages()
+            if objectMessages[indexPath.row][kTYPE] as! String != kSYSTEMMESSAGE {
+                if messages[indexPath.row].isMediaMessage {
+                    (cell as! MessageViewIncoming).timeLabelForMediaMessages?.text = messages[indexPath.row].date.timeAgoInMessages()
+                } else {
+                    (cell as! MessageViewIncoming).timeLabel?.text = messages[indexPath.row].date.timeAgoInMessages()
+                }
             } else {
-                (cell as! MessageViewIncoming).timeLabel?.text = messages[indexPath.row].date.timeAgoInMessages()
+                (cell as! MessageViewIncoming).timeLabel?.text = ""
             }
         }
         
@@ -60,7 +71,9 @@ extension ChatViewController {
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
         let data = messages[indexPath.row]
-        
+        if objectMessages[indexPath.row][kTYPE] as! String == kSYSTEMMESSAGE {
+            return nil
+        }
         if data.senderId == FUser.currentId() {
             return outgoingBubble
         } else {
@@ -69,6 +82,9 @@ extension ChatViewController {
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForMessageBubbleTopLabelAt indexPath: IndexPath!) -> CGFloat {
+        if objectMessages[indexPath.row][kTYPE] as! String == kSYSTEMMESSAGE {
+            return 0
+        }
         if !isFirstInSet(indexOfMessage: indexPath), !firstMessageOfTheDay(indexOfMessage: indexPath) {
             return 0
         }
@@ -79,6 +95,9 @@ extension ChatViewController {
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
+        if objectMessages[indexPath.row][kTYPE] as! String == kSYSTEMMESSAGE {
+            return nil
+        }
         if !isFirstInSet(indexOfMessage: indexPath) && !firstMessageOfTheDay(indexOfMessage: indexPath) {
             return nil
         }
@@ -91,7 +110,20 @@ extension ChatViewController {
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForCellTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
         let message = messages[indexPath.row]
         if firstMessageOfTheDay(indexOfMessage: indexPath) {
-            return NSAttributedString(string: message.date.timeAgoInMessages(fullTimeAgo: true), attributes: [NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel]) // ])
+            let combinedAS = NSMutableAttributedString()
+            let string = message.date.timeAgoInMessages(fullTimeAgo: true)
+            let mutableAttributedString = NSMutableAttributedString(string: string, attributes: [NSAttributedString.Key.foregroundColor: UIColor.label, NSAttributedString.Key.font : UIFont.systemFont(ofSize: 12)])
+            combinedAS.append(mutableAttributedString)
+            if objectMessages[indexPath.row][kTYPE] as! String == kSYSTEMMESSAGE {
+                let mutableASForSystemMessages = NSAttributedString(string: "\n\n" + messages[indexPath.row].text, attributes: [NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel, NSAttributedString.Key.font : UIFont.italicSystemFont(ofSize: 13)])
+                
+                
+                combinedAS.append(mutableASForSystemMessages)
+            }
+            return combinedAS
+            
+        } else if objectMessages[indexPath.row][kTYPE] as! String == kSYSTEMMESSAGE{
+            return NSAttributedString(string: messages[indexPath.row].text, attributes: [NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel, NSAttributedString.Key.font : UIFont.italicSystemFont(ofSize: 13)])
         } else {
             return nil // NSAttributedString(string: message.date.timeAgoInMessages(fullTimeAgo: false))
         }
@@ -100,6 +132,9 @@ extension ChatViewController {
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForCellBottomLabelAt indexPath: IndexPath!) -> NSAttributedString! {
         let message = objectMessages[indexPath.row]
         
+        if objectMessages[indexPath.row][kTYPE] as! String == kSYSTEMMESSAGE {
+            return nil
+        }
         var status: NSAttributedString = NSAttributedString(string: kWAITINGTOSEND)
         
         _ = [NSAttributedString.Key.foregroundColor: UIColor.darkGray]
@@ -123,14 +158,19 @@ extension ChatViewController {
             let statusText = "Seen " + readTimeFrom(dateString: message[kREADDATE] as! String)
             //            status = NSAttributedString(string: messages[indexPath.row].date.timeAgoInMessages() + (indexPath.row == (messages.count - 1) && messages[indexPath.row].senderId == FUser.currentId() ? ("・" + statusText) : ""), attributes: attributetStringColor)
             status = NSAttributedString(string: statusText)
+        case kSENDING:
+            status = NSAttributedString(string: "→")
         default:
-            status = NSAttributedString(string: "✔️⇢")
+            status = NSAttributedString()
         }
         
         return status
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
+        if objectMessages[indexPath.row][kTYPE] as! String == kSYSTEMMESSAGE {
+            return nil
+        }
         let message = messages[indexPath.row]
         let nextIndexPath = IndexPath(row: indexPath.row + 1, section: indexPath.section)
         if !isLastInSet(indexOfMessage: indexPath), !firstMessageOfTheDay(indexOfMessage: nextIndexPath) {
@@ -150,7 +190,7 @@ extension ChatViewController {
         if indexOfMessage.item == messages.count - 1 {
             return true
         } else {
-            return (messages[indexOfMessage.item].senderId != messages[indexOfMessage.item + 1].senderId)
+            return (messages[indexOfMessage.item].senderId != messages[indexOfMessage.item + 1].senderId) ||  (objectMessages[indexOfMessage.item + 1][kTYPE] as! String == kSYSTEMMESSAGE && (objectMessages[indexOfMessage.item][kSENDERID] as! String == objectMessages[indexOfMessage.item + 1][kSENDERID] as! String))
         }
     }
     
@@ -165,10 +205,21 @@ extension ChatViewController {
         }
     }
     
+    override func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let messageSize = super.collectionView(collectionView, layout: collectionViewLayout, sizeForItemAt: indexPath)
+        if objectMessages[indexPath.row][kTYPE] as! String == kSYSTEMMESSAGE {
+            return CGSize(width: messageSize.width, height: firstMessageOfTheDay(indexOfMessage: indexPath) ? 60 : 45)
+        } else {
+            return CGSize(width: messageSize.width, height: messageSize.height)
+        }
+    }
+    
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForCellBottomLabelAt indexPath: IndexPath!) -> CGFloat {
         let data = messages[indexPath.row]
-        
-        if data.senderId == FUser.currentId(), indexPath.row == objectMessages.count - 1 || objectMessages[indexPath.row][kSTATUS] as! String == kWAITINGTOSEND {
+        if objectMessages[indexPath.row][kTYPE] as! String == kSYSTEMMESSAGE {
+            return 0.0
+        }
+        if data.senderId == FUser.currentId(), indexPath.row == objectMessages.count - 1 || objectMessages[indexPath.row][kSTATUS] as! String == kWAITINGTOSEND || objectMessages[indexPath.row][kSTATUS] as! String == kSENDING {
             return kJSQMessagesCollectionViewCellLabelHeightDefault
         } else {
             return 0.0
@@ -180,7 +231,11 @@ extension ChatViewController {
         //            previousDate = messages[indexPath.row].date()
         //
         if firstMessageOfTheDay(indexOfMessage: indexPath) {
-            return 40.0
+            return objectMessages[indexPath.row][kTYPE] as! String == kSYSTEMMESSAGE ? 60.0 : 45.0
+        }
+        
+        if objectMessages[indexPath.row][kTYPE] as! String == kSYSTEMMESSAGE {
+            return 45.0
         }
         
         if messages[indexPath.row].senderId != messages[indexPath.row - 1].senderId {
@@ -266,7 +321,7 @@ extension ChatViewController {
                 return false
             }
         } else {
-            if action.description == "delete:" || action.description == "copy:" {
+            if (action.description == "delete:" || action.description == "copy:") && objectMessages[indexPath.row][kSTATUS] as! String != kSENDING {
                 return true
             } else {
                 return false
@@ -280,9 +335,9 @@ extension ChatViewController {
         objectMessages.remove(at: indexPath.row)
         messages.remove(at: indexPath.row)
         // collectionView.reloadData()
-//        UIView.animate(withDuration: 1) {
-//             collectionView.reloadEmptyDataSet()
-//        }
+        //        UIView.animate(withDuration: 1) {
+        //             collectionView.reloadEmptyDataSet()
+        //        }
         
         if messages.count == 0 {
             UIView.transition(with: collectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
@@ -436,8 +491,8 @@ class CustomCollectionViewFlowLayout: JSQMessagesCollectionViewFlowLayout {
     override func messageBubbleSizeForItem(at indexPath: IndexPath!) -> CGSize {
         var superSize = super.messageBubbleSizeForItem(at: indexPath)
         
-        // let messageItem = collectionView.dataSource?.collectionView(collectionView, messageDataForItemAt: indexPath)
-        if superSize.width > 300 {
+        let messageItem = collectionView.dataSource?.collectionView(collectionView, messageDataForItemAt: indexPath)
+        if superSize.width > 300 && messageItem?.senderId() != FUser.currentId() {
             superSize = CGSize(width: 300, height: superSize.height)
         }
         

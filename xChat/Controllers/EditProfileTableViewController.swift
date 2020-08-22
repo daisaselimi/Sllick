@@ -38,7 +38,8 @@ class EditProfileTableViewController: UITableViewController, UIImagePickerContro
     
     func fpnDisplayCountryList() {
         let listController: FPNCountryListViewController = FPNCountryListViewController(style: .insetGrouped)
-        let navigationViewController = UINavigationController(rootViewController: listController)
+        let navigationViewControllerx = UINavigationController(rootViewController: listController)
+        navigationViewControllerx.navigationBar.tintColor = UIColor.getAppColor(.light)
         phoneNumberTextFld.flagButtonSize = CGSize(width: 25, height: 25)
         listController.title = "Countries"
         listController.setup(repository: phoneNumberTextFld.countryRepository)
@@ -46,7 +47,7 @@ class EditProfileTableViewController: UITableViewController, UIImagePickerContro
             self?.phoneNumberTextFld.setFlag(countryCode: country.code)
             self?.countryCode = country.code.rawValue
         }
-        present(navigationViewController, animated: true, completion: nil)
+        present(navigationViewControllerx, animated: true, completion: nil)
     }
     
     var avatarImage: UIImage?
@@ -230,7 +231,7 @@ class EditProfileTableViewController: UITableViewController, UIImagePickerContro
     
     func imagePickerController(_ picker: UIImagePickerController,
                                didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
-        guard let selectedImage = info[.originalImage] as? UIImage else {
+        guard let selectedImage = info[.editedImage] as? UIImage else {
             fatalError("Expected a dictionary containing an image, but was provided the following: \(info)")
         }
         let chosenImage = selectedImage.resizeTo(MB: 1) // 2
@@ -288,7 +289,7 @@ class EditProfileTableViewController: UITableViewController, UIImagePickerContro
         if UIImagePickerController.isSourceTypeAvailable(sourceType) {
             let imagePickerController = UIImagePickerController()
             imagePickerController.delegate = self
-            imagePickerController.allowsEditing = false
+            imagePickerController.allowsEditing = true
             imagePickerController.sourceType = sourceType
             present(imagePickerController, animated: true, completion: nil)
         }

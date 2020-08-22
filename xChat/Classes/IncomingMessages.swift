@@ -12,6 +12,7 @@ import JSQMessagesViewController
 class IncomingMessage {
     
     var collectionView: JSQMessagesCollectionView
+    var isSendingMessage: Bool = false
     
     init(collectionVIew_: JSQMessagesCollectionView) {
         collectionView = collectionVIew_
@@ -23,7 +24,7 @@ class IncomingMessage {
         let type = messageDictionary[kTYPE] as! String
         
         switch type {
-        case kTEXT: createTextMessage(messageDicitionary: messageDictionary, chatRoomId: chatRoomId) {
+        case kTEXT, kSYSTEMMESSAGE: createTextMessage(messageDicitionary: messageDictionary, chatRoomId: chatRoomId) {
             decryptedTxt in
             message = decryptedTxt
         }
@@ -90,7 +91,7 @@ class IncomingMessage {
             
             if image != nil {
                 mediaItem?.image = image!
-                self.collectionView.reloadDataAndScrollToPreviousPosition()
+                self.isSendingMessage ? self.collectionView.reloadData() : self.collectionView.reloadDataAndScrollToPreviousPosition()
             }
         }
         
@@ -128,7 +129,7 @@ class IncomingMessage {
                 
                 if image != nil {
                     mediaItem.image = image!
-                    self.collectionView.reloadDataAndScrollToPreviousPosition()
+                       self.isSendingMessage ? self.collectionView.reloadData() : self.collectionView.reloadDataAndScrollToPreviousPosition()
                 }
             }
             //self.collectionView.reloadDataAndScrollToPreviousPosition()
@@ -174,7 +175,7 @@ class IncomingMessage {
             
             let audioData = try? Data(contentsOf: url as URL)
             audioItem.audioData = audioData
-            self.collectionView.reloadDataAndScrollToPreviousPosition()
+               self.isSendingMessage ? self.collectionView.reloadData() : self.collectionView.reloadDataAndScrollToPreviousPosition()
         }
         return audioMessage!
     }

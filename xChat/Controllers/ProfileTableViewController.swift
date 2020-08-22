@@ -60,17 +60,17 @@ class ProfileTableViewController: UITableViewController {
             return
         }
         observer = NotificationCenter.default.addObserver(forName: .globalContactsVariable, object: nil, queue: .main) { [weak self] _ in
-            if self!.user == nil {
+            if self?.user == nil {
                 return
             }
             if MyVariables.globalContactsVariable.contains(self!.user!.objectId) {
-                self!.setBarButton(imageName: "person.badge.minus.fill", imageType: .systemImage, withTintColor: .systemPink)
-                self!.activityLabel.isHidden = false
-                self!.isInContacts = true
+                self?.setBarButton(imageName: "person.badge.minus.fill", imageType: .systemImage, withTintColor: .systemPink)
+                self?.activityLabel.isHidden = false
+                self?.isInContacts = true
             } else {
-                self!.setBarButton(imageName: "person.badge.plus.fill", imageType: .systemImage, withTintColor: .systemGreen)
-                self!.activityLabel.isHidden = true
-                self!.isInContacts = false
+                self?.setBarButton(imageName: "person.badge.plus.fill", imageType: .systemImage, withTintColor: .systemGreen)
+                self?.activityLabel.isHidden = true
+                self?.isInContacts = false
             }
         }
         //         isParOfContacts(user: user!.objectId) { (inContactsList) in

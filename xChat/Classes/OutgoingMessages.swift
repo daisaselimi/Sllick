@@ -16,7 +16,7 @@ class OutgoingMessage {
     
     // text message
     init(message: String, senderId: String, senderName: String, date: Date, status: String, type: String) {
-        messageDictionary = NSMutableDictionary(objects: [message, senderId, senderName, dateFormatter().string(from: date), !MyVariables.internetConnectionState ? kWAITINGTOSEND : kDELIVERED, type], forKeys: [kMESSAGE as NSCopying, kSENDERID as NSCopying, kSENDERNAME as NSCopying, kDATE as NSCopying, kSTATUS as NSCopying, kTYPE as NSCopying])
+        messageDictionary = NSMutableDictionary(objects: [message, senderId, senderName, dateFormatter().string(from: date), kDELIVERED, type], forKeys: [kMESSAGE as NSCopying, kSENDERID as NSCopying, kSENDERNAME as NSCopying, kDATE as NSCopying, kSTATUS as NSCopying, kTYPE as NSCopying])
     }
     
     // picture message
@@ -46,6 +46,9 @@ class OutgoingMessage {
             reference(.Message).document(memberId).collection(chatRoomID).document(messageId).setData(messageDictionary as! [String: Any])
         }
         
+        if messageDictionary[kTYPE] as! String == kSYSTEMMESSAGE {
+            return
+        }
         // update recent chat
         updateRecents(forMembers: memberIds, chatRoomId: chatRoomID, lastMessage: messageDictionary[kMESSAGE] as! String, lastMessageType: lastMessageType)
         

@@ -22,6 +22,7 @@ func dateFormatter() -> DateFormatter {
     dateFormatter.timeZone = TimeZone(secondsFromGMT: TimeZone.current.secondsFromGMT())
     
     dateFormatter.dateFormat = dateFormat
+    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
     
     return dateFormatter
 }
@@ -65,6 +66,45 @@ func imageFromData(pictureData: String, withBlock: (_ image: UIImage?) -> Void) 
     withBlock(image)
 }
 
+func sendSystemMessage(text: String, chatRoomId: String, memberIds: [String], membersToPush: [String], group: NSDictionary) {
+    let currentUser = FUser.currentUser()
+    var outgoingMessage: OutgoingMessage!
+    
+    let seperatedText = text.components(separatedBy: "-")
+    var systemMessageText = ""
+    print(seperatedText)
+
+
+    for memberId in memberIds {
+        if seperatedText[2] == memberId {
+            switch seperatedText[0] {
+            case "r":
+                systemMessageText = "← You were removed from chat"
+            case "a":
+                systemMessageText = "→ You were added to chat"
+            case "l":
+                systemMessageText = "↩︎ You left the chat"
+            default:
+                systemMessageText = ""
+            }
+        } else {
+            switch seperatedText[0] {
+            case "r":
+                systemMessageText = "← " + seperatedText[1] + " was removed from chat"
+            case "a":
+                systemMessageText = "→ " + seperatedText[1] + " was added to chat"
+            case "l":
+                systemMessageText = "← " + seperatedText[1] + " left the chat"
+            default:
+                systemMessageText = ""
+            }
+        }
+        outgoingMessage = OutgoingMessage(message: systemMessageText, senderId: currentUser!.objectId, senderName: currentUser!.firstname, date: Date(), status: kDELIVERED, type: kSYSTEMMESSAGE)
+        let messageId = UUID().uuidString
+        outgoingMessage.messageDictionary[kMESSAGEID] = messageId
+        reference(.Message).document(memberId).collection(chatRoomId).document(messageId).setData(outgoingMessage.messageDictionary as! [String: Any])
+    }
+}
 // func timeElapsed(date: Date) -> String {
 //
 //    let seconds = NSDate().timeIntervalSince(date)
@@ -185,7 +225,17 @@ func dictionaryFromSnapshots(snapshots: [DocumentSnapshot]) -> [NSDictionary] {
 //    for snapshot in snapshots{
 //        allMessages.append(snapshot.data() as! NSDictionary)
 //    }
-    allMessages = snapshots.map { $0.data()! as NSDictionary }
+    
+    allMessages = snapshots.map {        var doc = $0.data()! as NSDictionary
+        if $0.metadata.hasPendingWrites {
+            let mCopy = doc.mutableCopy() as! NSMutableDictionary
+            mCopy[kSTATUS] = kSENDING
+            doc = mCopy as NSDictionary
+        }
+        
+        return doc
+        
+    }
     return allMessages
 }
 
@@ -929,6 +979,7 @@ extension Date {
         let dateFormatter = DateFormatter()
         // Estimation
         // Year
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         
         if fullTimeAgo {
             if Calendar.current.isDateInToday(fromDate) {

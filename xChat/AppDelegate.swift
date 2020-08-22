@@ -39,6 +39,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         setupUIForAlerts()
         GradientLoadingBar.shared.gradientColors = [UIColor.getAppColor(.light), .systemTeal, UIColor.getAppColor(.dark)]
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = UIColor(named: "outgoingBubbleColor")
+        UIView.appearance(whenContainedInInstancesOf: [UIImagePickerController.self]).tintColor = UIColor.getAppColor(.light)
+        
+        UIView.appearance(whenContainedInInstancesOf: [])
         
         if #available(iOS 10.0, *) {
             UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound], completionHandler: { _, _ in
@@ -215,6 +218,20 @@ func changePresenceStatusForAllUsers() {
         
         for doc in docs! {
             reference(.status).document(doc[kUSERID] as! String).updateData(["state": "Offline"])
+        }
+    }
+}
+
+func createKeywordsForAllUsers() {
+    reference(.User).getDocuments { (snapshot, error) in
+        
+        let docs = snapshot?.documents
+        
+        for doc in docs! {
+            let fullname = doc["fullname"] as! String
+            
+            let keywords = Array(createKeywords(word: fullname.lowercased()))
+            reference(.UserKeywords).addDocument(data: ["userId" : doc["objectId"]!, "keywords" : keywords])
         }
     }
 }

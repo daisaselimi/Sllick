@@ -9,12 +9,11 @@
 import Firebase
 import FlagPhoneNumber
 import GradientLoadingBar
-import ImagePicker
 import OneSignal
 import ProgressHUD
 import UIKit
 
-class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, FPNTextFieldDelegate {
+class FinishRegistrationViewController: UIViewController, FPNTextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     var email: String!
     var password: String!
@@ -192,31 +191,75 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
     
     // MARK: ImagePickerDelegate
     
-    func wrapperDidPress(_ imagePicker: ImagePickerController, images: [UIImage]) {
-        dismiss(animated: true, completion: nil)
-    }
+//    func wrapperDidPress(_ imagePicker: ImagePickerController, images: [UIImage]) {
+//        dismiss(animated: true, completion: nil)
+//    }
+//
+//    func doneButtonDidPress(_ imagePicker: ImagePickerController, images: [UIImage]) {
+//        if images.count > 0 {
+//            avatarImage = images.first!
+//            avatarImageView.image = avatarImage
+//            avatarImageView.maskCircle()
+//        }
+//        dismiss(animated: true, completion: nil)
+//    }
     
-    func doneButtonDidPress(_ imagePicker: ImagePickerController, images: [UIImage]) {
-        if images.count > 0 {
-            avatarImage = images.first!
-            avatarImageView.image = avatarImage
-            avatarImageView.maskCircle()
-        }
-        dismiss(animated: true, completion: nil)
-    }
+    func imagePickerController(_ picker: UIImagePickerController,
+                                  didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+           guard let selectedImage = info[.originalImage] as? UIImage else {
+               fatalError("Expected a dictionary containing an image, but was provided the following: \(info)")
+           }
+           let chosenImage = selectedImage.resizeTo(MB: 1) // 2
+           avatarImage = chosenImage // 4
+           //        let screenWidth = UIScreen.main.bounds
+           //        print("*** * * * * * * * * *                  * **** ** **---------- * * * * ** * *:::::::::: \(screenWidth.size.width)")
+           //        avatarImage = resizeImage(image: avatarImage!, targetSize: CGSize(width: screenWidth.size.width, height: screenWidth.size.width))
+           avatarImageView.image = avatarImage!
+           avatarImageView.maskCircle()
+           
+           dismiss(animated: true, completion: nil) // 5
+       }
+       
+       func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+           picker.dismiss(animated: true, completion: nil)
+       }
     
-    func cancelButtonDidPress(_ imagePicker: ImagePickerController) {
-        dismiss(animated: true, completion: nil)
-    }
     
     @IBAction func avatarTapp(_ sender: Any) {
-        let imagePickerController = ImagePickerController()
-        imagePickerController.delegate = self
-        imagePickerController.imageLimit = 1
-        
-        present(imagePickerController, animated: true, completion: nil)
-        dismissKeyboard()
+       showAlert()
     }
+    
+    func showAlert() {
+        let alert = UIAlertController(title: nil, message: "Change profile photo", preferredStyle: .actionSheet)
+        if !(avatarImage == nil) {
+            let resetAction = UIAlertAction(title: "Remove Current Photo", style: .destructive) { _ in
+                
+                self.avatarImage = nil
+                self.avatarImageView.image = UIImage(named: "avatarph")
+            }
+            alert.addAction(resetAction)
+        }
+        
+        alert.addAction(UIAlertAction(title: "Take Photo", style: .default, handler: { (_: UIAlertAction) in
+            self.getImage(fromSourceType: .camera)
+        }))
+        alert.addAction(UIAlertAction(title: "Choose From Library", style: .default, handler: { (_: UIAlertAction) in
+            self.getImage(fromSourceType: .photoLibrary)
+        }))
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: {
+            _ in
+            
+        })
+        alert.addAction(cancelAction)
+        
+        alert.preferredAction = cancelAction
+        present(alert, animated: true, completion: {
+//            alert.view.superview?.isUserInteractionEnabled = true
+//            alert.view.superview?.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.dismissOnTapOutside)))
+        })
+    }
+
     
     // MARK: FlagPhoneNumber delegate
     
@@ -232,4 +275,15 @@ class FinishRegistrationViewController: UIViewController, ImagePickerDelegate, F
             phoneTextField.tintColor = .red
         }
     }
+    
+    func getImage(fromSourceType sourceType: UIImagePickerController.SourceType) {
+           // Check is source type available
+           if UIImagePickerController.isSourceTypeAvailable(sourceType) {
+               let imagePickerController = UIImagePickerController()
+               imagePickerController.delegate = self
+               imagePickerController.allowsEditing = false
+               imagePickerController.sourceType = sourceType
+               present(imagePickerController, animated: true, completion: nil)
+           }
+       }
 }
