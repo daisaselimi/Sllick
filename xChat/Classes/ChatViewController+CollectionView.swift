@@ -112,18 +112,17 @@ extension ChatViewController {
         if firstMessageOfTheDay(indexOfMessage: indexPath) {
             let combinedAS = NSMutableAttributedString()
             let string = message.date.timeAgoInMessages(fullTimeAgo: true)
-            let mutableAttributedString = NSMutableAttributedString(string: string, attributes: [NSAttributedString.Key.foregroundColor: UIColor.label, NSAttributedString.Key.font : UIFont.systemFont(ofSize: 12)])
+            let mutableAttributedString = NSMutableAttributedString(string: string, attributes: [NSAttributedString.Key.foregroundColor: UIColor.label, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 12)])
             combinedAS.append(mutableAttributedString)
             if objectMessages[indexPath.row][kTYPE] as! String == kSYSTEMMESSAGE {
-                let mutableASForSystemMessages = NSAttributedString(string: "\n\n" + messages[indexPath.row].text, attributes: [NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel, NSAttributedString.Key.font : UIFont.italicSystemFont(ofSize: 13)])
-                
+                let mutableASForSystemMessages = NSAttributedString(string: "\n\n" + messages[indexPath.row].text, attributes: [NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel, NSAttributedString.Key.font: UIFont.italicSystemFont(ofSize: 13)])
                 
                 combinedAS.append(mutableASForSystemMessages)
             }
             return combinedAS
             
-        } else if objectMessages[indexPath.row][kTYPE] as! String == kSYSTEMMESSAGE{
-            return NSAttributedString(string: messages[indexPath.row].text, attributes: [NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel, NSAttributedString.Key.font : UIFont.italicSystemFont(ofSize: 13)])
+        } else if objectMessages[indexPath.row][kTYPE] as! String == kSYSTEMMESSAGE {
+            return NSAttributedString(string: messages[indexPath.row].text, attributes: [NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel, NSAttributedString.Key.font: UIFont.italicSystemFont(ofSize: 13)])
         } else {
             return nil // NSAttributedString(string: message.date.timeAgoInMessages(fullTimeAgo: false))
         }
@@ -190,7 +189,7 @@ extension ChatViewController {
         if indexOfMessage.item == messages.count - 1 {
             return true
         } else {
-            return (messages[indexOfMessage.item].senderId != messages[indexOfMessage.item + 1].senderId) ||  (objectMessages[indexOfMessage.item + 1][kTYPE] as! String == kSYSTEMMESSAGE && (objectMessages[indexOfMessage.item][kSENDERID] as! String == objectMessages[indexOfMessage.item + 1][kSENDERID] as! String))
+            return (messages[indexOfMessage.item].senderId != messages[indexOfMessage.item + 1].senderId) || (objectMessages[indexOfMessage.item + 1][kTYPE] as! String == kSYSTEMMESSAGE && (objectMessages[indexOfMessage.item][kSENDERID] as! String == objectMessages[indexOfMessage.item + 1][kSENDERID] as! String))
         }
     }
     
@@ -321,7 +320,7 @@ extension ChatViewController {
                 return false
             }
         } else {
-            if (action.description == "delete:" || action.description == "copy:") && objectMessages[indexPath.row][kSTATUS] as! String != kSENDING {
+            if action.description == "delete:" || action.description == "copy:", objectMessages[indexPath.row][kSTATUS] as! String != kSENDING {
                 return true
             } else {
                 return false
@@ -341,7 +340,7 @@ extension ChatViewController {
         
         if messages.count == 0 {
             UIView.transition(with: collectionView, duration: 0.5, options: .transitionCrossDissolve, animations: {
-                //Do the data reload here
+                // Do the data reload here
                 self.collectionView.reloadEmptyDataSet()
             }, completion: nil)
         }
@@ -442,6 +441,9 @@ extension ChatViewController {
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
         if !text.trimmingCharacters(in: .whitespaces).isEmpty {
             print(text!)
+            if isGroup!, group == nil {
+                return
+            }
             sendMessage(text: text, date: date, picture: nil, location: nil, video: nil, audio: nil)
             updateSendButton(isSend: false)
             collectionView.reloadData()
@@ -458,10 +460,9 @@ extension ChatViewController {
     }
     
     override func textViewDidChange(_ textView: UITextView) {
-        if textView.text.trimmingCharacters(in: .whitespaces).isEmpty  {
+        if textView.text.trimmingCharacters(in: .whitespaces).isEmpty {
             updateSendButton(isSend: false)
-        }
-        else  if textView.text != "" {
+        } else if textView.text != "" {
             updateSendButton(isSend: true)
         } else {
             updateSendButton(isSend: false)
@@ -492,7 +493,7 @@ class CustomCollectionViewFlowLayout: JSQMessagesCollectionViewFlowLayout {
         var superSize = super.messageBubbleSizeForItem(at: indexPath)
         
         let messageItem = collectionView.dataSource?.collectionView(collectionView, messageDataForItemAt: indexPath)
-        if superSize.width > 300 && messageItem?.senderId() != FUser.currentId() {
+        if superSize.width > 300, messageItem?.senderId() != FUser.currentId() {
             superSize = CGSize(width: 300, height: superSize.height)
         }
         

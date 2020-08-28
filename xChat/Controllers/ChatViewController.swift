@@ -182,9 +182,9 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
                 createTypingObserver()
             }
         } else {
-             createTypingObserver()
+            createTypingObserver()
         }
-       
+        
         loadUserDefaults()
         firstLoadMessages = true
         JSQMessagesCollectionViewCell.registerMenuAction(#selector(delete))
@@ -531,13 +531,32 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     
     func getOldMessagesInBackground() {
         if loadedMessages.count > kNUMBEROFMESSAGES {
-            let firstMessageDate = loadedMessages.first![kDATE] as! String
+            var firstMessageDate: Timestamp?
+            var firstMsg = loadedMessages.first![kMESSAGE] as! String
+            if let timeStamp = (loadedMessages.first![kACTUALLYSENT] as? Timestamp) {
+                firstMessageDate = (loadedMessages.first![kACTUALLYSENT] as? Timestamp)
+            } else {
+                firstMessageDate = Timestamp()
+            }
             
-            reference(.Message).document(FUser.currentId()).collection(chatRoomId).whereField(kDATE, isLessThan: firstMessageDate).getDocuments { snapshot, _ in
+            reference(.Message).document(FUser.currentId()).collection(chatRoomId).whereField(kACTUALLYSENT, isLessThan: firstMessageDate!).getDocuments { snapshot, _ in
                 
                 guard let snapshot = snapshot else { return }
                 
-                let sorted = (dictionaryFromSnapshots(snapshots: snapshot.documents) as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: true)]) as! [NSDictionary]
+                var sorted = (dictionaryFromSnapshots(snapshots: snapshot.documents) as NSArray).sortedArray(using: [NSSortDescriptor(key: kACTUALLYSENT, ascending: true)]) as! [NSDictionary]
+                var pendingMessages: [NSDictionary] = []
+                sorted.forEach { dictionary in
+                    if dictionary[kSTATUS] as! String == kSENDING {
+                        pendingMessages.append(dictionary)
+                        let index = sorted.firstIndex(of: dictionary)
+                        sorted.remove(at: index!)
+                    }
+                }
+                var x = sorted
+                var y = pendingMessages
+                pendingMessages.sort { dateFormatter().date(from: $0[kDATE] as! String)! < dateFormatter().date(from: $1[kDATE] as! String)! }
+                
+                sorted.append(contentsOf: pendingMessages)
                 self.loadedMessages = self.removeSuspiciousMessages(allMessages: sorted) + self.loadedMessages
                 
                 // get the picture messages

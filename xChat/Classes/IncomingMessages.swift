@@ -6,6 +6,7 @@
 //  Copyright © 2019 com.isaselimi. All rights reserved.
 //
 
+import Firebase
 import Foundation
 import JSQMessagesViewController
 
@@ -58,13 +59,17 @@ class IncomingMessage {
             date = Date()
         }
         
+        if let timeStamp = messageDicitionary[kACTUALLYSENT] as? Timestamp {
+            date = timeStamp.dateValue()
+        }
         let text = messageDicitionary[kMESSAGE] as! String
         
-      //  Encryption.decryptText(chatRoomId: chatRoomId, encryptedMessage: text) {
-          //  decryptedTxt in
-            
-            completion(JSQMessage(senderId: userId, senderDisplayName: name, date: date, text: text))
-      //  }
+        //  Encryption.decryptText(chatRoomId: chatRoomId, encryptedMessage: text) {
+        //  decryptedTxt in
+        
+        completion(JSQMessage(senderId: userId, senderDisplayName: name, date: date, text: text))
+        
+        //  }
     }
     
     func createPictureMessage(messageDictionary: NSDictionary) -> JSQMessage {
@@ -81,6 +86,10 @@ class IncomingMessage {
             }
         } else {
             date = Date()
+        }
+        
+        if let timeStamp = messageDictionary[kACTUALLYSENT] as? Timestamp {
+            date = timeStamp.dateValue()
         }
         
         let mediaItem = PhotoMediaItem(image: nil)
@@ -114,6 +123,10 @@ class IncomingMessage {
             date = Date()
         }
         
+        if let timeStamp = messageDictionary[kACTUALLYSENT] as? Timestamp {
+            date = timeStamp.dateValue()
+        }
+        
         let videoURL = NSURL(fileURLWithPath: messageDictionary[kVIDEO] as! String)
         
         let mediaItem = VideoMessage(withFileURL: videoURL, maskOutgoing: returnOutgoingStatusForUser(senderId: userId!))
@@ -129,10 +142,10 @@ class IncomingMessage {
                 
                 if image != nil {
                     mediaItem.image = image!
-                       self.isSendingMessage ? self.collectionView.reloadData() : self.collectionView.reloadDataAndScrollToPreviousPosition()
+                    self.isSendingMessage ? self.collectionView.reloadData() : self.collectionView.reloadDataAndScrollToPreviousPosition()
                 }
             }
-            //self.collectionView.reloadDataAndScrollToPreviousPosition()
+            // self.collectionView.reloadDataAndScrollToPreviousPosition()
         }
         
         return JSQMessage(senderId: userId, senderDisplayName: name, date: date, media: mediaItem)
@@ -158,6 +171,10 @@ class IncomingMessage {
             date = Date()
         }
         
+        if let timeStamp = messageDictionary[kACTUALLYSENT] as? Timestamp {
+            date = timeStamp.dateValue()
+        }
+        
         let audioItem = JSQAudioMediaItem(data: nil)
         let color = UIColor(named: "outgoingBubbleColor")!
         audioItem.audioViewAttributes.tintColor = color
@@ -175,7 +192,7 @@ class IncomingMessage {
             
             let audioData = try? Data(contentsOf: url as URL)
             audioItem.audioData = audioData
-               self.isSendingMessage ? self.collectionView.reloadData() : self.collectionView.reloadDataAndScrollToPreviousPosition()
+            self.isSendingMessage ? self.collectionView.reloadData() : self.collectionView.reloadDataAndScrollToPreviousPosition()
         }
         return audioMessage!
     }

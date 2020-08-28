@@ -1040,7 +1040,7 @@
                                                     <color key="textColor" red="0.23422299998665819" green="0.23422299998665819" blue="0.23422299998665819" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="//" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" enabled="NO" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MwA-In-YLv">
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" enabled="NO" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MwA-In-YLv">
                                                     <rect key="frame" x="90" y="39" width="296" height="24"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="24" id="dq3-bq-pLp"/>

@@ -26,7 +26,6 @@ class RecentChatsTableViewCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-//
 //        self.avatarImageView.image = nil // or set a placeholder image
 //        nameLabel.text = ""
 //        lastMessageLabel.text = ""
@@ -121,7 +120,9 @@ class RecentChatsTableViewCell: UITableViewCell {
             date = Date()
         }
         
-        dateLabel.text = "・" + timeElapsed(date: date)
+        if recentChat[kLASTMESSAGETYPE] as! String != "sending_message" {
+            dateLabel.text = "・" + timeElapsed(date: date)
+        }
         
         var decryptedText = ""
         //  DispatchQueue.global().async {
@@ -138,6 +139,12 @@ class RecentChatsTableViewCell: UITableViewCell {
         } else if recentChat[kLASTMESSAGETYPE] as! String == "removed_message" {
             //   DispatchQueue.main.async {
             lastMessageLabel.text = "You removed a message"
+            lastMessageLabel.font = lastMessageLabel.font.italic
+            //  }
+            return
+        } else if recentChat[kLASTMESSAGETYPE] as! String == "sending_message" {
+            //   DispatchQueue.main.async {
+            lastMessageLabel.text = "Waiting to send your message..."
             lastMessageLabel.font = lastMessageLabel.font.italic
             //  }
             return

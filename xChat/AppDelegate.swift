@@ -223,7 +223,7 @@ func changePresenceStatusForAllUsers() {
 }
 
 func createKeywordsForAllUsers() {
-    reference(.User).getDocuments { (snapshot, error) in
+    reference(.User).getDocuments { snapshot, _ in
         
         let docs = snapshot?.documents
         
@@ -231,7 +231,7 @@ func createKeywordsForAllUsers() {
             let fullname = doc["fullname"] as! String
             
             let keywords = Array(createKeywords(word: fullname.lowercased()))
-            reference(.UserKeywords).addDocument(data: ["userId" : doc["objectId"]!, "keywords" : keywords])
+            reference(.UserKeywords).addDocument(data: ["userId": doc["objectId"]!, "keywords": keywords])
         }
     }
 }

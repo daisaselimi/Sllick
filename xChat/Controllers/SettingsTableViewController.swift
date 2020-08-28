@@ -172,7 +172,7 @@ class SettingsTableViewController: UITableViewController {
         do {
             let files = try FileManager.default.contentsOfDirectory(atPath: getDocumentsURL().path)
             if files.count == 0 {
-                showMessage("Cache is already empty", type: .warning)
+                showMessage("Cache is already empty", type: .warning, options: [.textColor(.label)])
             }
             for file in files {
                 try FileManager.default.removeItem(atPath: "\(getDocumentsURL().path)/\(file)")
@@ -193,7 +193,7 @@ class SettingsTableViewController: UITableViewController {
         // for iPad
         activityViewController.popoverPresentationController?.sourceView = view
         
-        activityViewController.setValue("Let's chat on Sllick", forKey: "subject")
+        activityViewController.setValue("Hey! Let's chat on Sllick", forKey: "subject")
         
         present(activityViewController, animated: true, completion: nil)
     }

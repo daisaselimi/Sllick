@@ -15,9 +15,9 @@ import MBProgressHUD
 let storage = Storage.storage()
 
 func uploadImage(image: UIImage, chatRoomId: String, view: UIView, completion: @escaping (_ imageLink: String?) -> Void) {
-   // let progressHUD = MBProgressHUD.showAdded(to: view, animated: true)
+    // let progressHUD = MBProgressHUD.showAdded(to: view, animated: true)
     
-  //  progressHUD.mode = .determinateHorizontalBar
+    //  progressHUD.mode = .determinateHorizontalBar
     
     let dateString = dateFormatter().string(from: Date())
     
@@ -32,7 +32,7 @@ func uploadImage(image: UIImage, chatRoomId: String, view: UIView, completion: @
     task = storageRef.putData(imageData!, metadata: nil, completion: { _, error in
         task.removeAllObservers()
         
-   //     progressHUD.hide(animated: true)
+        //     progressHUD.hide(animated: true)
         
         if error != nil {
             print("error uploading image \(error!.localizedDescription)")
@@ -124,7 +124,7 @@ func uploadVideo(video: NSData, chatRoomId: String, view: UIView, completion: @e
     
     let dateString = dateFormatter().string(from: Date())
     
-    let videoFileName = "VideMessage/" + FUser.currentId() + "/" + chatRoomId + "/" + dateString + ".mov"
+    let videoFileName = "VideoMessages/" + FUser.currentId() + "/" + chatRoomId + "/" + dateString + ".mov"
     
     let storageRef = storage.reference(forURL: kFILEREFERENCE).child(videoFileName)
     
@@ -133,7 +133,7 @@ func uploadVideo(video: NSData, chatRoomId: String, view: UIView, completion: @e
     task = storageRef.putData(video as Data, metadata: nil, completion: { _, error in
         
         task.removeAllObservers()
-    //    progressHUD.hide(animated: true)
+        //    progressHUD.hide(animated: true)
         
         if error != nil {
             print("error couldnt upload video \(error!.localizedDescription)")
@@ -202,7 +202,7 @@ func uploadAudio(audioPath: String, chatRoomId: String, view: UIView, completion
     task = storageRef.putData(audio! as Data, metadata: nil, completion: { _, error in
         
         task.removeAllObservers()
-        //progressHUD.hide(animated: true)
+        // progressHUD.hide(animated: true)
         
         if error != nil {
             print("error couldnt upload audio \(error!.localizedDescription)")

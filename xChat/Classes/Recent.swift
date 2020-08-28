@@ -29,7 +29,7 @@ func startPrivateChat(user1: FUser, user2: FUser) -> String {
     return chatRoomId
 }
 
-func createRecent(members: [String], chatRoomId: String, withUserUsername: String, type: String, users: [FUser]?, avatarOfGroup: String?) {
+func createRecent(members: [String], chatRoomId: String, withUserUsername: String, type: String, users: [FUser]?, avatarOfGroup: String?, restartingChat: Bool = false) {
     var tempMembers = members
     
     reference(.Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).getDocuments { snapshot, _ in
@@ -50,7 +50,7 @@ func createRecent(members: [String], chatRoomId: String, withUserUsername: Strin
         
         for userId in tempMembers {
             // create recent items
-            createRecentItems(userId: userId, chatRoomId: chatRoomId, members: members, withUserUsername: withUserUsername, type: type, users: users, avatarOfGroup: avatarOfGroup)
+            createRecentItems(userId: userId, chatRoomId: chatRoomId, members: members, withUserUsername: withUserUsername, type: type, users: users, avatarOfGroup: avatarOfGroup, restartingChat: restartingChat)
         }
     }
 }
@@ -71,7 +71,7 @@ func updateRecent(thatContainsID: String, withValues: [String: Any]) {
     }
 }
 
-func createRecentItems(userId: String, chatRoomId: String, members: [String], withUserUsername: String, type: String, users: [FUser]?, avatarOfGroup: String?) {
+func createRecentItems(userId: String, chatRoomId: String, members: [String], withUserUsername: String, type: String, users: [FUser]?, avatarOfGroup: String?, restartingChat: Bool = false) {
     let localReference = reference(.Recent).document()
     let recentId = localReference.documentID
     
@@ -95,7 +95,7 @@ func createRecentItems(userId: String, chatRoomId: String, members: [String], wi
     }
     else {
         if avatarOfGroup != nil {
-            recent = [kRECENTID: recentId, kSENDERNAME: FUser.currentUser()!.firstname, kSENDERID: FUser.currentId(), kUSERID: userId, kCHATROOMID: chatRoomId, kMEMBERS: members, kMEMBERSTOPUSH: members, kWITHUSERFULLNAME: withUserUsername, kLASTMESSAGE: "No messages", kLASTMESSAGETYPE: "group_created", kCOUNTER: 0, kDATE: date, kTYPE: type, kAVATAR: avatarOfGroup!] as [String: Any]
+            recent = [kRECENTID: recentId, kSENDERNAME: FUser.currentUser()!.firstname, kSENDERID: FUser.currentId(), kUSERID: userId, kCHATROOMID: chatRoomId, kMEMBERS: members, kMEMBERSTOPUSH: members, kWITHUSERFULLNAME: withUserUsername, kLASTMESSAGE: restartingChat ? "" : "No messages", kLASTMESSAGETYPE: restartingChat ? "" : "group_created", kCOUNTER: 0, kDATE: date, kTYPE: type, kAVATAR: avatarOfGroup!] as [String: Any]
         }
     }
     
@@ -114,7 +114,7 @@ func restartChat(recent: NSDictionary) {
     }
     
     if recent[kTYPE] as! String == kGROUP {
-        createRecent(members: [kMEMBERS], chatRoomId: recent[kCHATROOMID] as! String, withUserUsername: recent[kWITHUSERFULLNAME] as! String, type: kGROUP, users: nil, avatarOfGroup: recent[kAVATAR] as? String)
+        createRecent(members: recent[kMEMBERS] as! [String], chatRoomId: recent[kCHATROOMID] as! String, withUserUsername: recent[kWITHUSERFULLNAME] as! String, type: kGROUP, users: nil, avatarOfGroup: recent[kAVATAR] as? String, restartingChat: true)
     }
 }
 
@@ -158,8 +158,25 @@ func updateRecentItem(recent: NSDictionary, lastMessage: String, lastMessageType
 }
 
 func updateRecents(forMembers: [String], chatRoomId: String, lastMessage: String, lastMessageType: String) {
-    reference(.Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).getDocuments { snapshot, _ in
-        
+//    forMembers.forEach { (member) in
+//        reference(.Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).whereField(kMEMBERS, arrayContains: member).getDocuments { (snapshot, error) in
+//
+//            guard let snapshot = snapshot else { return }
+//            if !snapshot.isEmpty {
+//                       for recent in snapshot.documents {
+//                           let currentRecent = recent.data() as NSDictionary
+//                           if forMembers.contains(recent[kUSERID] as! String) {
+//                               updateRecentItem(recent: currentRecent, lastMessage: lastMessage, lastMessageType: lastMessageType)
+//                           }
+//                       }
+//                   }
+//
+//        }
+//    }
+    reference(.Recent).whereField(kCHATROOMID, isEqualTo: chatRoomId).getDocuments { snapshot, error in
+        if error != nil {
+            print(error!.localizedDescription)
+        }
         guard let snapshot = snapshot else { return }
         
         if !snapshot.isEmpty {

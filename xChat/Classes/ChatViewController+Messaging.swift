@@ -11,7 +11,7 @@ import Foundation
 import JSQMessagesViewController
 
 extension ChatViewController {
- 
+    
     func loadMessages() {
         // update message status
         updatedChatListener = reference(.Message).document(FUser.currentId()).collection(chatRoomId).addSnapshotListener { snapshot, _ in
@@ -26,25 +26,30 @@ extension ChatViewController {
                         let tempArray = self.objectMessages.filter { $0[kMESSAGEID] as! String == dict[kMESSAGEID] as! String }
                         let changedMessageDoc = tempArray.count > 0 ? tempArray[0] : nil
                         if changedMessageDoc != nil {
-                            let index = self.objectMessages.firstIndex(of: changedMessageDoc!)
-                            self.objectMessages.remove(at: index!)
-                            self.messages.remove(at: index!)
-                            self.objectMessages.insert(dict as NSDictionary, at: index!)
-                            let incomingMessage = IncomingMessage(collectionVIew_: self.collectionView)
-                            incomingMessage.isSendingMessage = true
-                            let message = incomingMessage.createMessage(messageDictionary: dict as NSDictionary, chatRoomId: self.chatRoomId)
-                            self.messages.insert(message!, at: index!)
-                            self.collectionView.reloadData()
+                            if dict[kSTATUS] as! String == kREAD, dict[kSENDERID] as! String == FUser.currentId() {
+                                let index = self.objectMessages.firstIndex(of: changedMessageDoc!)
+                                self.objectMessages.remove(at: index!)
+                                self.messages.remove(at: index!)
+                                self.objectMessages.insert(dict as NSDictionary, at: index!)
+                                let incomingMessage = IncomingMessage(collectionVIew_: self.collectionView)
+                                incomingMessage.isSendingMessage = true
+                                let message = incomingMessage.createMessage(messageDictionary: dict as NSDictionary, chatRoomId: self.chatRoomId)
+                                self.messages.insert(message!, at: index!)
+                                self.collectionView.reloadData()
+                            } else {
+                                if dict[kSENDERID] as! String == FUser.currentId() {
+                                    self.messageHasBeenSent(messageDict: dict as NSDictionary)
+                                }
+                            }
                         }
                         // self.updateMessage(messageDictionary: diff.document.data() as NSDictionary)
                     }
                 }
             }
         }
-
         
         // get last 21 messages
-        reference(.Message).document(FUser.currentId()).collection(chatRoomId).order(by: kDATE, descending: true).limit(to: 21).getDocuments(completion: { snapshot, error in
+        reference(.Message).document(FUser.currentId()).collection(chatRoomId).order(by: kACTUALLYSENT, descending: true).limit(to: 21).getDocuments(completion: { snapshot, error in
             self.collectionView.emptyDataSetDelegate = self
             self.collectionView.emptyDataSetSource = self
             self.internetConnectionChanged()
@@ -66,16 +71,35 @@ extension ChatViewController {
                 return
             }
             
+            var sorted = (dictionaryFromSnapshots(snapshots: snapshot.documents) as NSArray).sortedArray(using: [NSSortDescriptor(key: kACTUALLYSENT, ascending: true)]) as! [NSDictionary]
             
-            let sorted = (dictionaryFromSnapshots(snapshots: snapshot.documents) as NSArray).sortedArray(using: [NSSortDescriptor(key: kDATE, ascending: true)]) as! [NSDictionary]
+            var pendingMessages: [NSDictionary] = []
+            
+            sorted.forEach { dictionary in
+                if dictionary[kSTATUS] as! String == kSENDING {
+                    pendingMessages.append(dictionary)
+                    let index = sorted.firstIndex(of: dictionary)
+                    sorted.remove(at: index!)
+                }
+            }
+            
+            pendingMessages.sort { dateFormatter().date(from: $0[kDATE] as! String)! < dateFormatter().date(from: $1[kDATE] as! String)! }
+            
+            sorted.append(contentsOf: pendingMessages)
             
             // remove bad messages
             self.loadedMessages = sorted
+//            self.loadedMessages.forEach { (dict) in
+//                if (dict[kACTUALLYSENT] as? Timestamp) == nil {
+//                    let idx = self.loadedMessages.firstIndex(of: dict)
+//                    self.loadedMessages.remove(at: idx!)
+//                }
+//            }
             self.insertMessages()
             self.finishReceivingMessage(animated: false)
             self.scrollToBottom(animated: false)
-            //self.perform(Selector(("jsq_updateCollectionViewInsets")))
-          //  self.topContentAdditionalInset = 0
+            // self.perform(Selector(("jsq_updateCollectionViewInsets")))
+            //  self.topContentAdditionalInset = 0
             self.firstLoadingFinished = true
             self.initialLoadComplete = true
             print("we have \(self.messages.count) messages loaded")
@@ -89,30 +113,27 @@ extension ChatViewController {
             
         })
         
-      firstMessagesListener = reference(.Message).document(FUser.currentId()).collection(chatRoomId).order(by: kDATE, descending: true).limit(to: 21).addSnapshotListener(includeMetadataChanges: true) { (snapshot, error) in
-            guard let snapshot = snapshot else { return }
-
-            if !snapshot.isEmpty {
-
-                for diff in snapshot.documentChanges(includeMetadataChanges: true) {
-                    let item = diff.document.data() as NSDictionary
-                    let messageDict: NSMutableDictionary = item as! NSMutableDictionary
-                    if  diff.document.metadata.hasPendingWrites {
-                        messageDict[kSTATUS] = kSENDING
-
-                    } else {
-                        messageDict[kSTATUS] = kDELIVERED
-                        //                                    OutgoingMessage.updateMessage(withId: messageDict[kMESSAGEID] as! String, chatRoomId: self.chatRoomId, memberIds: self.memberIds, values: [kDATE : dateFormatter().string(from: Date())])
-
-                        self.updateMessage(messageDictionary: messageDict)
-                    }
-                }
-            }
-        }
+        //      firstMessagesListener = reference(.Message).document(FUser.currentId()).collection(chatRoomId).order(by: kACTUALLYSENT, descending: true).limit(to: 21).addSnapshotListener(includeMetadataChanges: true) { (snapshot, error) in
+        //            guard let snapshot = snapshot else { return }
+        //
+        //            if !snapshot.isEmpty {
+        //
+        //                for diff in snapshot.documentChanges(includeMetadataChanges: true) {
+        //                    let item = diff.document.data() as NSDictionary
+        //                    let messageDict: NSMutableDictionary = item as! NSMutableDictionary
+        //                    if  diff.document.metadata.hasPendingWrites {
+        //                        messageDict[kSTATUS] = kSENDING
+        //
+        //                    } else {
+        //                        messageDict[kSTATUS] = kDELIVERED
+        //                        //                                    OutgoingMessage.updateMessage(withId: messageDict[kMESSAGEID] as! String, chatRoomId: self.chatRoomId, memberIds: self.memberIds, values: [kDATE : dateFormatter().string(from: Date())])
+        //
+        //                        self.updateMessage(messageDictionary: messageDict)
+        //                    }
+        //                }
+        //            }
+        //        }
     }
-    
-    
-  
     
     func updateMessage(messageDictionary: NSDictionary) {
         for index in 0..<objectMessages.count {
@@ -127,54 +148,92 @@ extension ChatViewController {
     }
     
     func listenForNewChat() {
-        var lastMessageDate = "0"
+        var lastMessageDate = ""
         
         if loadedMessages.count > 0 {
-            lastMessageDate = loadedMessages.last![kDATE] as! String
+            if let timeStamp = (loadedMessages.last![kACTUALLYSENT] as? Timestamp) {
+                lastMessageDate = dateFormatter().string(from: timeStamp.dateValue())
+            } else {
+                lastMessageDate = loadedMessages.last![kDATE] as! String
+            }
         }
         
-        newChatListener = reference(.Message).document(FUser.currentId()).collection(chatRoomId).whereField(kDATE, isGreaterThan: lastMessageDate).addSnapshotListener(includeMetadataChanges: true) { snapshot, _ in
+        newChatListener = reference(.Message).document(FUser.currentId()).collection(chatRoomId).whereField(kDATE, isGreaterThan: lastMessageDate).addSnapshotListener { snapshot, _ in
             
             guard let snapshot = snapshot else { return }
             
             if !snapshot.isEmpty {
-                
-                for diff in snapshot.documentChanges(includeMetadataChanges: true) {
-                  // if diff.type == .added {
-                        let item = diff.document.data() as NSDictionary
-                        
-                        if let type = item[kTYPE] {
-                            if self.legitTypes.contains(type as! String) {
-                                if type as! String == kPICTURE {
-                                    self.addNewPictureMessageLink(link: item[kPICTURE] as! String)
+                for diff in snapshot.documentChanges {
+                    //  if diff.type == .added {
+                    let item = diff.document.data() as NSDictionary
+                    
+                    if let type = item[kTYPE] {
+                        if self.legitTypes.contains(type as! String) {
+                            if type as! String == kPICTURE {
+                                self.addNewPictureMessageLink(link: item[kPICTURE] as! String)
+                            }
+                            let messageDict: NSMutableDictionary = item as! NSMutableDictionary
+                            if diff.document.metadata.hasPendingWrites {
+                                messageDict[kSTATUS] = kSENDING
+                                
+                            } else {
+                                if messageDict[kSTATUS] as! String != kREAD, messageDict[kSENDERID] as! String == FUser.currentId() {
+                                    messageDict[kSTATUS] = kDELIVERED
+                                    // self.messageHasBeenSent(messageDict: messageDict)
                                 }
-                                let messageDict: NSMutableDictionary = item as! NSMutableDictionary
-                                if  diff.document.metadata.hasPendingWrites {
-                                    messageDict[kSTATUS] = kSENDING
-                                   
-                                } else {
-                                    if messageDict[kSTATUS] as! String != kREAD {
-                                        messageDict[kSTATUS] = kDELIVERED
-                                        self.firstMessagesListener?.remove()
-                                        //                                    OutgoingMessage.updateMessage(withId: messageDict[kMESSAGEID] as! String, chatRoomId: self.chatRoomId, memberIds: self.memberIds, values: [kDATE : dateFormatter().string(from: Date())])
-                                        
-                                        self.updateMessage(messageDictionary: messageDict)
-                                    }
-                       
+                            }
+                            if diff.type != .removed, diff.type != .modified {
+                                if self.insertInitialLoadMessages(messageDictionary: messageDict, isSendingMessage: true) && type as! String != kSYSTEMMESSAGE {
+                                    JSQSystemSoundPlayer.jsq_playMessageReceivedSound()
                                 }
-                                if diff.type != .removed  && (diff.type != .modified){
-                                    if self.insertInitialLoadMessages(messageDictionary: messageDict, isSendingMessage: true) && type as! String != kSYSTEMMESSAGE {
-                                        JSQSystemSoundPlayer.jsq_playMessageReceivedSound()
-                                    }
-                                    self.finishReceivingMessage()
-                                }
-                               
+                                self.finishReceivingMessage()
                             }
                         }
-                   // }
+                    }
+                    //   }
                 }
             }
         }
+    }
+    
+    func messageHasBeenSent(messageDict: NSDictionary) {
+        print(messageDict)
+        self.firstMessagesListener?.remove()
+        //                                    OutgoingMessage.updateMessage(withId: messageDict[kMESSAGEID] as! String, chatRoomId: self.chatRoomId, memberIds: self.memberIds, values: [kDATE : dateFormatter().string(from: Date())])
+        if messageDict[kTYPE] as! String == kSYSTEMMESSAGE {
+            return
+        }
+        let objectMessage = self.objectMessages.first { (dict) -> Bool in
+            dict[kMESSAGEID] as! String == messageDict[kMESSAGEID] as! String
+        }
+        
+        let index = self.objectMessages.firstIndex(of: objectMessage!)
+        self.objectMessages.remove(at: index!)
+        self.messages.remove(at: index!)
+        // self.insertInitialLoadMessages(messageDictionary: objectMessage!)
+        let incomingMessage = IncomingMessage(collectionVIew_: self.collectionView!)
+        incomingMessage.isSendingMessage = true
+        let message = incomingMessage.createMessage(messageDictionary: messageDict, chatRoomId: self.chatRoomId)
+        self.objectMessages.append(messageDict)
+        
+        self.messages.append(message!)
+        collectionView.reloadData()
+        
+        updateRecents(forMembers: self.memberIds, chatRoomId: self.chatRoomId, lastMessage: messageDict[kMESSAGE] as! String, lastMessageType: messageDict[kTYPE] as! String)
+        
+        // send push notification
+        var pushText = ""
+        let plainMessage = messageDict[kMESSAGE] as! String
+        
+        switch messageDict[kTYPE] as! String {
+        case kPICTURE: pushText = "Sent a picture."
+        case kVIDEO: pushText = "Sent a video."
+        case kAUDIO: pushText = "Sent an audio message."
+        default:
+            pushText = plainMessage != "" ? plainMessage : "Sent a message."
+        }
+        
+        sendPushNotification(membersToPush: self.membersToPush, message: pushText, isGroup: self.isGroup!, groupName: self.isGroup! ? (self.group![kNAME] as! String) : "", memberIds: self.memberIds, chatRoomId: self.chatRoomId, titleName: self.titleLabel.text!)
     }
     
     // insert messages
@@ -189,7 +248,7 @@ extension ChatViewController {
         for i in minMessageNumber..<maxMessageNumber {
             let messageDictionary = loadedMessages[i]
             
-            _ = insertInitialLoadMessages(messageDictionary: messageDictionary)
+            _ = self.insertInitialLoadMessages(messageDictionary: messageDictionary)
             
             loadedMessagesCount += 1
         }
@@ -217,8 +276,11 @@ extension ChatViewController {
                     messages.remove(at: index)
                 }
             }
+            
             objectMessages.append(messageDictionary)
+            
             messages.append(message!)
+            // self.collectionView.reloadData()
         }
         
         return isIncoming(messageDictionary: messageDictionary)
@@ -292,7 +354,7 @@ extension ChatViewController {
     }
     
     func finishSendingMediaMessage() {
-        let text =  self.inputToolbar.contentView.textView?.text
+        let text = self.inputToolbar.contentView.textView?.text
         self.finishSendingMessage()
         self.inputToolbar.contentView.textView?.text = text
     }

@@ -6,6 +6,7 @@
 //  Copyright © 2019 com.isaselimi. All rights reserved.
 //
 
+import Firebase
 import Foundation
 
 class OutgoingMessage {
@@ -41,43 +42,26 @@ class OutgoingMessage {
     func sendMessage(chatRoomID: String, messageDictionary: NSMutableDictionary, memberIds: [String], membersToPush: [String], lastMessageType: String, isGroup: Bool = false, groupName: String = "", chatTitle: String, plainMessage: String = "") {
         let messageId = UUID().uuidString
         messageDictionary[kMESSAGEID] = messageId
+        messageDictionary[kACTUALLYSENT] = FieldValue.serverTimestamp()
         
         for memberId in memberIds {
             reference(.Message).document(memberId).collection(chatRoomID).document(messageId).setData(messageDictionary as! [String: Any])
         }
-        
-        if messageDictionary[kTYPE] as! String == kSYSTEMMESSAGE {
-            return
-        }
-        // update recent chat
-        updateRecents(forMembers: memberIds, chatRoomId: chatRoomID, lastMessage: messageDictionary[kMESSAGE] as! String, lastMessageType: lastMessageType)
-        
-        // send push notification
-        var pushText = ""
-        
-        switch messageDictionary[kTYPE] as! String {
-            case kPICTURE: pushText = "Sent a picture."
-            case kVIDEO: pushText = "Sent a video."
-            case kAUDIO: pushText = "Sent an audio message."
-            default:
-                pushText = plainMessage != "" ? plainMessage : "Sent a message."
-        }
-        
-        sendPushNotification(membersToPush: membersToPush, message: pushText, isGroup: isGroup, groupName: groupName, memberIds: memberIds, chatRoomId: chatRoomID, titleName: chatTitle)
+        updateRecents(forMembers: ["\(FUser.currentId())"], chatRoomId: chatRoomID, lastMessage: messageDictionary[kMESSAGE] as! String, lastMessageType: messageDictionary[kTYPE] as! String)
     }
     
     class func deleteMessage(withId: String, chatRoomId: String) {
         reference(.Message).document(FUser.currentId()).collection(chatRoomId).document(withId).delete()
     }
     
-    class func updateMessage(withId: String, chatRoomId: String, memberIds: [String], values: [String : String]) {
+    class func updateMessage(withId: String, chatRoomId: String, memberIds: [String], values: [String: String]) {
         for userId in memberIds {
             reference(.Message).document(userId).collection(chatRoomId).document(withId).getDocument { snapshot, _ in
                 guard let snapshot = snapshot else { return }
                 
                 if snapshot.exists {
                     if snapshot.data()![kSTATUS] as! String != kREAD {
-                       reference(.Message).document(userId).collection(chatRoomId).document(withId).updateData(values)
+                        reference(.Message).document(userId).collection(chatRoomId).document(withId).updateData(values)
                     }
                 }
             }

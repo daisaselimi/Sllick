@@ -73,8 +73,7 @@ func sendSystemMessage(text: String, chatRoomId: String, memberIds: [String], me
     let seperatedText = text.components(separatedBy: "-")
     var systemMessageText = ""
     print(seperatedText)
-
-
+    
     for memberId in memberIds {
         if seperatedText[2] == memberId {
             switch seperatedText[0] {
@@ -102,9 +101,11 @@ func sendSystemMessage(text: String, chatRoomId: String, memberIds: [String], me
         outgoingMessage = OutgoingMessage(message: systemMessageText, senderId: currentUser!.objectId, senderName: currentUser!.firstname, date: Date(), status: kDELIVERED, type: kSYSTEMMESSAGE)
         let messageId = UUID().uuidString
         outgoingMessage.messageDictionary[kMESSAGEID] = messageId
+        outgoingMessage.messageDictionary[kACTUALLYSENT] = FieldValue.serverTimestamp()
         reference(.Message).document(memberId).collection(chatRoomId).document(messageId).setData(outgoingMessage.messageDictionary as! [String: Any])
     }
 }
+
 // func timeElapsed(date: Date) -> String {
 //
 //    let seconds = NSDate().timeIntervalSince(date)
@@ -226,16 +227,16 @@ func dictionaryFromSnapshots(snapshots: [DocumentSnapshot]) -> [NSDictionary] {
 //        allMessages.append(snapshot.data() as! NSDictionary)
 //    }
     
-    allMessages = snapshots.map {        var doc = $0.data()! as NSDictionary
+    allMessages = snapshots.map { var doc = $0.data()! as NSDictionary
         if $0.metadata.hasPendingWrites {
             let mCopy = doc.mutableCopy() as! NSMutableDictionary
             mCopy[kSTATUS] = kSENDING
             doc = mCopy as NSDictionary
-        }
+        } else {}
         
         return doc
-        
     }
+    
     return allMessages
 }
 
@@ -984,11 +985,9 @@ extension Date {
         if fullTimeAgo {
             if Calendar.current.isDateInToday(fromDate) {
                 return "・Today・"
-            }
-            else if Calendar.current.isDateInYesterday(fromDate) {
+            } else if Calendar.current.isDateInYesterday(fromDate) {
                 return "Yesterday"
-            }
-            else if let interval = Calendar.current.dateComponents([.year], from: fromDate, to: toDate).year, interval > 0 {
+            } else if let interval = Calendar.current.dateComponents([.year], from: fromDate, to: toDate).year, interval > 0 {
                 dateFormatter.dateFormat = "MMMM d, yyy"
                 return dateFormatter.string(from: fromDate)
             } else {
@@ -999,27 +998,27 @@ extension Date {
             dateFormatter.dateFormat = "HH:mm"
             return dateFormatter.string(from: fromDate)
         }
-//        
+//
 //        if fullTimeAgo {
 //            if Calendar.current.isDateInToday(fromDate) {
 //                return "・Today・"
 //            }
-//            
+//
 //            if Calendar.current.isDateInYesterday(fromDate) {
 //                return "Yesterday"
 //            }
-//            
+//
 //            if let interval = Calendar.current.dateComponents([.year], from: fromDate, to: toDate).year, interval > 0 {
 //                dateFormatter.dateFormat = "MMMM d, yyy"
 //                return dateFormatter.string(from: fromDate)
 //            }
-//            
+//
 //            // Month
 //            if let interval = Calendar.current.dateComponents([.month], from: fromDate, to: toDate).month, interval > 0 {
 //                dateFormatter.dateFormat = "EEEE, d MMMM"
 //                return dateFormatter.string(from: fromDate)
 //            }
-//            
+//
 //            // Day
 //            if let interval = Calendar.current.dateComponents([.day], from: fromDate, to: toDate).day, interval > 0 {
 //                if interval >= 7 {
@@ -1029,7 +1028,7 @@ extension Date {
 //                dateFormatter.dateFormat = "EEEE"
 //                return dateFormatter.string(from: fromDate)
 //            }
-//            
+//
 //        } else {
 //            dateFormatter.dateFormat = "HH:mm"
 //            return dateFormatter.string(from: fromDate)
@@ -1067,7 +1066,6 @@ extension UIAlertController {
 }
 
 extension UICollectionView {
-    
     func reloadDataAndScrollToPreviousPosition() {
         let oldOffset = self.contentOffset.y
         let oldHeight = self.contentSize.height

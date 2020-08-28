@@ -20,24 +20,14 @@ extension ChatViewController: DZNEmptyDataSetDelegate, DZNEmptyDataSetSource {
         return NSAttributedString(string: "Wave at them, perhaps?\n", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 10.0), NSAttributedString.Key.foregroundColor: UIColor.secondaryLabel])
     }
     
-    //    func buttonTitle(forEmptyDataSet scrollView: UIScrollView!, for state: UIControl.State) -> NSAttributedString! {
-    //        return NSAttributedString(string: wavingHand, attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 40.0)])
-    //    }
-    
     func image(forEmptyDataSet scrollView: UIScrollView!) -> UIImage! {
         return wavingHand.emojiToImage()
     }
     
-    //    func emptyDataSet(_ scrollView: UIScrollView!, didTap button: UIButton!) {
-    //        var outgoingMessage: OutgoingMessage?
-    //        let currentUser = FUser.currentUser()
-    //        outgoingMessage = OutgoingMessage(message: wavingHand, senderId: currentUser!.objectId, senderName: currentUser!.firstname, date: Date(), status: kDELIVERED, type: kTEXT)
-    //        JSQSystemSoundPlayer.jsq_playMessageSentSound()
-    //        finishSendingMessage()
-    //        outgoingMessage!.sendMessage(chatRoomID: chatRoomId, messageDictionary: outgoingMessage!.messageDictionary, memberIds: memberIds, membersToPush: membersToPush, lastMessageType: kTEXT, isGroup: isGroup! ? true : false, groupName: isGroup! ? (group![kNAME] as! String) : "", chatTitle: titleLabel.text!, plainMessage: wavingHand)
-    //    }
-    
     func emptyDataSet(_ scrollView: UIScrollView!, didTap view: UIView!) {
+        if isGroup!, group == nil {
+            return
+        }
         var outgoingMessage: OutgoingMessage?
         let currentUser = FUser.currentUser()
         outgoingMessage = OutgoingMessage(message: wavingHand, senderId: currentUser!.objectId, senderName: currentUser!.firstname, date: Date(), status: kDELIVERED, type: kTEXT)
