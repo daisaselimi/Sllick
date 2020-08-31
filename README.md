@@ -50,7 +50,7 @@ It uses Firebase's Authentication/Database/Storage libraries for messaging imple
 <img src="https://i.imgur.com/P1JcClK.png" width="200" />
 <img src="https://i.imgur.com/OQ8TQhR.png" width="200" />
 <img src="https://i.imgur.com/OqUwRIn.png" width="200" />
-<img src="https://i.imgur.com/OH4zUIO.png" width="200" />
+<img src="https://i.imgur.com/5pQGhIq.png" width="200" />
 <img src="https://i.imgur.com/jKsKDas.png" width="250" />
 <img src="https://i.imgur.com/gKdtPIw.png" width="250" /> 
 <img src="https://i.imgur.com/LTTJsVv.jpg" width="250" /> 
