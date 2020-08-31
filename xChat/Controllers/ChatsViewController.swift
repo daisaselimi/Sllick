@@ -50,7 +50,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             self?.activeUsersListeners.forEach { $0.remove() }
             self?.activeUsersListeners.removeAll()
             self?.contactsChanged = true
-            self?.checkOnlineStatus(forUsers: MyVariables.globalContactsVariable)
+            self?.checkOnlineStatus(forUsers: GeneralVariables.globalContactsVariable)
         }
         loadUserDefaults()
         gradientLoadingBar.gradientColors = [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
@@ -125,7 +125,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             
             let data = document?.data()
             let contacts = data?["contacts"] as? [String]
-            MyVariables.globalContactsVariable = contacts ?? []
+            GeneralVariables.globalContactsVariable = contacts ?? []
         }
     }
     
@@ -138,7 +138,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             loadActiveTabOnce = true
         }
         if forUsers.isEmpty {
-            MyVariables.usersOnline = []
+            GeneralVariables.usersOnline = []
             usersOnline = []
             recentChatsTableView.reloadData()
             return
@@ -146,7 +146,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         let contactsBy10 = forUsers.chunked(into: 10)
         var index = 0
-        MyVariables.usersOnline = []
+        GeneralVariables.usersOnline = []
         var tempUsersOnline: [String] = []
         usersOnline = []
         
@@ -174,7 +174,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                                 }
                             }
                         }
-                        MyVariables.usersOnline = self.usersOnline
+                        GeneralVariables.usersOnline = self.usersOnline
                         print(self.usersOnline)
                         self.recentChatsTableView.reloadData()
                         return
@@ -203,7 +203,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                     }
                     
                     if index == contactsBy10.count - 1 {
-                        MyVariables.usersOnline = tempUsersOnline
+                        GeneralVariables.usersOnline = tempUsersOnline
                         self.usersOnline = tempUsersOnline
                         self.recentChatsTableView.reloadData()
                         self.contactsChanged = false
@@ -216,7 +216,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
                     }
                     
                     if index == tempUsersOnline.count - 1 {
-                        MyVariables.usersOnline = tempUsersOnline
+                        GeneralVariables.usersOnline = tempUsersOnline
                         self.usersOnline = tempUsersOnline
                         self.recentChatsTableView.reloadData()
                         
@@ -265,7 +265,7 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     }
     
     @objc func internetConnectionChanged() {
-        if !MyVariables.internetConnectionState {
+        if !GeneralVariables.internetConnectionState {
             recentChatsTableView.showTableHeaderView(header: getTableViewHeader(title: kNOINTERNETCONNECTION, backgroundColor: .systemGray6, textColor: .label))
         } else {
             recentChatsTableView.hideTableHeaderView()
@@ -784,21 +784,21 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
 
 extension ChatsViewController: DZNEmptyDataSetDelegate, DZNEmptyDataSetSource {
     func image(forEmptyDataSet scrollView: UIScrollView!) -> UIImage! {
-        if searchController.isActive && searchController.searchBar.text != "" {
+        if searchController.isActive, searchController.searchBar.text != "" {
             return UIImage()
         }
         return UIImage(named: "chatting")
     }
     
     func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
-        if searchController.isActive && searchController.searchBar.text != "" {
+        if searchController.isActive, searchController.searchBar.text != "" {
             return NSAttributedString(string: "NO RESULTS", attributes: [NSAttributedString.Key.foregroundColor: UIColor.label, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16.0)])
         }
         return NSAttributedString(string: "NO RECENT CHATS", attributes: [NSAttributedString.Key.foregroundColor: UIColor.label, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16.0)])
     }
     
     func description(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
-        if searchController.isActive && searchController.searchBar.text != "" {
+        if searchController.isActive, searchController.searchBar.text != "" {
             return NSAttributedString(string: "No results found for \"\(searchController.searchBar.text!)\"", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14.0)])
         }
         return NSAttributedString(string: "All your chats will appear here. You can chat with your contacts or any other Sllick user.", attributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 14.0)])
@@ -809,14 +809,14 @@ extension ChatsViewController: DZNEmptyDataSetDelegate, DZNEmptyDataSetSource {
     }
     
     func buttonTitle(forEmptyDataSet scrollView: UIScrollView!, for state: UIControl.State) -> NSAttributedString! {
-        if searchController.isActive && searchController.searchBar.text != "" {
+        if searchController.isActive, searchController.searchBar.text != "" {
             return NSAttributedString()
         }
         return NSAttributedString(string: "Start chatting", attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemYellow, NSAttributedString.Key.font: UIFont.systemFont(ofSize: 13.0)])
     }
     
     func emptyDataSet(_ scrollView: UIScrollView!, didTap button: UIButton!) {
-        if searchController.isActive && searchController.searchBar.text != "" {
+        if searchController.isActive, searchController.searchBar.text != "" {
             return
         }
         selectUserForChat(isGroup: false)

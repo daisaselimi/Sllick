@@ -817,7 +817,7 @@ func checkContactsAccess(viewController: UIViewController, completion: @escaping
     completion(.denied)
 }
 
-struct MyVariables {
+struct GeneralVariables {
     static var globalContactsVariable: [String] = [] {
         didSet {
             NotificationCenter.default.post(name: .globalContactsVariable, object: nil)
@@ -839,6 +839,8 @@ struct MyVariables {
             NotificationCenter.default.post(name: .onlineUsersNotification, object: nil)
         }
     }
+    
+    static var updatedChatListeners: [String : ListenerRegistration] = [:]
 }
 
 extension Date {
@@ -901,7 +903,11 @@ extension String {
     }
     
     func removeExtraSpaces() -> String {
-        return self.replacingOccurrences(of: "[\\s\n]+", with: " ", options: .regularExpression, range: nil)
+        return self.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+    
+    func isEmptyWithSpaces() -> Bool {
+        self.trimmingCharacters(in: .whitespaces).isEmpty
     }
 }
 
@@ -1077,3 +1083,48 @@ extension UICollectionView {
         self.contentOffset = CGPoint(x: 0.0, y: self.contentSize.height - reverseOffset)
     }
 }
+
+func changePresenceStatusForAllUsers() {
+    reference(.status).getDocuments { snapshot, _ in
+        
+        let docs = snapshot?.documents
+        
+        for doc in docs! {
+            reference(.status).document(doc[kUSERID] as! String).updateData(["state": "Offline"])
+        }
+    }
+}
+
+func createKeywordsForAllUsers() {
+    reference(.User).getDocuments { snapshot, _ in
+        
+        let docs = snapshot?.documents
+        
+        for doc in docs! {
+            let fullname = doc["fullname"] as! String
+            
+            let keywords = Array(createKeywords(word: fullname.lowercased()))
+            reference(.UserKeywords).addDocument(data: ["userId": doc["objectId"]!, "keywords": keywords])
+        }
+    }
+}
+
+func createKeywords(word: String) -> Set<String> {
+    var allKeywords: Set<String> = Set<String>()
+    
+    for num in 0..<word.count {
+        for num1 in num...word.count {
+            if num == num1 {
+                continue
+            }
+            let substr = word[num..<num1]
+            if substr == " " || substr == "" {
+                continue
+            }
+            allKeywords.insert(substr)
+        }
+    }
+    
+    return allKeywords
+}
+

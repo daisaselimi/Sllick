@@ -92,7 +92,7 @@ class FinishRegistrationTableViewController: UITableViewController, FPNTextField
                 doneButton.title = "Done"
                 return
             }
-            FUser.registerUserWith(email: email, password: password, firstName: nameTextField.text!, lastName: surnameTextField.text!) { error in
+            FUser.registerUserWith(email: email, password: password, firstName: nameTextField.text!.removeExtraSpaces(), lastName: surnameTextField.text!.removeExtraSpaces()) { error in
                 
                 if error != nil {
                     self.gradientLoadingBar.fadeOut()
@@ -122,11 +122,11 @@ class FinishRegistrationTableViewController: UITableViewController, FPNTextField
     }
     
     func registerUser() {
-        let fullName = nameTextField.text! + " " + surnameTextField.text!
-        
+        var fullName = nameTextField.text! + " " + surnameTextField.text!
+        fullName = fullName.removeExtraSpaces()
         var tempDictionary: Dictionary = [
-            kFIRSTNAME: nameTextField.text!, kLASTNAME: surnameTextField.text!,
-            kFULLNAME: fullName, kCOUNTRY: countryTextField.text!, kCITY: cityTextField.text!,
+            kFIRSTNAME: nameTextField.text!.removeExtraSpaces(), kLASTNAME: surnameTextField.text!.removeExtraSpaces(),
+            kFULLNAME: fullName, kCOUNTRY: countryTextField.text!.removeExtraSpaces(), kCITY: cityTextField.text!.removeExtraSpaces(),
             kPHONE: phoneNumber, kCOUNTRYCODE: countryCode,
         ] as [String: Any]
         
@@ -174,11 +174,11 @@ class FinishRegistrationTableViewController: UITableViewController, FPNTextField
     }
     
     func allFieldsAreFilled() -> Bool {
-        return nameTextField.text != "" &&
-            surnameTextField.text != "" &&
-            countryTextField.text != "" &&
-            cityTextField.text != "" &&
-            phoneTextField.text != ""
+        return !nameTextField.text!.isEmptyWithSpaces() &&
+            !surnameTextField.text!.isEmptyWithSpaces() &&
+            !countryTextField.text!.isEmptyWithSpaces() &&
+            !cityTextField.text!.isEmptyWithSpaces() &&
+            !phoneTextField.text!.isEmptyWithSpaces()
     }
     
     func dismissKeyboard() {

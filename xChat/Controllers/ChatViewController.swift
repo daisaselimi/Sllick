@@ -212,7 +212,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     override func viewWillAppear(_ animated: Bool) {
         // super.viewWillAppear(animated)
         
-        if memberIds.count > 1, !MyVariables.globalContactsVariable.contains((memberIds.filter { $0 != FUser.currentId() })[0]) {
+        if memberIds.count > 1, !GeneralVariables.globalContactsVariable.contains((memberIds.filter { $0 != FUser.currentId() })[0]) {
             if let isGroup = isGroup {
                 if !isGroup { subTitleLabel.text = "Sllick Chat" }
             }
@@ -261,7 +261,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     }
     
     @objc func internetConnectionChanged() {
-        if !MyVariables.internetConnectionState {
+        if !GeneralVariables.internetConnectionState {
             showMessage(kNOINTERNETCONNECTION, type: .warning, options: [.autoHide(false), .hideOnTap(false), .textColor(.label)])
             // self.loadViewIfNeeded()
         } else {
@@ -397,7 +397,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
             firstLoading = false
             return
         }
-        if !MyVariables.globalContactsVariable.contains((memberIds.filter { $0 != FUser.currentId() })[0]) {
+        if !GeneralVariables.globalContactsVariable.contains((memberIds.filter { $0 != FUser.currentId() })[0]) {
             return
         }
         
@@ -447,7 +447,10 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     }
     
     func addNewPictureMessageLink(link: String) {
-        allPictureMessages.append(link)
+        let index = allPictureMessages.firstIndex(of: link)
+        if index == nil {
+            allPictureMessages.append(link)
+        }
     }
     
     func getPictureMessages() {
@@ -532,8 +535,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     func getOldMessagesInBackground() {
         if loadedMessages.count > kNUMBEROFMESSAGES {
             var firstMessageDate: Timestamp?
-            var firstMsg = loadedMessages.first![kMESSAGE] as! String
-            if let timeStamp = (loadedMessages.first![kACTUALLYSENT] as? Timestamp) {
+            if (loadedMessages.first![kACTUALLYSENT] as? Timestamp) != nil {
                 firstMessageDate = (loadedMessages.first![kACTUALLYSENT] as? Timestamp)
             } else {
                 firstMessageDate = Timestamp()
@@ -552,8 +554,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
                         sorted.remove(at: index!)
                     }
                 }
-                var x = sorted
-                var y = pendingMessages
+                
                 pendingMessages.sort { dateFormatter().date(from: $0[kDATE] as! String)! < dateFormatter().date(from: $1[kDATE] as! String)! }
                 
                 sorted.append(contentsOf: pendingMessages)
@@ -636,7 +637,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         }
         
         if updatedChatListener != nil {
-            updatedChatListener.remove()
+            // updatedChatListener.remove()
         }
     }
     

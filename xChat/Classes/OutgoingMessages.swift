@@ -55,16 +55,22 @@ class OutgoingMessage {
     }
     
     class func updateMessage(withId: String, chatRoomId: String, memberIds: [String], values: [String: String]) {
+//        for userId in memberIds {
+//            reference(.Message).document(userId).collection(chatRoomId).document(withId).getDocument { snapshot, error in
+//                if error != nil {
+//                    print("error")
+//                }
+//                guard let snapshot = snapshot else { return }
+//
+//                if snapshot.exists {
+//                    if snapshot.data()![kSTATUS] as! String != kREAD {
+//                        reference(.Message).document(userId).collection(chatRoomId).document(withId).updateData(values)
+//                    }
+//                }
+//            }
+//        }
         for userId in memberIds {
-            reference(.Message).document(userId).collection(chatRoomId).document(withId).getDocument { snapshot, _ in
-                guard let snapshot = snapshot else { return }
-                
-                if snapshot.exists {
-                    if snapshot.data()![kSTATUS] as! String != kREAD {
-                        reference(.Message).document(userId).collection(chatRoomId).document(withId).updateData(values)
-                    }
-                }
-            }
+            reference(.Message).document(userId).collection(chatRoomId).document(withId).updateData(values)
         }
     }
 }

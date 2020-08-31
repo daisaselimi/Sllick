@@ -107,7 +107,7 @@ class EditProfileTableViewController: UITableViewController, UIImagePickerContro
     }
     
     @IBAction func saveButtonPressed(_ sender: Any) {
-        if firstNameTextField.text != "", lastNameTextField.text != "", phoneNumberTextFld.text != "" {
+        if !firstNameTextField.text!.isEmptyWithSpaces(), !lastNameTextField.text!.isEmptyWithSpaces(), !phoneNumberTextFld.text!.isEmptyWithSpaces() {
             if phoneNumber == "Not Valid" {
                 showMessage("Phone number is not valid", type: .error)
                 return
@@ -120,7 +120,7 @@ class EditProfileTableViewController: UITableViewController, UIImagePickerContro
             var fullName = firstNameTextField.text! + " " + lastNameTextField.text!
             fullName = fullName.removeExtraSpaces()
             
-            var withValues = [kFIRSTNAME: firstNameTextField.text!, kLASTNAME: lastNameTextField.text!, kFULLNAME: fullName, kPHONE: phoneNumber, kCOUNTRYCODE: countryCode]
+            var withValues = [kFIRSTNAME: firstNameTextField.text!.removeExtraSpaces(), kLASTNAME: lastNameTextField.text!.removeExtraSpaces(), kFULLNAME: fullName, kPHONE: phoneNumber, kCOUNTRYCODE: countryCode]
             
             var avatarData: Data?
             if avatarImage == nil {

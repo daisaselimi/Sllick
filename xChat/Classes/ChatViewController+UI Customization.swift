@@ -37,12 +37,11 @@ extension ChatViewController {
 //            inputToolbar.backgroundColor = .systemBackground
 //            inputToolbar.isOpaque = true
 //        }
-        
     }
     
     func setUIForGroupChat() {
         imageFromData(pictureData: group![kAVATAR] as! String) { image in
-            if image != nil && isPartOfGroup! {
+            if image != nil, isPartOfGroup ?? true {
                 avatarButton.setImage(image!, for: .normal)
             } else if let isPartOfGrp = isPartOfGroup {
                 if !isPartOfGrp {

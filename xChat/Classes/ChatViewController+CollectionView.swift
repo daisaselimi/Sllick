@@ -140,8 +140,8 @@ extension ChatViewController {
         // status = NSAttributedString(string: messages[indexPath.row].date.timeAgoInMessages())
         switch message[kSTATUS] as! String {
         case kWAITINGTOSEND:
-            if MyVariables.internetConnectionState {
-                OutgoingMessage.updateMessage(withId: message[kMESSAGEID] as! String, chatRoomId: chatRoomId, memberIds: memberIds!, values: [kSTATUS: kDELIVERED])
+            if GeneralVariables.internetConnectionState {
+//                OutgoingMessage.updateMessage(withId: message[kMESSAGEID] as! String, chatRoomId: chatRoomId, memberIds: memberIds!, values: [kSTATUS: kDELIVERED])
                 //                if indexPath.row == messages.count - 1 {
                 //                    updateExistingRecentWithNewValues(forMembers:[FUser.currentId()], chatRoomId: chatRoomId, withValues: [kLASTMESSAGE : message[kMESSAGE] as! String, kDATE : dateFormatter().string(from: Date())
                 //                    ])
@@ -364,7 +364,7 @@ extension ChatViewController {
     }
     
     override func didPressAccessoryButton(_ sender: UIButton!) {
-        if !MyVariables.internetConnectionState {
+        if !GeneralVariables.internetConnectionState {
             showMessage(kNOINTERNETCONNECTION, type: .warning, options: [.autoHide(false), .hideOnTap(false), .textColor(.label)])
             return
         }
@@ -449,7 +449,7 @@ extension ChatViewController {
             collectionView.reloadData()
             // self.view.layoutIfNeeded()
         } else {
-            if !MyVariables.internetConnectionState {
+            if !GeneralVariables.internetConnectionState {
                 showMessage(kNOINTERNETCONNECTION, type: .warning, options: [.autoHide(false), .hideOnTap(false), .textColor(.label)])
                 return
             }

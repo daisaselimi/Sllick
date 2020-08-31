@@ -47,15 +47,15 @@ extension ChatViewController: DZNEmptyDataSetDelegate, DZNEmptyDataSetSource {
     func imageAnimation(forEmptyDataSet scrollView: UIScrollView!) -> CAAnimation! {
         let animation = CAKeyframeAnimation(keyPath: "transform")
         
-        let wobbleAngle: CGFloat = 0.125
+        let wobbleAngle: CGFloat = 0.15
         
-        let valLeft = NSValue(caTransform3D: CATransform3DMakeRotation(wobbleAngle, 0.0, 0.0, 0.125))
-        let valRight = NSValue(caTransform3D: CATransform3DMakeRotation(-wobbleAngle, 0.0, 0.0, 0.125))
+        let valLeft = NSValue(caTransform3D: CATransform3DMakeRotation(wobbleAngle, 0.0, 0.0, 0.15))
+        let valRight = NSValue(caTransform3D: CATransform3DMakeRotation(-wobbleAngle, 0.0, 0.0, 0.15))
         animation.values = [valLeft, valRight]
         
         animation.autoreverses = true
-        animation.duration = 0.125
-        animation.repeatCount = 6.125
+        animation.duration = 0.15
+        animation.repeatCount = 5.75
         return animation
     }
     

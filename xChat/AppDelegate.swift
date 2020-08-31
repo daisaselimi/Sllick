@@ -35,7 +35,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         UNUserNotificationCenter.current().delegate = self
         
         checkReachability()
-        
+
         setupUIForAlerts()
         GradientLoadingBar.shared.gradientColors = [UIColor.getAppColor(.light), .systemTeal, UIColor.getAppColor(.dark)]
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = UIColor(named: "outgoingBubbleColor")
@@ -71,7 +71,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                     chatVC.titleName = additionalData!["titleName"] as? String
                     chatVC.isGroup = additionalData!["isGroup"] as? Bool
                     chatVC.initialWithUser = chatVC.isGroup! ? additionalData!["titleName"] as? String : (additionalData!["withUser"] as! String)
-                    chatVC.initialImage = chatVC.isGroup! ? UIImage(named: "grouph") : UIImage(named: "avatarph")
+                    chatVC.initialImage = chatVC.isGroup! ? UIImage(named: "groupph") : UIImage(named: "avatarph")
                     chatVC.hidesBottomBarWhenPushed = true
                     
                     let tabBarController = UIApplication.shared.windows.first!.rootViewController! as! UITabBarController
@@ -114,12 +114,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 } else {
                     print("- - - - - - - - - - - - - - - - - - - - - -- - Reachable via Cellular")
                 }
-                MyVariables.internetConnectionState = true
+                GeneralVariables.internetConnectionState = true
             }
             
             reachability.whenUnreachable = { _ in
                 print("- - - - - - - - - -Not reachable")
-                MyVariables.internetConnectionState = false
+                GeneralVariables.internetConnectionState = false
             }
             
             do {
@@ -167,7 +167,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             chatVC.titleName = dictionaryItem!["titleName"] as? String
             chatVC.isGroup = dictionaryItem!["isGroup"] as? Bool
             chatVC.initialWithUser = chatVC.isGroup! ? dictionaryItem!["titleName"] as? String : (dictionaryItem!["withUser"] as! String)
-            chatVC.initialImage = chatVC.isGroup! ? UIImage(named: "grouph") : UIImage(named: "avatarph")
+            chatVC.initialImage = chatVC.isGroup! ? UIImage(named: "groupph") : UIImage(named: "avatarph")
             chatVC.hidesBottomBarWhenPushed = true
             
             let tabBarController = UIApplication.shared.windows.first!.rootViewController! as! UITabBarController
@@ -211,46 +211,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
 }
 
-func changePresenceStatusForAllUsers() {
-    reference(.status).getDocuments { snapshot, _ in
-        
-        let docs = snapshot?.documents
-        
-        for doc in docs! {
-            reference(.status).document(doc[kUSERID] as! String).updateData(["state": "Offline"])
-        }
-    }
-}
-
-func createKeywordsForAllUsers() {
-    reference(.User).getDocuments { snapshot, _ in
-        
-        let docs = snapshot?.documents
-        
-        for doc in docs! {
-            let fullname = doc["fullname"] as! String
-            
-            let keywords = Array(createKeywords(word: fullname.lowercased()))
-            reference(.UserKeywords).addDocument(data: ["userId": doc["objectId"]!, "keywords": keywords])
-        }
-    }
-}
-
-func createKeywords(word: String) -> Set<String> {
-    var allKeywords: Set<String> = Set<String>()
-    
-    for num in 0..<word.count {
-        for num1 in num...word.count {
-            if num == num1 {
-                continue
-            }
-            let substr = word[num..<num1]
-            if substr == " " || substr == "" {
-                continue
-            }
-            allKeywords.insert(substr)
-        }
-    }
-    
-    return allKeywords
-}

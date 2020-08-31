@@ -6,9 +6,9 @@
 //  Copyright © 2020 com.isaselimi. All rights reserved.
 //
 
+import DZNEmptyDataSet
 import FirebaseFirestore
 import UIKit
-import DZNEmptyDataSet
 
 class ActiveNowTableViewController: UITableViewController, DZNEmptyDataSetSource, DZNEmptyDataSetDelegate {
     
@@ -25,9 +25,9 @@ class ActiveNowTableViewController: UITableViewController, DZNEmptyDataSetSource
         // self.title = "Active now"
         tableView.tableFooterView = UIView()
         tableView.separatorStyle = .none
-
-      //  tableView.emptyDataSetSource = self
-       
+        
+        //  tableView.emptyDataSetSource = self
+        
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(onlineUsersChanged),
                                                name: .onlineUsersNotification, object: nil)
@@ -35,7 +35,7 @@ class ActiveNowTableViewController: UITableViewController, DZNEmptyDataSetSource
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-//        usersOnline = MyVariables.usersOnline
+//        usersOnline = GeneralVariables.usersOnline
 //        loadUsers()
     }
     
@@ -49,13 +49,13 @@ class ActiveNowTableViewController: UITableViewController, DZNEmptyDataSetSource
         super.viewWillLayoutSubviews()
         if tableView?.emptyDataSetSource == nil {
             tableView?.emptyDataSetSource = self
-             tableView.emptyDataSetDelegate = self
+            tableView.emptyDataSetDelegate = self
             tableView?.reloadEmptyDataSet()
         }
     }
     
     @objc func onlineUsersChanged() {
-        usersOnline = MyVariables.usersOnline
+        usersOnline = GeneralVariables.usersOnline
         loadUsers()
     }
     
@@ -112,7 +112,7 @@ class ActiveNowTableViewController: UITableViewController, DZNEmptyDataSetSource
         cell.generateCellWith(fUser: user, indexPath: indexPath, isOnline: true)
         return cell
     }
-
+    
     // MARK: DZN data source/delegate methods
     
     func image(forEmptyDataSet scrollView: UIScrollView!) -> UIImage! {
@@ -120,7 +120,7 @@ class ActiveNowTableViewController: UITableViewController, DZNEmptyDataSetSource
     }
     
     func title(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {
-        return NSAttributedString(string: "NO ACTIVE USERS", attributes: [NSAttributedString.Key.foregroundColor : UIColor.label, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16.0)])
+        return NSAttributedString(string: "NO ACTIVE USERS", attributes: [NSAttributedString.Key.foregroundColor: UIColor.label, NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 16.0)])
     }
     
     func description(forEmptyDataSet scrollView: UIScrollView!) -> NSAttributedString! {

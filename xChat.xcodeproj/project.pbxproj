@@ -34,7 +34,6 @@
 		7F3FD5E323566A5500354313 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3FD5E223566A5500354313 /* Constants.swift */; };
 		7F3FD5E523566C4E00354313 /* HelperFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3FD5E423566C4E00354313 /* HelperFunctions.swift */; };
 		7F3FD5E723566C5700354313 /* CollectionReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3FD5E623566C5700354313 /* CollectionReference.swift */; };
-		7F4023DA23C292710001CB65 /* gr_ls.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F4023D923C292700001CB65 /* gr_ls.png */; };
 		7F4D61AE2365C68000F18D42 /* PhotoMediaItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F4D61AD2365C68000F18D42 /* PhotoMediaItem.swift */; };
 		7F4DED1F23639C0B00D86661 /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F4DED1E23639C0B00D86661 /* Camera.swift */; };
 		7F4E7F62243FC365004D6E42 /* ActiveNowTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F4E7F61243FC365004D6E42 /* ActiveNowTableViewController.swift */; };
@@ -144,7 +143,6 @@
 		7F3FD5E223566A5500354313 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		7F3FD5E423566C4E00354313 /* HelperFunctions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelperFunctions.swift; sourceTree = "<group>"; };
 		7F3FD5E623566C5700354313 /* CollectionReference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionReference.swift; sourceTree = "<group>"; };
-		7F4023D923C292700001CB65 /* gr_ls.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = gr_ls.png; sourceTree = "<group>"; };
 		7F4D61AD2365C68000F18D42 /* PhotoMediaItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoMediaItem.swift; sourceTree = "<group>"; };
 		7F4DED1E23639C0B00D86661 /* Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Camera.swift; sourceTree = "<group>"; };
 		7F4E7F61243FC365004D6E42 /* ActiveNowTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveNowTableViewController.swift; sourceTree = "<group>"; };
@@ -366,7 +364,6 @@
 				7FFB47252356069F00CC10A2 /* Assets.xcassets */,
 				7FFB47272356069F00CC10A2 /* LaunchScreen.storyboard */,
 				7F56B556239C2C520054D9F5 /* sent-no-bg.png */,
-				7F4023D923C292700001CB65 /* gr_ls.png */,
 				7FFB472A2356069F00CC10A2 /* Info.plist */,
 				7F3FD5DE2356686500354313 /* GoogleService-Info.plist */,
 			);
@@ -490,7 +487,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7F7B23B824DB3E9A00AA2D52 /* MessageViewOutgoing.xib in Resources */,
-				7F4023DA23C292710001CB65 /* gr_ls.png in Resources */,
 				7F50AEA32426858700CE11A7 /* ringback.wav in Resources */,
 				7F7B23B724DB3E9A00AA2D52 /* MessageViewIncoming.xib in Resources */,
 				7FC7139624C488AC0020310C /* README.md in Resources */,
@@ -683,7 +679,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = C2FCSXGG97;
 				INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -706,7 +702,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = C2FCSXGG97;
 				INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -846,7 +842,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = xChat/SentDebug.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = C2FCSXGG97;
 				INFOPLIST_FILE = xChat/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -874,7 +870,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = xChat/Sent.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = C2FCSXGG97;
 				INFOPLIST_FILE = xChat/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;

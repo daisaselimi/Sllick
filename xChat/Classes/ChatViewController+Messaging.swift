@@ -14,7 +14,11 @@ extension ChatViewController {
     
     func loadMessages() {
         // update message status
-        updatedChatListener = reference(.Message).document(FUser.currentId()).collection(chatRoomId).addSnapshotListener { snapshot, _ in
+        if GeneralVariables.updatedChatListeners[chatRoomId] != nil {
+            GeneralVariables.updatedChatListeners[chatRoomId]!.remove()
+        }
+        
+        GeneralVariables.updatedChatListeners[chatRoomId] = reference(.Message).document(FUser.currentId()).collection(chatRoomId).addSnapshotListener { snapshot, _ in
             
             guard let snapshot = snapshot else { return }
             

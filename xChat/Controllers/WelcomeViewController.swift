@@ -90,7 +90,7 @@ class WelcomeViewController: UIViewController {
     }
     
     @IBAction func signUpPressed(_ sender: Any) {
-        if emailTextField.text != "", passwordTextField.text != "", repeatPasswordTextField.text != "" {
+        if fieldsAreFilled() {
             if passwordTextField.text == repeatPasswordTextField.text! {
                 if passwordTextField.text!.count < 6 {
                     showMessage(kPASSWORDLENGTH6CHARS, type: .error)
@@ -103,7 +103,7 @@ class WelcomeViewController: UIViewController {
                 }
                 // ProgressHUD.show()
                 gradientLoadingBar.fadeIn()
-                Auth.auth().fetchSignInMethods(forEmail: emailTextField.text!) { providers, error in
+                Auth.auth().fetchSignInMethods(forEmail: emailTextField.text!.removeExtraSpaces()) { providers, error in
                     
                     if error != nil {
                         self.gradientLoadingBar.fadeOut()
@@ -128,6 +128,10 @@ class WelcomeViewController: UIViewController {
         } else {
             showMessage(kEMPTYFIELDS, type: .error)
         }
+    }
+    
+    func fieldsAreFilled() -> Bool {
+        return !emailTextField.text!.isEmptyWithSpaces() && !passwordTextField.text!.isEmptyWithSpaces() && !repeatPasswordTextField.text!.isEmptyWithSpaces()
     }
     
     func isValidEmail(emailStr: String) -> Bool {

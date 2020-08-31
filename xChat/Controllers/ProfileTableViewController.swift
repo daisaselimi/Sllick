@@ -63,7 +63,7 @@ class ProfileTableViewController: UITableViewController {
             if self?.user == nil {
                 return
             }
-            if MyVariables.globalContactsVariable.contains(self!.user!.objectId) {
+            if GeneralVariables.globalContactsVariable.contains(self!.user!.objectId) {
                 self?.setBarButton(imageName: "person.badge.minus.fill", imageType: .systemImage, withTintColor: .systemPink)
                 self?.activityLabel.isHidden = false
                 self?.isInContacts = true
@@ -84,7 +84,7 @@ class ProfileTableViewController: UITableViewController {
         //                   }
         //                      self.checkActivityStatus()
         //               }
-        if MyVariables.globalContactsVariable.contains(user!.objectId) {
+        if GeneralVariables.globalContactsVariable.contains(user!.objectId) {
             setBarButton(imageName: "person.badge.minus.fill", imageType: .systemImage, withTintColor: .systemPink)
             activityLabel.isHidden = false
             isInContacts = true
