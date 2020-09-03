@@ -43,6 +43,7 @@ class ActiveNowTableViewController: UITableViewController, DZNEmptyDataSetSource
 //                if (self.tableView.contentOffset.y < 0 && self.tableView.isEmptyDataSetVisible) {
 //            self.tableView.contentOffset = CGPoint.zero;
 //        }
+        tableView.reloadData()
     }
     
     override func viewWillLayoutSubviews() {

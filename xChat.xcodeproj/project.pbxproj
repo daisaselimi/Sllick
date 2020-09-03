@@ -255,10 +255,6 @@
 				7F85E7F1241D234100333662 /* PushNotifications.swift */,
 				7F0BED972422980500785646 /* CallClass.swift */,
 				7F8767332427D8D700D0650B /* Badges.swift */,
-				7F0F6B6A24E6A34A0028A490 /* ChatViewController+DZNDataSet.swift */,
-				7F0F6B6E24E6A47A0028A490 /* ChatViewController+CollectionView.swift */,
-				7F0F6B7024E6A59C0028A490 /* ChatViewController+UI Customization.swift */,
-				7F0F6B7224E6B2E60028A490 /* ChatViewController+Messaging.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -266,6 +262,10 @@
 		7F2B37FC23589BC4002867EF /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				7F0F6B6A24E6A34A0028A490 /* ChatViewController+DZNDataSet.swift */,
+				7F0F6B6E24E6A47A0028A490 /* ChatViewController+CollectionView.swift */,
+				7F0F6B7024E6A59C0028A490 /* ChatViewController+UI Customization.swift */,
+				7F0F6B7224E6B2E60028A490 /* ChatViewController+Messaging.swift */,
 				7F2B37F823589431002867EF /* FinishRegistrationViewController.swift */,
 				7F50AE9F24267E9300CE11A7 /* CallViewController.swift */,
 				7FFB473023560C4E00CC10A2 /* WelcomeViewController.swift */,
@@ -307,6 +307,16 @@
 			path = OneSignalNotificationServiceExtension;
 			sourceTree = "<group>";
 		};
+		7F939AAA24FD71BC00A69868 /* MessagesCells */ = {
+			isa = PBXGroup;
+			children = (
+				7F7B23AB24DB383400AA2D52 /* Subclasses.swift */,
+				7F7B23B524DB3E9800AA2D52 /* MessageViewIncoming.xib */,
+				7F7B23B624DB3E9900AA2D52 /* MessageViewOutgoing.xib */,
+			);
+			path = MessagesCells;
+			sourceTree = "<group>";
+		};
 		7FB097A424699E47001CEBD6 /* TableViewCells */ = {
 			isa = PBXGroup;
 			children = (
@@ -345,9 +355,7 @@
 			isa = PBXGroup;
 			children = (
 				7FFB471C2356069E00CC10A2 /* AppDelegate.swift */,
-				7F7B23AB24DB383400AA2D52 /* Subclasses.swift */,
-				7F7B23B524DB3E9800AA2D52 /* MessageViewIncoming.xib */,
-				7F7B23B624DB3E9900AA2D52 /* MessageViewOutgoing.xib */,
+				7F939AAA24FD71BC00A69868 /* MessagesCells */,
 				7F50AEA52427C8CF00CE11A7 /* AudioControllerDelegate.swift */,
 				7F50AEA62427C8CF00CE11A7 /* SINCallKitProvider.swift */,
 				7FFB471E2356069E00CC10A2 /* SceneDelegate.swift */,

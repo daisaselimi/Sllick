@@ -59,7 +59,7 @@ class NewGroupViewController: UIViewController, UICollectionViewDataSource, UICo
     // MARK: IBActions
     
     @objc func createButtonPressed(_ sender: Any) {
-        if groupSubjectTextField.text != "" {
+        if !groupSubjectTextField.text!.isEmptyWithSpaces() {
             memberIds.append(FUser.currentId())
             
             var avatar = ""

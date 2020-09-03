@@ -91,7 +91,6 @@ extension ChatViewController {
             
             sorted.append(contentsOf: pendingMessages)
             
-            // remove bad messages
             self.loadedMessages = sorted
 //            self.loadedMessages.forEach { (dict) in
 //                if (dict[kACTUALLYSENT] as? Timestamp) == nil {
@@ -264,12 +263,15 @@ extension ChatViewController {
         let incomingMessage = IncomingMessage(collectionVIew_: collectionView!)
         incomingMessage.isSendingMessage = isSendingMessage
         // check if incoming
-        if messageDictionary[kSENDERID] as! String != FUser.currentId() {
-            if messageDictionary[kSTATUS] as! String == kDELIVERED {
-                OutgoingMessage.updateMessage(withId: messageDictionary[kMESSAGEID] as! String,
-                                              chatRoomId: chatRoomId, memberIds: memberIds, values: [kSTATUS: kREAD, kREADDATE: dateFormatter().string(from: Date())])
-            }
+        if ((UIApplication.getTopViewController() as? ChatViewController) != nil) {
+            if messageDictionary[kSENDERID] as! String != FUser.currentId() {
+                  if messageDictionary[kSTATUS] as! String == kDELIVERED {
+                      OutgoingMessage.updateMessage(withId: messageDictionary[kMESSAGEID] as! String,
+                                                    chatRoomId: chatRoomId, memberIds: memberIds, values: [kSTATUS: kREAD, kREADDATE: dateFormatter().string(from: Date())])
+                  }
+              }
         }
+  
         
         let message = incomingMessage.createMessage(messageDictionary: messageDictionary, chatRoomId: chatRoomId)
         

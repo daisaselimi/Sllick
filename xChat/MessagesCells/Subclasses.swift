@@ -1,11 +1,3 @@
-//
-//  Subclasses.swift
-//  SwiftExample
-//
-//  Created by XI on 8/29/16.
-//  Copyright © 2016 MacMeDan. All rights reserved.
-//
-
 import Foundation
 import JSQMessagesViewController
 
@@ -14,8 +6,8 @@ class MessageViewIncoming: JSQMessagesCollectionViewCellIncoming {
     @IBOutlet var timeLabel: UILabel!
     @IBOutlet var timeLabelForMediaMessages: JSQMessagesLabel!
     @IBOutlet var leadingBubbleImageViewConstraint: NSLayoutConstraint!
-
     @IBOutlet var timeLabelLeadingConstraint: NSLayoutConstraint!
+    
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
