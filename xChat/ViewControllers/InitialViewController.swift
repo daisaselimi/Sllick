@@ -20,7 +20,6 @@ class InitialViewController: UIViewController {
         // self.view.window?.overrideUserInterfaceStyle = .dark
         self.loginButton.backgroundColor = UIColor.getAppColor(.light)
         self.signupButton.backgroundColor = UIColor.getAppColor(.dark)
-        // Do any additional setup after loading the view.
     }
 
     override func viewWillAppear(_ animated: Bool) {

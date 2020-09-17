@@ -42,9 +42,64 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        //        navigationItem.leftBarButtonItem = UIBarButtonItem.menuButton(self, action: #selector(presentSettings), image: UIImage(named: "avatarph")!)
-        // addNoInternetConnectionLabel(height: 0)
+        
+        addObservers()
+        setupRecentChatsTableview()
+        setupNavigationController()
+        loadUserDefaults()
+        gradientLoadingBar.gradientColors = [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
+        loadContacts()
+        loadRecentChats()
+        internetConnectionChanged()
+        
+        setupLeftBarButtons()
+        
+        setupTabBarController()
+        
+        setBadges(controller: tabBarController!)
+        
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        
+        definesPresentationContext = true
+    }
+    
+    func loadContacts() {
+        reference(.Contact).document(FUser.currentId()).addSnapshotListener { document, _ in
+            
+            let data = document?.data()
+            let contacts = data?["contacts"] as? [String]
+            GeneralVariables.globalContactsVariable = contacts ?? []
+        }
+    }
+    
+    func setupTabBarController() {
+        tabBarController?.tabBar.layer.borderWidth = 0.50
+        tabBarController?.tabBar.layer.borderColor = UIColor.clear.cgColor
+        tabBarController?.tabBar.clipsToBounds = true
+        tabBarController?.tabBar.backgroundImage = UIImage()
+        tabBarController?.tabBar.shadowImage = UIImage()
+        tabBarController?.tabBar.backgroundColor = UIColor(named: "bwBackground")?.withAlphaComponent(0.9)
+        tabBarController?.tabBar.isTranslucent = true
+    }
+    
+    func setupRecentChatsTableview() {
+        recentChatsTableView.delegate = self
+        recentChatsTableView.dataSource = self
+        
+        recentChatsTableView.separatorStyle = .none
+        recentChatsTableView.rowHeight = 75
+    }
+    
+    func setupNavigationController() {
         navigationItem.largeTitleDisplayMode = .never
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.viewControllers[0] = self
+        navigationItem.searchController = searchController
+    }
+    
+    func addObservers() {
         observer = NotificationCenter.default.addObserver(forName: .globalContactsVariable, object: nil, queue: .main) { [weak self] _ in
             
             self?.activeUsersListeners.forEach { $0.remove() }
@@ -52,20 +107,9 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
             self?.contactsChanged = true
             self?.checkOnlineStatus(forUsers: GeneralVariables.globalContactsVariable)
         }
-        loadUserDefaults()
-        gradientLoadingBar.gradientColors = [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
-        loadContacts()
-        loadRecentChats()
-        internetConnectionChanged()
-        // setTabItemTitle(controller: self.tabBarController!, title: "Active (0)")
-        
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
-        
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(receivedNotification(_:)),
                                                name: NSNotification.Name(rawValue: "ReceivedNotification"), object: nil)
-        
-        setupLeftBarButtons()
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(setupLeftBarButtons),
                                                name: NSNotification.Name(rawValue: "UserSavedLocally"), object: nil)
@@ -77,56 +121,6 @@ class ChatsViewController: UIViewController, UITableViewDelegate, UITableViewDat
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(internetConnectionChanged),
                                                name: .internetConnectionState, object: nil)
-        
-        tabBarController?.tabBar.layer.borderWidth = 0.50
-        tabBarController?.tabBar.layer.borderColor = UIColor.clear.cgColor
-        tabBarController?.tabBar.clipsToBounds = true
-        
-        //        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        //        self.navigationController?.navigationBar.shadowImage = UIImage()
-        //        self.navigationController?.navigationBar.backgroundColor = UIColor(named: "bwBackground")?.withAlphaComponent(0.9)
-        //        self.navigationController?.navigationBar.isTranslucent = true
-        
-        tabBarController?.tabBar.backgroundImage = UIImage()
-        tabBarController?.tabBar.shadowImage = UIImage()
-        tabBarController?.tabBar.backgroundColor = UIColor(named: "bwBackground")?.withAlphaComponent(0.9)
-        tabBarController?.tabBar.isTranslucent = true
-        
-        navigationController?.navigationBar.shadowImage = UIImage()
-        
-        setBadges(controller: tabBarController!)
-        recentChatsTableView.delegate = self
-        recentChatsTableView.dataSource = self
-        navigationController?.viewControllers[0] = self
-        
-        // recentChatsTableView.separatorInset = UIEdgeInsets(top: 0, left: 93, bottom: 0, right: 0)
-        recentChatsTableView.separatorStyle = .none
-        recentChatsTableView.rowHeight = 75
-        // let navBarAppearance = UINavigationBarAppearance()
-        //        navBarAppearance.configureWithOpaqueBackground()
-        //        navBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.black]
-        //        navBarAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.black]
-        //        navBarAppearance.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-        //        navigationController?.navigationBar.standardAppearance = navBarAppearance
-        //        navigationController?.navigationBar.scrollEdgeAppearance = navBarAppearance
-        //
-        //        navigationItem.hidesSearchBarWhenScrolling = true
-        // navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.searchController = searchController
-        searchController.searchResultsUpdater = self
-        searchController.obscuresBackgroundDuringPresentation = false
-        
-        definesPresentationContext = true
-        // Do any additional setup after loading the view.
-    }
-    
-    func loadContacts() {
-        reference(.Contact).document(FUser.currentId()).addSnapshotListener { document, _ in
-            
-            let data = document?.data()
-            let contacts = data?["contacts"] as? [String]
-            GeneralVariables.globalContactsVariable = contacts ?? []
-        }
     }
     
     func checkOnlineStatus(forUsers: [String]) {

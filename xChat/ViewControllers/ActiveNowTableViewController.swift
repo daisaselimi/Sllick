@@ -36,7 +36,7 @@ class ActiveNowTableViewController: UITableViewController, DZNEmptyDataSetSource
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 //        usersOnline = GeneralVariables.usersOnline
-//        loadUsers()
+        loadUsers()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -95,12 +95,10 @@ class ActiveNowTableViewController: UITableViewController, DZNEmptyDataSetSource
     // MARK: - Table view data source\
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
         return 1
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
         return activeNow.count
     }
     

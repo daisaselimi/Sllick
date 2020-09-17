@@ -36,8 +36,6 @@ class LoginViewController: UIViewController {
         emailTextField.layer.masksToBounds = false
         viewTapGestureRecognizer.addTarget(self, action: #selector(viewTap))
         view.addGestureRecognizer(viewTapGestureRecognizer)
-        
-        // Do any additional setup after loading the view.
     }
     
     override func viewDidLayoutSubviews() {

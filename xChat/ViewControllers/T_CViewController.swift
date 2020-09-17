@@ -22,7 +22,6 @@ class T_CViewController: UIViewController {
         self.t_c_textView.attributedText = t_c_text
         self.t_c_textView.textColor = .label
         self.t_c_textView.scrollRangeToVisible(NSRange(location: 0, length: 0))
-        // Do any additional setup after loading the view.
     }
 
     /*

@@ -71,7 +71,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                     chatVC.titleName = additionalData!["titleName"] as? String
                     chatVC.isGroup = additionalData!["isGroup"] as? Bool
                     chatVC.initialWithUser = chatVC.isGroup! ? additionalData!["titleName"] as? String : (additionalData!["withUser"] as! String)
-                    chatVC.initialImage = chatVC.isGroup! ? UIImage(named: "groupph") : UIImage(named: "avatarph")
+                    chatVC.initialImage = chatVC.isGroup! ? UIImage(named: "groupph") : nil//UIImage(named: "avatarph")
                     chatVC.hidesBottomBarWhenPushed = true
                     
                     let tabBarController = UIApplication.shared.windows.first!.rootViewController! as! UITabBarController
@@ -167,7 +167,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             chatVC.titleName = dictionaryItem!["titleName"] as? String
             chatVC.isGroup = dictionaryItem!["isGroup"] as? Bool
             chatVC.initialWithUser = chatVC.isGroup! ? dictionaryItem!["titleName"] as? String : (dictionaryItem!["withUser"] as! String)
-            chatVC.initialImage = chatVC.isGroup! ? UIImage(named: "groupph") : UIImage(named: "avatarph")
+            chatVC.initialImage = chatVC.isGroup! ? UIImage(named: "groupph") : nil// UIImage(named: "avatarph")
             chatVC.hidesBottomBarWhenPushed = true
             
             let tabBarController = UIApplication.shared.windows.first!.rootViewController! as! UITabBarController

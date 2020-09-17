@@ -84,7 +84,6 @@ class EditProfileTableViewController: UITableViewController, UIImagePickerContro
     // MARK: - Table view data source
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
         switch section {
         case 0: return 1
         case 1: return 2

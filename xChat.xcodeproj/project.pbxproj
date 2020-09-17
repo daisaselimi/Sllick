@@ -259,7 +259,7 @@
 			path = Classes;
 			sourceTree = "<group>";
 		};
-		7F2B37FC23589BC4002867EF /* Controllers */ = {
+		7F2B37FC23589BC4002867EF /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
 				7F0F6B6A24E6A34A0028A490 /* ChatViewController+DZNDataSet.swift */,
@@ -293,7 +293,7 @@
 				7F0F3836245635E600470EF8 /* ChangeEmailTableViewController.swift */,
 				7F0F38382456380F00470EF8 /* ChangePasswordTableViewController.swift */,
 			);
-			path = Controllers;
+			path = ViewControllers;
 			sourceTree = "<group>";
 		};
 		7F85E7F8241E880800333662 /* OneSignalNotificationServiceExtension */ = {
@@ -368,7 +368,7 @@
 				7FB097A424699E47001CEBD6 /* TableViewCells */,
 				7F2B37FB235894DC002867EF /* Classes */,
 				7F2B37FA235894BF002867EF /* Helpers */,
-				7F2B37FC23589BC4002867EF /* Controllers */,
+				7F2B37FC23589BC4002867EF /* ViewControllers */,
 				7FFB47252356069F00CC10A2 /* Assets.xcassets */,
 				7FFB47272356069F00CC10A2 /* LaunchScreen.storyboard */,
 				7F56B556239C2C520054D9F5 /* sent-no-bg.png */,
@@ -687,7 +687,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = C2FCSXGG97;
 				INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -710,7 +710,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = C2FCSXGG97;
 				INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -850,7 +850,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = xChat/SentDebug.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = C2FCSXGG97;
 				INFOPLIST_FILE = xChat/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -878,7 +878,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = xChat/Sent.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = C2FCSXGG97;
 				INFOPLIST_FILE = xChat/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;

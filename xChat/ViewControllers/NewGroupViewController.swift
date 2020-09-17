@@ -34,8 +34,6 @@ class NewGroupViewController: UIViewController, UICollectionViewDataSource, UICo
         view.addGestureRecognizer(viewGestureRecognizer)
         navigationItem.title = "Create group"
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Create", style: .plain, target: self, action: #selector(createButtonPressed))
-        
-        // Do any additional setup after loading the view.
     }
     
     // MARK: CollectionViewDataSource

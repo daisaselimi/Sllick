@@ -292,6 +292,7 @@ extension UIImage {
     var breadth: CGFloat { return min(size.width, size.height) }
     var breadthSize: CGSize { return CGSize(width: self.breadth, height: self.breadth) }
     var breadthRect: CGRect { return CGRect(origin: .zero, size: self.breadthSize) }
+    static let loadingImage = UIColor.systemGray6.image(CGSize(width: 40, height: 40))
     
     var circleMasked: UIImage? {
         UIGraphicsBeginImageContextWithOptions(self.breadthSize, false, scale)
@@ -1126,5 +1127,14 @@ func createKeywords(word: String) -> Set<String> {
     }
     
     return allKeywords
+}
+
+extension UIColor {
+    func image(_ size: CGSize = CGSize(width: 1, height: 1)) -> UIImage {
+        return UIGraphicsImageRenderer(size: size).image { rendererContext in
+            self.setFill()
+            rendererContext.fill(CGRect(origin: .zero, size: size))
+        }
+    }
 }
 

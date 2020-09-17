@@ -119,7 +119,6 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
         
         if searchController.isActive, searchController.searchBar.text != "" {
             return 1
@@ -130,7 +129,6 @@ class UsersTableViewController: UITableViewController, UISearchResultsUpdating, 
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
         if searchController.isActive, searchController.searchBar.text != "" {
             return filteredUsers.count
         }

@@ -117,21 +117,59 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        collectionView.contentInsetAdjustmentBehavior = .never
+        
         checkForBackgroundImage()
-        collectionView.collectionViewLayout = CustomCollectionViewFlowLayout()
+        setupCollectionView()
         clearRecentCounter(chatRoomId: chatRoomId)
-        inputToolbar.contentView.rightBarButtonItem.isEnabled = true
+        
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(internetConnectionChanged),
                                                name: .internetConnectionState, object: nil)
+        
+        loadMessages()
+        setupViewAppearance()
+        
+        registerCustomCells()
+        
+        loadUserDefaults()
+        firstLoadMessages = true
+        JSQMessagesCollectionViewCell.registerMenuAction(#selector(delete))
+        
+        senderId = FUser.currentId()
+        senderDisplayName = FUser.currentUser()!.firstname
+        
+        jsqAvatarDictionary = [:]
+        
+        setCustomTitle()
+        if isGroup! {
+            getCurrentGroup(withId: chatRoomId)
+        }
+        // fix for iphone x<
+        //        let constraints = perform(Selector(("toolbarBottomLayoutGuide")))?.takeUnretainedValue() as! NSLayoutConstraint
+        //        constraints.priority = UILayoutPriority(rawValue: 1000)
+        //        self.inputToolbar.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        customizeInputToolbar()
+    }
+    
+    func setupCollectionView() {
+        collectionView.contentInsetAdjustmentBehavior = .never
+        collectionView.collectionViewLayout = CustomCollectionViewFlowLayout()
+        collectionView.collectionViewLayout.incomingAvatarViewSize = CGSize(width: 30, height: 30)
+        collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSize.zero
+    }
+    
+    func setupViewAppearance() {
         view.backgroundColor = .systemBackground
         showTypingIndicator = false
         gradientLoadingBar.gradientColors = [.systemGray, .systemGray2, .systemGray3, .systemGray4, .systemGray5, .systemGray6]
         gradientForMessagesUploads.gradientColors = [#colorLiteral(red: 0.2435781095, green: 0.5777899342, blue: 0.5777899342, alpha: 1), #colorLiteral(red: 0.3266429034, green: 0.7572176396, blue: 0.7572176396, alpha: 1), #colorLiteral(red: 0.3785616556, green: 0.8979834621, blue: 0.8979834621, alpha: 1), #colorLiteral(red: 0.4215686275, green: 1, blue: 1, alpha: 1)]
-        loadMessages()
+        
         navigationItem.backBarButtonItem = UIBarButtonItem(
             title: "", style: .plain, target: nil, action: nil)
+        navigationItem.largeTitleDisplayMode = .never
+        navigationItem.leftBarButtonItems = [UIBarButtonItem(image: UIImage(named: "Back"), style: .plain, target: self, action: #selector(backAction))]
+        
+        inputToolbar.contentView.rightBarButtonItem.isEnabled = true
         if let isDeleted = isUserDeleted {
             if isDeleted {
                 titleLabel.text = "Sllick User"
@@ -142,10 +180,8 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
                 avatarButton.setImage(UIImage(named: "avatarph"), for: .normal)
             }
         }
-        
-        registerCustomCells()
         titleLabel.text = initialWithUser ?? ""
-        avatarButton.setImage(initialImage == nil ? UIImage() : initialImage, for: .normal)
+        avatarButton.setImage(initialImage == nil ? UIColor.systemGray6.image(CGSize(width: 40, height: 40)) : initialImage, for: .normal)
         subTitleLabel.text = isGroup! ? "Group chat" : "Sllick Chat"
         
         if let isPartOfGr = isPartOfGroup {
@@ -184,29 +220,6 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         } else {
             createTypingObserver()
         }
-        
-        loadUserDefaults()
-        firstLoadMessages = true
-        JSQMessagesCollectionViewCell.registerMenuAction(#selector(delete))
-        
-        navigationItem.largeTitleDisplayMode = .never
-        navigationItem.leftBarButtonItems = [UIBarButtonItem(image: UIImage(named: "Back"), style: .plain, target: self, action: #selector(backAction))]
-        senderId = FUser.currentId()
-        senderDisplayName = FUser.currentUser()!.firstname
-        
-        collectionView.collectionViewLayout.incomingAvatarViewSize = CGSize.zero
-        collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSize.zero
-        jsqAvatarDictionary = [:]
-        
-        setCustomTitle()
-        if isGroup! {
-            getCurrentGroup(withId: chatRoomId)
-        }
-        // fix for iphone x<
-        //        let constraints = perform(Selector(("toolbarBottomLayoutGuide")))?.takeUnretainedValue() as! NSLayoutConstraint
-        //        constraints.priority = UILayoutPriority(rawValue: 1000)
-        //        self.inputToolbar.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor).isActive = true
-        customizeInputToolbar()
     }
     
     override func viewWillAppear(_ animated: Bool) {

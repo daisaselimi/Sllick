@@ -9,7 +9,6 @@
 import UIKit
 
 class CallViewController: UIViewController, SINCallDelegate {
-    
     var speaker = false
     var muted = false
     var durationTimer: Timer!
@@ -32,6 +31,11 @@ class CallViewController: UIViewController, SINCallDelegate {
     @IBOutlet var answerCallButtonOutlet: UIButton!
     @IBOutlet var endCallButtonOutlet: UIButton!
     @IBOutlet var declineCallButtonOutlet: UIButton!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupView()
+    }
     
     override func viewWillAppear(_ animated: Bool) {
         let id = _call.remoteUserId
@@ -71,13 +75,7 @@ class CallViewController: UIViewController, SINCallDelegate {
         }
     }
     
-    override func viewDidLayoutSubviews() {
-        let value = UIInterfaceOrientation.portrait.rawValue
-        UIDevice.current.setValue(value, forKey: "orientation")
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    func setupView() {
         setupBackground()
         timeLabel.isHidden = false
         avatarImageView.maskCircle()
@@ -93,6 +91,11 @@ class CallViewController: UIViewController, SINCallDelegate {
             // show buttons
             setCallTime(text: "Calling...", animation: true)
         }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        let value = UIInterfaceOrientation.portrait.rawValue
+        UIDevice.current.setValue(value, forKey: "orientation")
     }
     
     func audioController() -> SINAudioController? {
