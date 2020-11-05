@@ -701,7 +701,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
                 } else {
                     getUsersFromFirestore(withIds: [self.group![kOWNERID] as! String]) {
                         print($0.count)
-                        self.subTitleLabel.text = "Created by \($0.count == 0 ? "a Sent user" : $0[0].firstname)"
+                        self.subTitleLabel.text = "Created by \($0.count == 0 ? "a Sllick user" : $0[0].firstname)"
                     }
                 }
                 

@@ -238,62 +238,134 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
-		7F2B37FB235894DC002867EF /* Classes */ = {
+		7F2B37FB235894DC002867EF /* Media */ = {
+			isa = PBXGroup;
+			children = (
+				7F4DED1E23639C0B00D86661 /* Camera.swift */,
+				7F4D61AD2365C68000F18D42 /* PhotoMediaItem.swift */,
+				7F0F52E42365DF9D001062AA /* VideoMessage.swift */,
+				7F0F52E6236719A7001062AA /* AudioViewController.swift */,
+			);
+			path = Media;
+			sourceTree = "<group>";
+		};
+		7F2B37FC23589BC4002867EF /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				7F415C1F25536EFB00D0F347 /* Chat */,
+				7F415C2025536F2400D0F347 /* Onboarding */,
+				7F415C2125536F7300D0F347 /* Settings */,
+				7F415C2225536FAC00D0F347 /* Core tabs */,
+				7F415C2325536FED00D0F347 /* Other */,
+			);
+			path = ViewControllers;
+			sourceTree = "<group>";
+		};
+		7F415C1D255361A000D0F347 /* Models */ = {
 			isa = PBXGroup;
 			children = (
 				7F3FD5E0235669DC00354313 /* FUser.swift */,
 				7FEF3416235E150C00ADE886 /* Recent.swift */,
 				7F520837236086A700BEBB26 /* OutgoingMessages.swift */,
 				7F520839236093F100BEBB26 /* IncomingMessages.swift */,
-				7F4DED1E23639C0B00D86661 /* Camera.swift */,
-				7F4D61AD2365C68000F18D42 /* PhotoMediaItem.swift */,
-				7F0F52E42365DF9D001062AA /* VideoMessage.swift */,
-				7F0F52E6236719A7001062AA /* AudioViewController.swift */,
-				7F37A06A2373120F0041AFAC /* CountryCode.swift */,
 				7FDC498823779799001EC3B9 /* Group.swift */,
 				7F8CFCE72379A8A1003E0A12 /* Encryption.swift */,
 				7F85E7F1241D234100333662 /* PushNotifications.swift */,
 				7F0BED972422980500785646 /* CallClass.swift */,
-				7F8767332427D8D700D0650B /* Badges.swift */,
 			);
-			path = Classes;
+			path = Models;
 			sourceTree = "<group>";
 		};
-		7F2B37FC23589BC4002867EF /* ViewControllers */ = {
+		7F415C1E2553648200D0F347 /* Other */ = {
+			isa = PBXGroup;
+			children = (
+				7F50AEA62427C8CF00CE11A7 /* SINCallKitProvider.swift */,
+				7F50AEA52427C8CF00CE11A7 /* AudioControllerDelegate.swift */,
+				7F37A06A2373120F0041AFAC /* CountryCode.swift */,
+				7F342FD423831A99007DF7CB /* terms_and_conditions.rtf */,
+				7F8767332427D8D700D0650B /* Badges.swift */,
+				7F50AEA22426858700CE11A7 /* incoming.wav */,
+				7F50AEA12426858700CE11A7 /* ringback.wav */,
+				7F56B556239C2C520054D9F5 /* sent-no-bg.png */,
+			);
+			path = Other;
+			sourceTree = "<group>";
+		};
+		7F415C1F25536EFB00D0F347 /* Chat */ = {
 			isa = PBXGroup;
 			children = (
 				7F0F6B6A24E6A34A0028A490 /* ChatViewController+DZNDataSet.swift */,
 				7F0F6B6E24E6A47A0028A490 /* ChatViewController+CollectionView.swift */,
 				7F0F6B7024E6A59C0028A490 /* ChatViewController+UI Customization.swift */,
 				7F0F6B7224E6B2E60028A490 /* ChatViewController+Messaging.swift */,
-				7F2B37F823589431002867EF /* FinishRegistrationViewController.swift */,
-				7F50AE9F24267E9300CE11A7 /* CallViewController.swift */,
-				7FFB473023560C4E00CC10A2 /* WelcomeViewController.swift */,
-				7F2B37FF2359D825002867EF /* SettingsTableViewController.swift */,
-				7F2B38032359EEA0002867EF /* UsersTableViewController.swift */,
-				7F0BED992422A07900785646 /* CallTableViewController.swift */,
-				7FEF3414235CCF9900ADE886 /* ProfileTableViewController.swift */,
 				7F5208352360714200BEBB26 /* ChatViewController.swift */,
 				7FFA406F236B1A8C00ACEB6A /* PicturesCollectionViewController.swift */,
-				7F4E7F61243FC365004D6E42 /* ActiveNowTableViewController.swift */,
+			);
+			path = Chat;
+			sourceTree = "<group>";
+		};
+		7F415C2025536F2400D0F347 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				7FFB473023560C4E00CC10A2 /* WelcomeViewController.swift */,
+				7FDEE3D9237EE1F7003D0DAA /* LoginViewController.swift */,
+				7FDEE3DB237F002D003D0DAA /* InitialViewController.swift */,
+				7FF466782454B0BD001EEBFA /* FinishRegistrationTableTableViewController.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		7F415C2125536F7300D0F347 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				7F2B37FF2359D825002867EF /* SettingsTableViewController.swift */,
 				7FD5B92C2371962B008343C3 /* BlockedUsersViewController.swift */,
 				7FD5B92E2371A6D3008343C3 /* BackgroundsCollectionViewController.swift */,
 				7FD5B9322371BCDB008343C3 /* T_CViewController.swift */,
 				7FD5B9342371CBA4008343C3 /* EditProfileTableViewController.swift */,
-				7F37A06823730ED30041AFAC /* ContactsTableViewController.swift */,
-				7F2B38052359FF12002867EF /* ChatsViewController.swift */,
-				7FBDCCBD23776DA400CE92EA /* NewGroupViewController.swift */,
-				7F54748323784C6E00488CCE /* GroupViewController.swift */,
-				7F547485237857C500488CCE /* InviteUsersTableViewController.swift */,
-				7FDEE3D9237EE1F7003D0DAA /* LoginViewController.swift */,
-				7FDEE3DB237F002D003D0DAA /* InitialViewController.swift */,
-				7F8C893023945D7C00432EAE /* GroupTableViewController.swift */,
-				7FF466782454B0BD001EEBFA /* FinishRegistrationTableTableViewController.swift */,
 				7F0F38342456328000470EF8 /* AccountTableViewController.swift */,
 				7F0F3836245635E600470EF8 /* ChangeEmailTableViewController.swift */,
 				7F0F38382456380F00470EF8 /* ChangePasswordTableViewController.swift */,
 			);
-			path = ViewControllers;
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		7F415C2225536FAC00D0F347 /* Core tabs */ = {
+			isa = PBXGroup;
+			children = (
+				7F4E7F61243FC365004D6E42 /* ActiveNowTableViewController.swift */,
+				7F2B38052359FF12002867EF /* ChatsViewController.swift */,
+			);
+			path = "Core tabs";
+			sourceTree = "<group>";
+		};
+		7F415C2325536FED00D0F347 /* Other */ = {
+			isa = PBXGroup;
+			children = (
+				7F50AE9F24267E9300CE11A7 /* CallViewController.swift */,
+				7F0BED992422A07900785646 /* CallTableViewController.swift */,
+				7F2B38032359EEA0002867EF /* UsersTableViewController.swift */,
+				7FEF3414235CCF9900ADE886 /* ProfileTableViewController.swift */,
+				7F37A06823730ED30041AFAC /* ContactsTableViewController.swift */,
+				7FBDCCBD23776DA400CE92EA /* NewGroupViewController.swift */,
+				7F54748323784C6E00488CCE /* GroupViewController.swift */,
+				7F547485237857C500488CCE /* InviteUsersTableViewController.swift */,
+				7F8C893023945D7C00432EAE /* GroupTableViewController.swift */,
+				7F2B37F823589431002867EF /* FinishRegistrationViewController.swift */,
+			);
+			path = Other;
+			sourceTree = "<group>";
+		};
+		7F415C252554449A00D0F347 /* SupportingFiles */ = {
+			isa = PBXGroup;
+			children = (
+				7FFB471C2356069E00CC10A2 /* AppDelegate.swift */,
+				7FFB471E2356069E00CC10A2 /* SceneDelegate.swift */,
+				7FFB47222356069E00CC10A2 /* Main.storyboard */,
+				7FFB47252356069F00CC10A2 /* Assets.xcassets */,
+				7FFB47272356069F00CC10A2 /* LaunchScreen.storyboard */,
+			);
+			path = SupportingFiles;
 			sourceTree = "<group>";
 		};
 		7F85E7F8241E880800333662 /* OneSignalNotificationServiceExtension */ = {
@@ -354,26 +426,18 @@
 		7FFB471B2356069E00CC10A2 /* xChat */ = {
 			isa = PBXGroup;
 			children = (
-				7FFB471C2356069E00CC10A2 /* AppDelegate.swift */,
-				7F939AAA24FD71BC00A69868 /* MessagesCells */,
-				7F50AEA52427C8CF00CE11A7 /* AudioControllerDelegate.swift */,
-				7F50AEA62427C8CF00CE11A7 /* SINCallKitProvider.swift */,
-				7FFB471E2356069E00CC10A2 /* SceneDelegate.swift */,
-				7F6BB4E5239F11AE00AE22CE /* Sent.entitlements */,
-				7F6BB4E4239F11AD00AE22CE /* SentDebug.entitlements */,
-				7FFB47222356069E00CC10A2 /* Main.storyboard */,
-				7F342FD423831A99007DF7CB /* terms_and_conditions.rtf */,
-				7F50AEA22426858700CE11A7 /* incoming.wav */,
-				7F50AEA12426858700CE11A7 /* ringback.wav */,
-				7FB097A424699E47001CEBD6 /* TableViewCells */,
-				7F2B37FB235894DC002867EF /* Classes */,
-				7F2B37FA235894BF002867EF /* Helpers */,
+				7F415C252554449A00D0F347 /* SupportingFiles */,
 				7F2B37FC23589BC4002867EF /* ViewControllers */,
-				7FFB47252356069F00CC10A2 /* Assets.xcassets */,
-				7FFB47272356069F00CC10A2 /* LaunchScreen.storyboard */,
-				7F56B556239C2C520054D9F5 /* sent-no-bg.png */,
+				7F415C1D255361A000D0F347 /* Models */,
+				7F939AAA24FD71BC00A69868 /* MessagesCells */,
+				7FB097A424699E47001CEBD6 /* TableViewCells */,
+				7F2B37FB235894DC002867EF /* Media */,
+				7F2B37FA235894BF002867EF /* Helpers */,
+				7F415C1E2553648200D0F347 /* Other */,
 				7FFB472A2356069F00CC10A2 /* Info.plist */,
 				7F3FD5DE2356686500354313 /* GoogleService-Info.plist */,
+				7F6BB4E5239F11AE00AE22CE /* Sent.entitlements */,
+				7F6BB4E4239F11AD00AE22CE /* SentDebug.entitlements */,
 			);
 			path = xChat;
 			sourceTree = "<group>";
