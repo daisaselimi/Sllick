@@ -167,6 +167,9 @@ extension ChatViewController {
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
+        if !showAvatars {
+            return nil
+        }
         if objectMessages[indexPath.row][kTYPE] as! String == kSYSTEMMESSAGE {
             return nil
         }

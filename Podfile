@@ -1,5 +1,5 @@
 # Uncomment the next line to define a global platform for your project
-platform :ios, '9.0'
+platform :ios, '10.0'
 
 target 'xChat' do
   # Comment the next line if you don't want to use dynamic frameworks
@@ -21,7 +21,7 @@ target 'xChat' do
   pod 'JSQMessagesViewController', '7.3.3'
   pod 'IDMPhotoBrowser'
   pod 'RNCryptor'
-  pod 'ImagePicker'
+ # pod 'ImagePicker'
   pod 'TextFieldEffects'
   pod 'SKPhotoBrowser'
   pod 'AMPopTip'

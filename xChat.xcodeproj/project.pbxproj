@@ -50,7 +50,6 @@
 		7F547486237857C500488CCE /* InviteUsersTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F547485237857C500488CCE /* InviteUsersTableViewController.swift */; };
 		7F54E3FA236481F000BC6F1B /* Downloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F54E3F9236481F000BC6F1B /* Downloader.swift */; };
 		7F56B557239C2C520054D9F5 /* sent-no-bg.png in Resources */ = {isa = PBXBuildFile; fileRef = 7F56B556239C2C520054D9F5 /* sent-no-bg.png */; };
-		7F5DBD7B237AFB3F00D4D1CC /* ImagePicker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F5DBD7A237AFB3F00D4D1CC /* ImagePicker.framework */; };
 		7F6ABC7F24C74BA90057FEC4 /* Constants-Blueprint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F6ABC7E24C74BA90057FEC4 /* Constants-Blueprint.swift */; };
 		7F7B23AE24DB383600AA2D52 /* Subclasses.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F7B23AB24DB383400AA2D52 /* Subclasses.swift */; };
 		7F7B23B724DB3E9A00AA2D52 /* MessageViewIncoming.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7F7B23B524DB3E9800AA2D52 /* MessageViewIncoming.xib */; };
@@ -218,7 +217,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7F50AE9E24265D0E00CE11A7 /* PushKit.framework in Frameworks */,
-				7F5DBD7B237AFB3F00D4D1CC /* ImagePicker.framework in Frameworks */,
 				0F7F161376C752BD63E467FD /* Pods_xChat.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -751,7 +749,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_TEAM = C2FCSXGG97;
 				INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -774,7 +772,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_TEAM = C2FCSXGG97;
 				INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -914,7 +912,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = xChat/SentDebug.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_TEAM = C2FCSXGG97;
 				INFOPLIST_FILE = xChat/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -942,7 +940,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = xChat/Sent.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 15;
 				DEVELOPMENT_TEAM = C2FCSXGG97;
 				INFOPLIST_FILE = xChat/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;

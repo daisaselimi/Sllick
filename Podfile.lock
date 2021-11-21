@@ -329,7 +329,6 @@ PODS:
     - DACircularProgress
     - pop
     - SDWebImage (= 4.0.0)
-  - ImagePicker (3.2.0)
   - IQAudioRecorderController (1.2.3):
     - SCSiriWaveformView
   - JSQMessagesViewController (7.3.3):
@@ -356,7 +355,7 @@ PODS:
   - SDWebImage (4.0.0):
     - SDWebImage/Core (= 4.0.0)
   - SDWebImage/Core (4.0.0)
-  - SinchRTC (3.12.9)
+  - SinchRTC (4.2.11)
   - SKPhotoBrowser (6.1.0)
   - TextFieldEffects (1.6.0)
 
@@ -372,7 +371,6 @@ DEPENDENCIES:
   - GradientLoadingBar (~> 2.0)
   - GSMessages
   - IDMPhotoBrowser
-  - ImagePicker
   - IQAudioRecorderController
   - JSQMessagesViewController (= 7.3.3)
   - MBProgressHUD
@@ -412,7 +410,6 @@ SPEC REPOS:
     - GSMessages
     - GTMSessionFetcher
     - IDMPhotoBrowser
-    - ImagePicker
     - IQAudioRecorderController
     - JSQMessagesViewController
     - JSQSystemSoundPlayer
@@ -458,7 +455,6 @@ SPEC CHECKSUMS:
   GSMessages: b9bcf210247426ae113ff22eac1d8f03ad5dee53
   GTMSessionFetcher: 6f5c8abbab8a9bce4bb3f057e317728ec6182b10
   IDMPhotoBrowser: b96159fe4adb991a844068eb17dab9c0b7d7e51a
-  ImagePicker: 1d950bbb2422548ed58791b4ec7f42fe42920511
   IQAudioRecorderController: 69a67c2e0b87bd8746cbb4de175fd7a0bf820009
   JSQMessagesViewController: 0ee3f80237268192a3e8337fd0d787f1a1bf5a7a
   JSQSystemSoundPlayer: c5850e77a4363ffd374cd851154b9af93264ed8d
@@ -475,10 +471,10 @@ SPEC CHECKSUMS:
   RNCryptor: a369134686cd2ad391323cc856b62e591193ba79
   SCSiriWaveformView: 15b9dd6f94c7536e2032b34a35c6ff74d38c7411
   SDWebImage: 76a6348bdc74eb5a55dd08a091ef298e56b55e41
-  SinchRTC: ed769fd3fec5940e6b75ed310e93796d62149810
+  SinchRTC: 4cd96455e0cc148614fd6a59a32878aff1830683
   SKPhotoBrowser: 343de95d89dc7913763c5dda243cc6e606e4a168
   TextFieldEffects: 529b8aff706fb40f82c41c780c0777941a893796
 
-PODFILE CHECKSUM: e7778de09c4b2e05f45c13c614c0b58a3fe6175f
+PODFILE CHECKSUM: b94c7527113cdaa40ce4b1cef7f03636e74c1701
 
-COCOAPODS: 1.8.3
+COCOAPODS: 1.10.1

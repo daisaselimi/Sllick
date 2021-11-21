@@ -119,6 +119,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         super.viewDidLoad()
         
         checkForBackgroundImage()
+        loadUserDefaults()
         setupCollectionView()
         clearRecentCounter(chatRoomId: chatRoomId)
         
@@ -131,7 +132,6 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
         
         registerCustomCells()
         
-        loadUserDefaults()
         firstLoadMessages = true
         JSQMessagesCollectionViewCell.registerMenuAction(#selector(delete))
         
@@ -154,7 +154,7 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     func setupCollectionView() {
         collectionView.contentInsetAdjustmentBehavior = .never
         collectionView.collectionViewLayout = CustomCollectionViewFlowLayout()
-        collectionView.collectionViewLayout.incomingAvatarViewSize = CGSize(width: 30, height: 30)
+        collectionView.collectionViewLayout.incomingAvatarViewSize = showAvatars ? CGSize(width: 30, height: 30) : .zero
         collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSize.zero
     }
     
@@ -380,6 +380,9 @@ class ChatViewController: JSQMessagesViewController, UINavigationControllerDeleg
     }
     
     func createJSQAvatars(avatarDictionary: NSMutableDictionary?) {
+        if !showAvatars {
+            return
+        }
         let defaultAvatar = JSQMessagesAvatarImageFactory.avatarImage(with: UIImage(named: "avatarph"), diameter: 70)
         
         if avatarDictionary != nil {

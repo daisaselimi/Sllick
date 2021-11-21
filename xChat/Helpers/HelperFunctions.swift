@@ -736,13 +736,13 @@ func checkCameraAccess(viewController: UIViewController, completion: @escaping (
 
 func checkMicPermission(viewController: UIViewController, whenSomeoneIsCalling receivedCall: Bool = false, completion: @escaping (CNAuthorizationStatus) -> Void) {
     switch AVAudioSession.sharedInstance().recordPermission {
-    case AVAudioSessionRecordPermission.granted:
+    case AVAudioSession.RecordPermission.granted:
         UserDefaults.standard.set(false, forKey: "Don't ask for mic permission")
         completion(.authorized)
-    case AVAudioSessionRecordPermission.denied:
+    case AVAudioSession.RecordPermission.denied:
         !receivedCall ? presentSettings(viewController: viewController, titleText: "Microphone access denied") : !UserDefaults.standard.bool(forKey: "Don't ask for mic permission") ? showReceivedCallDialog(viewController: viewController) : completion(.denied)
     // completion(.denied)
-    case AVAudioSessionRecordPermission.undetermined:
+    case AVAudioSession.RecordPermission.undetermined:
         AVAudioSession.sharedInstance().requestRecordPermission { granted in
             if granted {
                 UserDefaults.standard.set(false, forKey: "Don't ask for mic permission")
@@ -824,6 +824,8 @@ struct GeneralVariables {
             NotificationCenter.default.post(name: .globalContactsVariable, object: nil)
         }
     }
+    
+    static var currentChatRoomId: String = ""
     
     static var internetConnectionState: Bool = true {
         didSet {

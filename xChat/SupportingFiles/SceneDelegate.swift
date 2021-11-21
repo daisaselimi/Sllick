@@ -102,7 +102,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
         self.push.setDesiredPushTypeAutomatically()
         
         func userDidLogin(userId: String) {
-            self.push.registerUserNotificationSettings()
+            // Unrecognized 1
+            //self.push.registerUserNotificationSettings()
             self.initSinchWithUserId(userId: userId)
             self.startOneSignal()
         }
@@ -186,7 +187,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
     }
     
     public func startSinch(userId: String) {
-        self.push.registerUserNotificationSettings()
+        // Unrecognized 2
+        //self.push.registerUserNotificationSettings()
         self.initSinchWithUserId(userId: userId)
     }
     
@@ -220,8 +222,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
     }
     
     func sceneDidEnterBackground(_ scene: UIScene) {
-        if let rctBadgeHangler = recentBadgeHandler {
-            rctBadgeHangler.remove()
+        if let rctBadgeHandler = recentBadgeHandler {
+            rctBadgeHandler.remove()
         }
         
         //        updateCurrentUserInFirestore(withValues: [kISONLINE : false]) { (error) in
@@ -293,9 +295,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate, SINClientDelegate, SINC
             print("handle call notification")
         }
         
-        if result!.isCall(), result!.call()!.isCallCanceled {
-            self.presentMissedCallNotificationWithRemoteUserId(userId: result!.call()!.callId)
-        }
+        // Unrecognized 3
+//        if result!.isCall(), result!.call()!.isCallCanceled {
+//            self.presentMissedCallNotificationWithRemoteUserId(userId: result!.call()!.callId)
+//        }
     }
     
     func presentMissedCallNotificationWithRemoteUserId(userId: String) {

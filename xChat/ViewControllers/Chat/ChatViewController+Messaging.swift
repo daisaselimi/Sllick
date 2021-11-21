@@ -14,6 +14,9 @@ extension ChatViewController {
     
     func loadMessages() {
         // update message status
+        
+        GeneralVariables.currentChatRoomId = chatRoomId
+        
         if GeneralVariables.updatedChatListeners[chatRoomId] != nil {
             GeneralVariables.updatedChatListeners[chatRoomId]!.remove()
         }
@@ -264,8 +267,8 @@ extension ChatViewController {
         incomingMessage.isSendingMessage = isSendingMessage
         // check if incoming
         if ((UIApplication.getTopViewController() as? ChatViewController) != nil) {
-            if messageDictionary[kSENDERID] as! String != FUser.currentId() {
-                  if messageDictionary[kSTATUS] as! String == kDELIVERED {
+            if messageDictionary[kSENDERID] as! String != FUser.currentId() && GeneralVariables.currentChatRoomId == chatRoomId{
+                  if messageDictionary[kSTATUS] as! String == kDELIVERED  {
                       OutgoingMessage.updateMessage(withId: messageDictionary[kMESSAGEID] as! String,
                                                     chatRoomId: chatRoomId, memberIds: memberIds, values: [kSTATUS: kREAD, kREADDATE: dateFormatter().string(from: Date())])
                   }
