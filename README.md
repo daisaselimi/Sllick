@@ -5,8 +5,6 @@ Sllick is a project that I started to improve my iOS Development knowledge. Late
 
 It uses Firebase's Authentication/Database/Storage libraries for messaging implementation, Firebase's realtime database and cloud functions for presence detection, SinchRTC for calling, OneSignal for notifications, and several other libraries.
 
-##### Install: [TestFlight link](https://testflight.apple.com/join/hcylw8w4)
-
 ##  Features
 
 - Messaging - **One-on-one** or in a **group**
